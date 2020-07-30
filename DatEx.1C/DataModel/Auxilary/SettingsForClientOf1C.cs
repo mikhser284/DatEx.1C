@@ -16,7 +16,5 @@ namespace DatEx._1C
             AgentLogin = agentLogin;
             AgentPassword = agentPassword;
         }
-
-
     }
 }

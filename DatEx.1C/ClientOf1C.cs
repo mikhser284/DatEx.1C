@@ -18,12 +18,9 @@ namespace DatEx._1C
         }
 
         public List<Contractor> GetContractors(Int32 skip, Int32 top)
-        {
-            List<Contractor> result = new List<Contractor>();
-
-            result = GetAsData<List<Contractor>>($"Catalog_Номенклатура$?$top={top}&$skip={skip}{AsJson}");
-
-            return result;
+        {   
+            ODataResult<Contractor> oDataRes = GetAsData<ODataResult<Contractor>>($"Catalog_Контрагенты/?$top={top}&$skip={skip}{AsJson}");
+            return oDataRes.Values;
         }
     }
 
@@ -75,6 +72,7 @@ namespace DatEx._1C
         private T GetAsData<T>(String query)
         {
             HttpResponseMessage response = HttpClient.GetAsync(query).Result;
+            
             response.EnsureSuccessStatusCode();
             String result = response.Content.ReadAsStringAsync().Result;
 #if DEBUG
