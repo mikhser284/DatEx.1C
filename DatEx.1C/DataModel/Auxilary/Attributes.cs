@@ -23,10 +23,9 @@ namespace DatEx._1C.DataModel.Auxilary
         }
     }
 
-    public class CreatioPropertyIgnoreAttribute
-    {
-        public CreatioPropertyIgnoreAttribute() { }
-    }
+    public class CreatioAuxAttribute : Attribute {}
+
+    public class CreatioIgnoreAttribute : Attribute { }
 
     public class CreatioTypeMapAttribute : Attribute
     {
@@ -40,6 +39,4 @@ namespace DatEx._1C.DataModel.Auxilary
             OneCName = oneCName;
         }
     }
-
-
 }

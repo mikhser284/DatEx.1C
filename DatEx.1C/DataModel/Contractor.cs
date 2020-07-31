@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Reflection;
 using DatEx._1C.DataModel.Auxilary;
 using Newtonsoft.Json;
 
@@ -8,7 +10,7 @@ namespace DatEx._1C.DataModel
 {
     [CreatioTypeMap("Account", "Catalog_Контрагенты")]
     [JsonObject("Catalog_Контрагенты")]
-    public class Contractor
+    public class Contractor : OneCBase
     {
         [CreatioPropertyMap("Уникальный идентификатор (guid)", "Id", "IdCreatio")]
         [JsonProperty("IdCreatio")]
@@ -50,145 +52,120 @@ namespace DatEx._1C.DataModel
         [JsonProperty("ЮрФизЛицо")]
         public String LegalOrIndividual { get; set; }
 
-
-
-
-        [JsonProperty("Predefined")]
-        public Boolean? Predefined { get; set; }
-
-        [JsonProperty("PredefinedDataName")]
-        public String PredefinedDataName { get; set; }
-
-        [JsonProperty("DataVersion")]
-        public String DataVersion { get; set; }
-
-
-        [JsonProperty("Code")]
-        public String Code { get; set; }
-
-        [JsonProperty("Parent_Key")]
-        public Guid? ParentId { get; set; }
-
+        // ····· Служебные или информативные поля ···································································································
+        
+        [CreatioAux]
         [JsonProperty("IsFolder")]
         public Boolean? IsFolder { get; set; }
 
+        [CreatioAux]
         [JsonProperty("DeletionMark")]
         public Boolean? DeletionMark { get; set; }
 
+        [CreatioAux]
+        [JsonProperty("Code")]
+        public String Code { get; set; }
 
+        [CreatioAux]
+        [JsonProperty("Parent_Key")]
+        public Guid? ParentId { get; set; }
+
+        [CreatioAux]
         [JsonProperty("Комментарий")]
         public String Comment { get; set; }
 
+        [CreatioAux]
         [JsonProperty("ДополнительноеОписание")]
         public String AuxilaryDescription { get; set; }
 
+        // ───── Не используемые поля ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+        [CreatioIgnore]
+        [JsonProperty("Predefined")]
+        public Boolean? Predefined { get; set; }
+
+        [CreatioIgnore]
+        [JsonProperty("PredefinedDataName")]
+        public String PredefinedDataName { get; set; }
+
+        [CreatioIgnore]
+        [JsonProperty("DataVersion")]
+        public String DataVersion { get; set; }
+
+        [CreatioIgnore]
         [JsonProperty("ГоловнойКонтрагент_Key")]
         public Guid? PrimaryContractorId { get; set; }
 
+        [CreatioIgnore]
         [JsonProperty("ИсточникИнформацииПриОбращении_Key")]
         public Guid? SourceOfInformationWhenContactingId { get; set; }
 
+        [CreatioIgnore]
         [JsonProperty("ОсновнойБанковскийСчет_Key")]
         public Guid? PrimaryBankAccountId { get; set; }
 
+        [CreatioIgnore]
         [JsonProperty("ОсновнойДоговорКонтрагента_Key")]
         public Guid? PrimaryConctactOfContractorId { get; set; }
 
+        [CreatioIgnore]
         [JsonProperty("ОсновнойВидДеятельности_Key")]
         public Guid? PrimaryActivityOfContractorId { get; set; }
 
+        [CreatioIgnore]
         [JsonProperty("ДокументУдостоверяющийЛичность")]
         public String IdentityDocument { get; set; }
 
+        [CreatioIgnore]
         [JsonProperty("ОсновнойМенеджерПокупателя_Key")]
         public Guid? MainBuyerManagerId { get; set; }
 
+        [CreatioIgnore]
         [JsonProperty("РасписаниеРаботыСтрокой")]
         public String WorkSheduleString { get; set; }
 
+        [CreatioIgnore]
         [JsonProperty("СрокВыполненияЗаказаПоставщиком")]
         public Int16? TimeOfOrderExecutionBySupplier { get; set; }
 
+        [CreatioIgnore]
         [JsonProperty("ОсновноеКонтактноеЛицо_Key")]
         public Guid? PrimaryContactPersonId { get; set; }
 
-
+        [CreatioIgnore]
         [JsonProperty("НомерСвидетельства")]
         public String CertificateNumber { get; set; }
 
-        
-
+        [CreatioIgnore]
         [JsonProperty("ГруппаДоступаКонтрагента_Key")]
         public Guid? ContractorAccessGroupId { get; set; }
 
+        [CreatioIgnore]
         [JsonProperty("ДополнятьНаименованиеАдресДаннымиГоловногоКонтрагентаВНН")]
         public Boolean? ShouldSupplementNameAddressDataHeadContractorVNN { get; set; }
 
+        [CreatioIgnore]
         [JsonProperty("КодФилиала")]
         public String CodeOfBranch { get; set; }
 
+        [CreatioIgnore]
         [JsonProperty("ИспользоватьЭДО1СЗвит")]
         public Boolean? ShouldUseEDO1Report { get; set; }
 
-        
-
+        [CreatioIgnore]
         [JsonProperty("ВидыДеятельности")]
         public List<Object> Activities { get; set; }
 
+        [CreatioIgnore]
         [JsonProperty("МенеджерыПокупателя")]
         public List<Object> BuyersManagers { get; set; }
-        
+
+        [CreatioIgnore]
         [JsonProperty("Parent")]
         public String ParentNavigationLinkUrl { get; set; }
 
+        [CreatioIgnore]
         [JsonProperty("ГоловнойКонтрагентnavigationLinkUrl")]
         public String HeadContractorNavigationLinkUrl { get; set; }
-
-
-        public override String ToString()
-        {
-            return ""
-                + $"\n IdCreatio:                                        | IdCreatio                                                | {IdCreatio}"
-                + $"\n Id:                                               | Ref_Key                                                  | {Id}"
-                + $"\n IsNotResident:                                    | НеЯвляетсяРезидентом                                     | {IsNotResident}"
-                + $"\n Description:                                      | Description                                              | {Description}"
-                + $"\n FullName:                                         | НаименованиеПолное                                       | {FullName}"
-                + $"\n CodeOfEdrpo:                                      | КодПоЕДРПОУ                                              | {CodeOfEdrpo}"
-                + $"\n INN:                                              | ИНН                                                      | {INN}"
-                + $"\n IsBuyer:                                          | Покупатель                                               | {IsBuyer}"
-                + $"\n IsProvider:                                       | Поставщик                                                | {IsProvider}"
-                + $"\n LegalOrIndividual:                                | ЮрФизЛицо                                                | {LegalOrIndividual}"
-                + $"\n ————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————"
-
-                + $"\n Predefined:                                       | Predefined                                               | {Predefined}"
-                + $"\n PredefinedDataName:                               | PredefinedDataName                                       | {PredefinedDataName}"
-                + $"\n DataVersion:                                      | DataVersion                                              | {DataVersion}"
-                + $"\n Code:                                             | Code                                                     | {Code}"
-                + $"\n ParentId:                                         | Parent_Key                                               | {ParentId}"
-                + $"\n IsFolder:                                         | IsFolder                                                 | {IsFolder}"
-                + $"\n DeletionMark:                                     | DeletionMark                                             | {DeletionMark}"
-                + $"\n Comment:                                          | Комментарий                                              | {Comment}"
-                + $"\n AuxilaryDescription:                              | ДополнительноеОписание                                   | {AuxilaryDescription}"
-                + $"\n PrimaryContractorId:                              | ГоловнойКонтрагент_Key                                   | {PrimaryContractorId}"
-                + $"\n SourceOfInformationWhenContactingId:              | ИсточникИнформацииПриОбращении_Key                       | {SourceOfInformationWhenContactingId}"
-                + $"\n PrimaryBankAccountId:                             | ОсновнойБанковскийСчет_Key                               | {PrimaryBankAccountId}"
-                + $"\n PrimaryConctactOfContractorId:                    | ОсновнойДоговорКонтрагента_Key                           | {PrimaryConctactOfContractorId}"
-                + $"\n PrimaryActivityOfContractorId:                    | ОсновнойВидДеятельности_Key                              | {PrimaryActivityOfContractorId}"
-                + $"\n IdentityDocument:                                 | ДокументУдостоверяющийЛичность                           | {IdentityDocument}"
-                + $"\n MainBuyerManagerId:                               | ОсновнойМенеджерПокупателя_Key                           | {MainBuyerManagerId}"
-                + $"\n WorkSheduleString:                                | РасписаниеРаботыСтрокой                                  | {WorkSheduleString}"
-                + $"\n TimeOfOrderExecutionBySupplier:                   | СрокВыполненияЗаказаПоставщиком                          | {TimeOfOrderExecutionBySupplier}"
-                + $"\n PrimaryContactPersonId:                           | ОсновноеКонтактноеЛицо_Key                               | {PrimaryContactPersonId}"
-                + $"\n CertificateNumber:                                | НомерСвидетельства                                       | {CertificateNumber}"
-                + $"\n ContractorAccessGroupId:                          | ГруппаДоступаКонтрагента_Key                             | {ContractorAccessGroupId}"
-                + $"\n ShouldSupplementNameAddressDataHeadContractorVNN: | ДополнятьНаименованиеАдресДаннымиГоловногоКонтрагентаВНН | {ShouldSupplementNameAddressDataHeadContractorVNN}"
-                + $"\n CodeOfBranch:                                     | КодФилиала                                               | {CodeOfBranch}"
-                + $"\n ShouldUseEDO1Report:                              | ИспользоватьЭДО1СЗвит                                    | {ShouldUseEDO1Report}"
-                + $"\n Activities:                                       | ВидыДеятельности                                         | {Activities.Count} шт."
-                + $"\n BuyersManagers:                                   | МенеджерыПокупателя                                      | {BuyersManagers.Count} шт."
-                + $"\n ParentNavigationLinkUrl:                          | Parent                                                   | {ParentNavigationLinkUrl}"
-                + $"\n HeadContractorNavigationLinkUrl:                  | ГоловнойКонтрагент                                       | {HeadContractorNavigationLinkUrl}"
-                ;
-        }
     }
 }
