@@ -438,10 +438,11 @@
 				</Key>
 				<Property Name="Period" Type="Edm.DateTime" Nullable="false"/>
 				<Property Name="ФизЛицо" Type="Edm.String" Nullable="false"/>
-				<Property Name="Фамилия" Type="Edm.String" Nullable="true"/>
+				<Property Name="ФизЛицо_Type" Type="Edm.String" Nullable="false"/>
+				
+        <Property Name="Фамилия" Type="Edm.String" Nullable="true"/>
 				<Property Name="Имя" Type="Edm.String" Nullable="true"/>
 				<Property Name="Отчество" Type="Edm.String" Nullable="true"/>
-				<Property Name="ФизЛицо_Type" Type="Edm.String" Nullable="false"/>
 			</EntityType>
 			<EntityType Name="Catalog_ФизическиеЛица">
 				<Key>

@@ -15,36 +15,76 @@ namespace App
         private static SettingsForClientOf1C settings = new SettingsForClientOf1C("http://creatio-dev3:81/Dev03_1C/odata/standard.odata/", "Администратор", "");
         public static ClientOf1C OneCHttpClient = new ClientOf1C(settings);
 
-        
+
 
         static void Main(string[] args)
         {
-            var contacts = CreatioHttpClient.ODataGet<ITIS.Contact>();
-            var mZorin = contacts.FirstOrDefault(x => x.Surname.Contains("Зорін"));
-            //OneCGetContractorsByIdentifiers();
-            //OneCGetContractorsByIdentifier();
-            //OneCGetContractorsByCodesOfEdrpo();
-            //OneCGetContractorByCodesOfEdrpo();
-            //OneCGetEmployee();
-            //OneCGetGetContactInfo();
+            //GetContractorsByIdentifiers();
+            //GetContractorsByIdentifier();
+            //GetContractorsByCodesOfEdrpo();
+            //GetContractorByCodesOfEdrpo();
+            //ShowContractors();
+            ShowEmployees();
+            //GetGetContactInfo();
+
+            //CreatioGetEmployees();
         }
 
-        public static void OneCGetEmployee()
+        public static void CreatioGetEmployees()
         {
-            OneCHttpClient.GetEmployees().ShowOneCObjects();
+            List<ITIS.Employee> contacts = CreatioHttpClient.ODataGet<ITIS.Employee>();
+            ITIS.Employee mZorin = contacts.FirstOrDefault(x => x.ITISSurName.Contains("Зорін"));
         }
 
-        public static void OneCGetGetContactInfo()
+        public static void ShowEmployees()
+        {
+            List<Guid> ids = OneCHttpClient.GetIdsOfEmployees();
+
+            ConsoleKeyInfo input;
+            Int32 index = 0;
+            Int32 count = 1;
+            do
+            {
+                Console.Clear();
+                Console.WriteLine($"Index: {index,4}; Count: {count,4}\n\n");
+                List<Guid> idsPage = ids.GetRange(index, count);
+                //ClientOf1C.GetEmployeesByIds(idsPage).ShowOneCObjects();
+                OneCHttpClient.GetEmployeesByIds(new Guid("f9e7b11f-609a-11e7-80cb-00155d65b717")).ShowOneCObjects();
+                //ClientOf1C.GetEmployeesLike("Зорін").ShowOneCObjects();
+                input = Console.ReadKey();
+                index += count;
+            } while(input.Key != ConsoleKey.Escape);
+        }
+
+        public static void ShowContractors()
+        {
+            List<Guid> ids = OneCHttpClient.GetIdsOfContractors();
+
+            ConsoleKeyInfo input;
+            Int32 index = 0;
+            Int32 count = 1;
+            do
+            {
+                Console.Clear();
+                Console.WriteLine($"Index: {index,4}; Count: {count,4}\n\n");
+                List<Guid> idsPage = ids.GetRange(index, count);
+                OneCHttpClient.GetContracorsByIds(idsPage).ShowOneCObjects();
+                input = Console.ReadKey();
+                index += count;
+            } while(input.Key != ConsoleKey.Escape);
+        }
+
+        public static void GetGetContactInfo()
         {
             OneCHttpClient.GetContactInfo().ShowOneCObjects();
         }
 
-        public static void OneCGetContractorByCodesOfEdrpo()
+        public static void GetContractorByCodesOfEdrpo()
         {
             OneCHttpClient.GetContractorsByCodeOfEdrpo("40623794").ShowOneCObjects();
         }
 
-        public static void OneCGetContractorsByCodesOfEdrpo()
+        public static void GetContractorsByCodesOfEdrpo()
         {
             List<String> codesOfEdrpo = new List<string>
             {
@@ -57,12 +97,12 @@ namespace App
             OneCHttpClient.GetContractorsByCodeOfEdrpo(codesOfEdrpo).ShowOneCObjects();
         }
 
-        public static void OneCGetContractorsByIdentifier()
+        public static void GetContractorsByIdentifier()
         {
             OneCHttpClient.GetContracorsByIds(new Guid("848b5acf-83ed-11e6-80ba-00155d65b717")).ShowOneCObjects();
         }
 
-        public static void OneCGetContractorsByIdentifiers()
+        public static void GetContractorsByIdentifiers()
         {
             List<Guid> identifiers = new List<Guid>
             {
