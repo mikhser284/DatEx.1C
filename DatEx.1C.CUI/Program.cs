@@ -17,13 +17,47 @@ namespace DatEx._1C.CUI
             //GetContractorsByIdentifier();
             //GetContractorsByCodesOfEdrpo();
             //GetContractorByCodesOfEdrpo();
-            GetEmployee();
+            //ShowContractors();
+            ShowEmployees();
             //GetGetContactInfo();
         }
 
-        public static void GetEmployee()
+        public static void ShowEmployees()
         {
-            ClientOf1C.GetEmployees().ShowOneCObjects();
+            List<Guid> ids = ClientOf1C.GetIdsOfEmployees();
+
+            ConsoleKeyInfo input;
+            Int32 index = 0;
+            Int32 count = 1;
+            do
+            {
+                Console.Clear();
+                Console.WriteLine($"Index: {index,4}; Count: {count,4}\n\n");
+                List<Guid> idsPage = ids.GetRange(index, count);
+                //ClientOf1C.GetEmployeesByIds(idsPage).ShowOneCObjects();
+                ClientOf1C.GetEmployeesByIds(new Guid("f9e7b11f-609a-11e7-80cb-00155d65b717")).ShowOneCObjects();
+                //ClientOf1C.GetEmployeesLike("Зорін").ShowOneCObjects();
+                input = Console.ReadKey();
+                index += count;
+            } while (input.Key != ConsoleKey.Escape);
+        }
+
+        public static void ShowContractors()
+        {
+            List<Guid> ids = ClientOf1C.GetIdsOfContractors();
+
+            ConsoleKeyInfo input;
+            Int32 index = 0;
+            Int32 count = 1;
+            do
+            {
+                Console.Clear();
+                Console.WriteLine($"Index: {index,4}; Count: {count,4}\n\n");
+                List<Guid> idsPage = ids.GetRange(index, count);
+                ClientOf1C.GetContracorsByIds(idsPage).ShowOneCObjects();
+                input = Console.ReadKey();
+                index += count;
+            } while (input.Key != ConsoleKey.Escape);
         }
 
         public static void GetGetContactInfo()

@@ -10,9 +10,46 @@ namespace DatEx._1C.DataModel
     [JsonObject("Catalog_СотрудникиОрганизаций")]
     public class Employee : OneCBase
     {
-        [CreatioPropertyMap("Уникальный идентификатор (guid)", "Id", "Ref_Key")]
+        [CreatioPropertyMap("Уникальный идентификатор (guid)", "Id", "IdCreatio")]
+        [JsonProperty("IdCreatio")]
+        public String IdCreatio { get; set; }
+
+        [CreatioPropertyMap("Уникальный идентификатор (guid)", "IdOneC", "Ref_Key")]
         [JsonProperty("Ref_Key")]
         public Guid Ref_Key { get; set; }
+
+        [CreatioPropertyMap("Строка (50)", "Name", "Description")]
+        [JsonProperty("Description")]
+        public String Description { get; set; }
+
+
+        [CreatioPropertyMap("Раздел<Контакты>", "ContactId", "Физлицо_Key")]
+        [JsonProperty("Физлицо_Key")]
+        public Guid? ContactId { get; set; }
+
+        // ····· Служебные или информативные поля ···································································································
+
+        [CreatioAux]
+        [JsonProperty("IsFolder")]
+        public Boolean? IsFolder { get; set; }
+
+        [CreatioAux]
+        [JsonProperty("DeletionMark")]
+        public Boolean? DeletionMark { get; set; }
+
+        [CreatioAux]
+        [JsonProperty("Code")]
+        public string Code { get; set; }
+
+        [CreatioAux]
+        [JsonProperty("Parent_Key")]
+        public Guid? ParentId { get; set; }
+
+
+
+
+
+        // ───── Не используемые поля ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
         [CreatioIgnore]
         [JsonProperty("Predefined")]
@@ -25,30 +62,6 @@ namespace DatEx._1C.DataModel
         [CreatioIgnore]
         [JsonProperty("DataVersion")]
         public string DataVersion { get; set; }
-
-        [CreatioIgnore]
-        [JsonProperty("Description")]
-        public String Description { get; set; }
-
-        [CreatioIgnore]
-        [JsonProperty("Code")]
-        public string Code { get; set; }
-
-        [CreatioIgnore]
-        [JsonProperty("Parent_Key")]
-        public Guid? Parent_Key { get; set; }
-
-        [CreatioIgnore]
-        [JsonProperty("IsFolder")]
-        public Boolean? IsFolder { get; set; }
-
-        [CreatioIgnore]
-        [JsonProperty("DeletionMark")]
-        public Boolean? DeletionMark { get; set; }
-
-        [CreatioIgnore]
-        [JsonProperty("Физлицо_Key")]
-        public Guid? Физлицо_Key { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("Актуальность")]
@@ -130,59 +143,56 @@ namespace DatEx._1C.DataModel
         [JsonProperty("ОсновноеНазначение_Key")]
         public Guid? ОсновноеНазначение_Key { get; set; }
 
-
-
-
-
-
-
         [CreatioIgnore]
         [JsonProperty("ГруппаВзносов_Key")]
-        public object ГруппаВзносов_Key { get; set; }
+        public Guid? ГруппаВзносов_Key { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ТекущееПодразделениеОрганизации_Key")]
-        public object ТекущееПодразделениеОрганизации_Key { get; set; }
+        public Guid? ТекущееПодразделениеОрганизации_Key { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ТекущаяДолжностьОрганизации_Key")]
-        public object ТекущаяДолжностьОрганизации_Key { get; set; }
+        public Guid? ТекущаяДолжностьОрганизации_Key { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ДатаПриемаНаРаботу")]
-        public object ДатаПриемаНаРаботу { get; set; }
+        public DateTime? ДатаПриемаНаРаботу { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ДатаУвольнения")]
-        public object ДатаУвольнения { get; set; }
+        public DateTime? ДатаУвольнения { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ТекущееПодразделениеКомпании_Key")]
-        public object ТекущееПодразделениеКомпании_Key { get; set; }
+        public Guid? ТекущееПодразделениеКомпании_Key { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ТекущаяДолжностьКомпании_Key")]
-        public object ТекущаяДолжностьКомпании_Key { get; set; }
+        public Guid? ТекущаяДолжностьКомпании_Key { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ДатаПриемаНаРаботуВКомпанию")]
-        public object ДатаПриемаНаРаботуВКомпанию { get; set; }
+        public DateTime? ДатаПриемаНаРаботуВКомпанию { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ДатаУвольненияИзКомпании")]
-        public object ДатаУвольненияИзКомпании { get; set; }
+        public DateTime? ДатаУвольненияИзКомпании { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("Контрагент_Key")]
-        public object Контрагент_Key { get; set; }
+        public Guid? Контрагент_Key { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ПоНаправлениюОргановЗанятости")]
-        public object ПоНаправлениюОргановЗанятости { get; set; }
+        public Boolean? ПоНаправлениюОргановЗанятости { get; set; }
 
-        [CreatioIgnore]
-        [JsonProperty("IdCreatio")]
-        public string IdCreatio { get; set; }
+
+
+
+
+
+
 
         [CreatioIgnore]
         [JsonProperty("ПерсональныеНадбавки")]

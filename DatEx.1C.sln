@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30309.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatEx.1C.CUI", "DatEx.1C.CUI\DatEx.1C.CUI.csproj", "{0FE8674C-9BAF-4D44-B5E3-1515B9AEC2C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatEx.1C.CUI", "DatEx.1C.CUI\DatEx.1C.CUI.csproj", "{0FE8674C-9BAF-4D44-B5E3-1515B9AEC2C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatEx.1C", "DatEx.1C\DatEx.1C.csproj", "{BBB37FEB-38FF-4F52-B8FD-14091A8FC257}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatEx.1C", "DatEx.1C\DatEx.1C.csproj", "{BBB37FEB-38FF-4F52-B8FD-14091A8FC257}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{D3A09EC0-1314-49C5-802E-F4A09BF5F478}"
+	ProjectSection(SolutionItems) = preProject
+		$metadata.xml = $metadata.xml
+		Creatio-1C 2 _29.07.2020.xlsx = Creatio-1C 2 _29.07.2020.xlsx
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

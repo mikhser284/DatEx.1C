@@ -14,9 +14,33 @@ namespace DatEx._1C
     /// <summary> Сотрудники организаций </summary>
     public partial class ClientOf1C
     {
-        public List<Employee> GetEmployees()
+        public List<Guid> GetIdsOfEmployees()
         {
-            String query = $"Catalog_СотрудникиОрганизаций/?$skip=0&$top=1000{AsJson}";
+            String query = $"Catalog_СотрудникиОрганизаций/?$select=Ref_Key{AsJson}";
+            ODataIdentifiersResult oDataRes = GetAsData<ODataIdentifiersResult>(query);
+            return oDataRes.Identifiers.Select(x => x.Id).ToList();
+        }
+
+        public List<Employee> GetEmployeesByIds(Guid identifier, params Guid[] identifiers)
+        {
+            List<Guid> ids = new List<Guid>(identifiers);
+            ids.Add(identifier);
+            return GetEmployeesByIds(ids);
+        }
+
+        public List<Employee> GetEmployeesByIds(IEnumerable<Guid> identifiers)
+        {
+            String filter = String.Join(" or \n", identifiers.Select(id => $"Ref_Key eq guid'{id}'"));
+            String query = $"Catalog_СотрудникиОрганизаций/?$filter=\n{filter}{AsJson}";
+
+            ODataResult<Employee> oDataRes = GetAsData<ODataResult<Employee>>(query);
+            return oDataRes.Values;
+        }
+
+        public List<Employee> GetEmployeesLike(String partOfName)
+        {
+            String query = $"Catalog_СотрудникиОрганизаций/?$filter=substringof('{partOfName}', Description){AsJson}";
+
             ODataResult<Employee> oDataRes = GetAsData<ODataResult<Employee>>(query);
             return oDataRes.Values;
         }
@@ -36,6 +60,13 @@ namespace DatEx._1C
         /// <summary> Получение контрагентов </summary>
     public partial class ClientOf1C
     {
+        public List<Guid> GetIdsOfContractors()
+        {
+            String query = $"Catalog_Контрагенты/?$select=Ref_Key{AsJson}";
+            ODataIdentifiersResult oDataRes = GetAsData<ODataIdentifiersResult>(query);
+            return oDataRes.Identifiers.Select(x => x.Id).ToList();
+        }
+
         public List<Contractor> GetContractorsByCodeOfEdrpo(String codeOfEdrpo, params String[] codesOfEdrpo)
         {
             List<String> edrpoCodes = new List<string>(codesOfEdrpo);
