@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace DatEx._1C
 {
-    class ODataResult<T>
+    class OneCODataResult<T>
     {
         [JsonProperty("odatametadata")]
         public String ODdataMetadata { get; set; }

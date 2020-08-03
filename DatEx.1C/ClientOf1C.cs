@@ -17,7 +17,7 @@ namespace DatEx._1C
         public List<Employee> GetEmployees()
         {
             String query = $"Catalog_СотрудникиОрганизаций/?$skip=0&$top=1000{AsJson}";
-            ODataResult<Employee> oDataRes = GetAsData<ODataResult<Employee>>(query);
+            OneCODataResult<Employee> oDataRes = GetAsData<OneCODataResult<Employee>>(query);
             return oDataRes.Values;
         }
     }
@@ -28,7 +28,7 @@ namespace DatEx._1C
         public List<ContactInfo> GetContactInfo()
         {
             String query = $"InformationRegister_КонтактнаяИнформация/?$skip=0&$top=10{AsJson}";
-            ODataResult<ContactInfo> oDataRes = GetAsData<ODataResult<ContactInfo>>(query);
+            OneCODataResult<ContactInfo> oDataRes = GetAsData<OneCODataResult<ContactInfo>>(query);
             return oDataRes.Values;
         }
     }
@@ -48,7 +48,7 @@ namespace DatEx._1C
             String filter = String.Join(" or \n", codesOfEdrpo.Select(id => $"КодПоЕДРПОУ eq '{id}'"));
             String query = $"Catalog_Контрагенты/?$filter=\n{filter}{AsJson}";
 
-            ODataResult<Contractor> oDataRes = GetAsData<ODataResult<Contractor>>(query);
+            OneCODataResult<Contractor> oDataRes = GetAsData<OneCODataResult<Contractor>>(query);
             return oDataRes.Values;
         }
 
@@ -64,7 +64,7 @@ namespace DatEx._1C
             String filter = String.Join(" or \n", identifiers.Select(id => $"Ref_Key eq guid'{id}'"));
             String query = $"Catalog_Контрагенты/?$filter=\n{filter}{AsJson}";
             
-            ODataResult<Contractor> oDataRes = GetAsData<ODataResult<Contractor>>(query);
+            OneCODataResult<Contractor> oDataRes = GetAsData<OneCODataResult<Contractor>>(query);
             return oDataRes.Values;
         }
     }

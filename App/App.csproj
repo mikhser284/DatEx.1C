@@ -3,11 +3,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>DatEx._1C.CUI</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DatEx.1C\DatEx.1C.csproj" />
+    <ProjectReference Include="..\DatEx.Creatio\DatEx.Creatio.csproj" />
   </ItemGroup>
 
 </Project>
