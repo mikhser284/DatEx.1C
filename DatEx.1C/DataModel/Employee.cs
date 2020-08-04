@@ -8,20 +8,11 @@ namespace DatEx.OneC.DataModel
 {
     [CreatioTypeMap("DatEx.Creatio.DataModel.ITIS.Contact", "Catalog_СотрудникиОрганизаций")]
     [JsonObject("Catalog_СотрудникиОрганизаций")]
-    public class Employee : OneCBase
+    public class Employee : OneCBaseLookup
     {
         [CreatioPropertyMap("Guid", "Id", "IdCreatio")]
         [JsonProperty("IdCreatio")]
         public String IdCreatio { get; set; }
-
-        [CreatioPropertyMap("Guid", "IdOneC", "Ref_Key")]
-        [JsonProperty("Ref_Key")]
-        public Guid Ref_Key { get; set; }
-
-        [CreatioPropertyMap("String", "Name", "Description")]
-        [JsonProperty("Description")]
-        public String Description { get; set; }
-
 
         [CreatioPropertyMap("Раздел<Контакты>", "ContactId", "Физлицо_Key")]
         [JsonProperty("Физлицо_Key")]
@@ -81,41 +72,7 @@ namespace DatEx.OneC.DataModel
         [JsonProperty("Контрагент_Key")]
         public Guid? ContractorId { get; set; }
 
-        // ····· Служебные или информативные поля ···································································································
-
-        [CreatioAux]
-        [JsonProperty("IsFolder")]
-        public Boolean? IsFolder { get; set; }
-
-        [CreatioAux]
-        [JsonProperty("DeletionMark")]
-        public Boolean? DeletionMark { get; set; }
-
-        [CreatioAux]
-        [JsonProperty("Code")]
-        public string Code { get; set; }
-
-        [CreatioAux]
-        [JsonProperty("Parent_Key")]
-        public Guid? ParentId { get; set; }
-
-
-
-
-
         // ───── Не используемые поля ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
-
-        [CreatioIgnore]
-        [JsonProperty("Predefined")]
-        public Boolean? Predefined { get; set; }
-
-        [CreatioIgnore]
-        [JsonProperty("PredefinedDataName")]
-        public String PredefinedDataName { get; set; }
-
-        [CreatioIgnore]
-        [JsonProperty("DataVersion")]
-        public string DataVersion { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ОбособленноеПодразделение_Key")]

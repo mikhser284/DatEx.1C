@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using DatEx.OneC.DataModel;
 using Newtonsoft.Json;
 
 namespace DatEx.OneC
 {
-    class OneCODataResult<T>
+    class OneCODataResult<T> where T : OneCObject
     {
         [JsonProperty("odatametadata")]
         public String ODdataMetadata { get; set; }

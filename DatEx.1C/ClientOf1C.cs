@@ -9,62 +9,58 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace DatEx.OneC
-{
-    /// <summary> Сотрудники организаций </summary>
-    public partial class ClientOf1C
+{   
+    /// <summary> Получение контрагентов </summary>
+    public partial class ClientOfOneC
     {
-        public List<Guid> GetIdsOfEmployees()
+        #region Общие методы
+
+        public List<T> GetObjs<T>(String query = default(String)) where T : OneCObject
         {
-            String query = $"Catalog_СотрудникиОрганизаций/?$select=Ref_Key{AsJson}";
-            ODataIdentifiersResult oDataRes = GetAsData<ODataIdentifiersResult>(query);
-            return oDataRes.Identifiers.Select(x => x.Id).ToList();
+            String typeName = TypesMap[typeof(T)];
+            String separator = !String.IsNullOrEmpty(query) ? "&" : "";
+            String fullQuery = $"{typeName}/?{query}{separator}{AsJson}";
+            HttpResponseMessage response = HttpClient.GetAsync(fullQuery).Result;
+            response.EnsureSuccessStatusCode();
+            String result = response.Content.ReadAsStringAsync().Result;
+#if DEBUG
+            result = JToken.Parse(result).ToString(Formatting.Indented);
+#endif
+            return JsonConvert.DeserializeObject<OneCODataResult<T>>(result).Values;
         }
 
-        public List<Employee> GetEmployeesByIds(Guid identifier, params Guid[] identifiers)
+        public List<Guid> GetIdsOfObjs<T>(String query = default(String)) where T : OneCBaseLookup
+        {
+            String typeName = TypesMap[typeof(T)];
+            String separator = !String.IsNullOrEmpty(query) ? "&" : "";
+            String fullQuery = $"{typeName}/?{query}{separator}$select=Ref_Key&{AsJson}";
+            HttpResponseMessage response = HttpClient.GetAsync(fullQuery).Result;
+            response.EnsureSuccessStatusCode();
+            String result = response.Content.ReadAsStringAsync().Result;
+#if DEBUG
+            result = JToken.Parse(result).ToString(Formatting.Indented);
+#endif
+            return JsonConvert.DeserializeObject<ODataIdentifiersResult>(result).Identifiers.Select(x => x.Id).ToList();
+        }
+
+        public List<T> GetObjsByIds<T>(IEnumerable<Guid> identifiers) where T : OneCBaseLookup
+        {
+            String typeName = TypesMap[typeof(T)];
+            String filter = String.Join(" or \n", identifiers.Select(id => $"Ref_Key eq guid'{id}'"));
+            String query = $"{typeName}/?$filter=\n{filter}{AsJson}";
+            return GetObjs<T>(query);
+        }
+
+        public List<T> GetObjsByIds<T>(Guid identifier, params Guid[] identifiers) where T : OneCBaseLookup
         {
             List<Guid> ids = new List<Guid>(identifiers);
             ids.Add(identifier);
-            return GetEmployeesByIds(ids);
+            return GetObjsByIds<T>(ids);
         }
 
-        public List<Employee> GetEmployeesByIds(IEnumerable<Guid> identifiers)
-        {
-            String filter = String.Join(" or \n", identifiers.Select(id => $"Ref_Key eq guid'{id}'"));
-            String query = $"Catalog_СотрудникиОрганизаций/?$filter=\n{filter}{AsJson}";
+        #endregion Общие методы
 
-            OneCODataResult<Employee> oDataRes = GetAsData<OneCODataResult<Employee>>(query);
-            return oDataRes.Values;
-        }
-
-        public List<Employee> GetEmployeesLike(String partOfName)
-        {
-            String query = $"Catalog_СотрудникиОрганизаций/?$filter=substringof('{partOfName}', Description){AsJson}";
-
-            OneCODataResult<Employee> oDataRes = GetAsData<OneCODataResult<Employee>>(query);
-            return oDataRes.Values;
-        }
-    }
-
-    /// <summary> Получение контрагентов </summary>
-    public partial class ClientOf1C
-    {
-        public List<ContactInfo> GetContactInfo()
-        {
-            String query = $"InformationRegister_КонтактнаяИнформация/?$skip=0&$top=10{AsJson}";
-            OneCODataResult<ContactInfo> oDataRes = GetAsData<OneCODataResult<ContactInfo>>(query);
-            return oDataRes.Values;
-        }
-    }
-
-    /// <summary> Получение контрагентов </summary>
-    public partial class ClientOf1C
-    {
-        public List<Guid> GetIdsOfContractors()
-        {
-            String query = $"Catalog_Контрагенты/?$select=Ref_Key{AsJson}";
-            ODataIdentifiersResult oDataRes = GetAsData<ODataIdentifiersResult>(query);
-            return oDataRes.Identifiers.Select(x => x.Id).ToList();
-        }
+        #region Получение контрагентов
 
         public List<Contractor> GetContractorsByCodeOfEdrpo(String codeOfEdrpo, params String[] codesOfEdrpo)
         {
@@ -77,38 +73,20 @@ namespace DatEx.OneC
         {
             String filter = String.Join(" or \n", codesOfEdrpo.Select(id => $"КодПоЕДРПОУ eq '{id}'"));
             String query = $"Catalog_Контрагенты/?$filter=\n{filter}{AsJson}";
-
-            OneCODataResult<Contractor> oDataRes = GetAsData<OneCODataResult<Contractor>>(query);
-            return oDataRes.Values;
+            return GetObjs<Contractor>(query);
         }
 
-        public List<Contractor> GetContracorsByIds(Guid identifier, params Guid[] identifiers)
-        {
-            List<Guid> ids = new List<Guid>(identifiers);
-            ids.Add(identifier);
-            return GetContracorsByIds(ids);
-        }
+        #endregion Получение контрагентов
 
-        public List<Contractor> GetContracorsByIds(IEnumerable<Guid> identifiers)
-        {
-            String filter = String.Join(" or \n", identifiers.Select(id => $"Ref_Key eq guid'{id}'"));
-            String query = $"Catalog_Контрагенты/?$filter=\n{filter}{AsJson}";
+        #region Служебные
 
-            OneCODataResult<Contractor> oDataRes = GetAsData<OneCODataResult<Contractor>>(query);
-            return oDataRes.Values;
-        }
-    }
-
-
-    public partial class ClientOf1C
-    {
-        public ClientOf1C(SettingsForClientOf1C settings)
+        public ClientOfOneC(SettingsForClientOf1C settings)
         {
             HttpClient = GetConfiguredClient(settings);
         }
 
         private readonly HttpClient HttpClient;
-        private const String AsJson = "&$format=application/json";
+        private const String AsJson = "$format=application/json";
 
         private HttpClient GetConfiguredClient(SettingsForClientOf1C settings)
         {
@@ -122,28 +100,16 @@ namespace DatEx.OneC
             return httpClient;
         }
 
-
-        private String GetAsJson(String query)
+        private static readonly Dictionary<Type, String> TypesMap = new Dictionary<Type, String>
         {
-            HttpResponseMessage response = HttpClient.GetAsync(query).Result;
-            response.EnsureSuccessStatusCode();
-            String result = response.Content.ReadAsStringAsync().Result;
-#if DEBUG
-            result = JToken.Parse(result).ToString(Formatting.Indented);
-#endif
-            return result;
-        }
+            { typeof(Contractor), "Catalog_Контрагенты" },
+            { typeof(Employee), "Catalog_СотрудникиОрганизаций" },
+            { typeof(Person), "Catalog_ФизическиеЛица" },
+            { typeof(IRNamesOfPersons), "InformationRegister_ФИОФизЛиц" },
+            { typeof(IRContactInfo), "InformationRegister_КонтактнаяИнформация" },
+            { typeof(ContactInfoType), "Catalog_ВидыКонтактнойИнформации" }
+        };
 
-        private T GetAsData<T>(String query)
-        {
-            HttpResponseMessage response = HttpClient.GetAsync(query).Result;
-
-            response.EnsureSuccessStatusCode();
-            String result = response.Content.ReadAsStringAsync().Result;
-#if DEBUG
-            result = JToken.Parse(result).ToString(Formatting.Indented);
-#endif
-            return JsonConvert.DeserializeObject<T>(result);
-        }
+        #endregion Служебные
     }
 }

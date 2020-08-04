@@ -10,7 +10,7 @@ namespace DatEx.OneC.DataModel
 {
     [CreatioTypeMap("Account", "Catalog_Контрагенты")]
     [JsonObject("Catalog_Контрагенты")]
-    public class Contractor : OneCBase
+    public class Contractor : OneCBaseHierarchicalLookup
     {
         [CreatioPropertyMap("Уникальный идентификатор (guid)", "Id", "IdCreatio")]
         [JsonProperty("IdCreatio")]
@@ -23,10 +23,6 @@ namespace DatEx.OneC.DataModel
         [CreatioPropertyMap("Справочник<???>", "ITISCounterpartyLegalStatus", "НеЯвляетсяРезидентом")]
         [JsonProperty("НеЯвляетсяРезидентом")]
         public Boolean? IsNotResident { get; set; }
-
-        [CreatioPropertyMap("Строка (250)", "Name", "Description")]
-        [JsonProperty("Description")]
-        public String Description { get; set; }
 
         [CreatioPropertyMap("Строка (250)", "Name", "НаименованиеПолное")]
         [JsonProperty("НаименованиеПолное")]
@@ -55,22 +51,6 @@ namespace DatEx.OneC.DataModel
         // ····· Служебные или информативные поля ···································································································
         
         [CreatioAux]
-        [JsonProperty("IsFolder")]
-        public Boolean? IsFolder { get; set; }
-
-        [CreatioAux]
-        [JsonProperty("DeletionMark")]
-        public Boolean? DeletionMark { get; set; }
-
-        [CreatioAux]
-        [JsonProperty("Code")]
-        public String Code { get; set; }
-
-        [CreatioAux]
-        [JsonProperty("Parent_Key")]
-        public Guid? ParentId { get; set; }
-
-        [CreatioAux]
         [JsonProperty("Комментарий")]
         public String Comment { get; set; }
 
@@ -79,18 +59,6 @@ namespace DatEx.OneC.DataModel
         public String AuxilaryDescription { get; set; }
 
         // ───── Не используемые поля ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
-
-        [CreatioIgnore]
-        [JsonProperty("Predefined")]
-        public Boolean? Predefined { get; set; }
-
-        [CreatioIgnore]
-        [JsonProperty("PredefinedDataName")]
-        public String PredefinedDataName { get; set; }
-
-        [CreatioIgnore]
-        [JsonProperty("DataVersion")]
-        public String DataVersion { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ГоловнойКонтрагент_Key")]

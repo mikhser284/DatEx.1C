@@ -8,7 +8,52 @@ using Newtonsoft.Json;
 
 namespace DatEx.OneC.DataModel
 {
-    public class OneCBase
+    public class OneCBaseLookup : OneCObject
+    {
+        [CreatioPropertyMap("Guid", "IdOneC", "Ref_Key")]
+        [JsonProperty("Ref_Key")]
+        public Guid Ref_Key { get; set; }
+
+        [CreatioAux]
+        [JsonProperty("Predefined")]
+        public Boolean? Predefined { get; set; }
+
+        [CreatioAux]
+        [JsonProperty("PredefinedDataName")]
+        public String PredefinedDataName { get; set; }
+
+
+        [CreatioAux]
+        [JsonProperty("DataVersion")]
+        public String DataVersion { get; set; }
+
+
+        [CreatioPropertyMap("String", "Name", "Description")]
+        [JsonProperty("Description")]
+        public String Description { get; set; }
+
+
+        [CreatioAux]
+        [JsonProperty("Code")]
+        public String Code { get; set; }
+
+        [CreatioAux]
+        [JsonProperty("DeletionMark")]
+        public Boolean? DeletionMark { get; set; }
+    }
+
+    public class OneCBaseHierarchicalLookup : OneCBaseLookup
+    {
+        [CreatioAux]
+        [JsonProperty("Parent_Key")]
+        public Guid? ParentId { get; set; }
+
+        [CreatioAux]
+        [JsonProperty("IsFolder")]
+        public Boolean? IsFolder { get; set; }
+    }
+
+    public class OneCObject
     {
         public void Show()
         {

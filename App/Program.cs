@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using DatEx.OneC;
-using DatEx.OneC.DataModel;
+using OneC = DatEx.OneC.DataModel;
 using DatEx.Creatio;
-using DatEx.Creatio.DataModel.Terrasoft.Base;
 using ITIS = DatEx.Creatio.DataModel.ITIS;
 
 namespace App
@@ -13,7 +12,7 @@ namespace App
     {
         private static ClientOfCreatio CreatioHttpClient = ClientOfCreatio.LogIn("http://185.59.101.152:50080/", "Supervisor", "Supervisor");
         private static SettingsForClientOf1C settings = new SettingsForClientOf1C("http://185.59.101.152:50081/Dev03_1C/odata/standard.odata/", "Администратор", "");
-        public static ClientOf1C OneCHttpClient = new ClientOf1C(settings);
+        public static ClientOfOneC OneCHttpClient = new ClientOfOneC(settings);
 
 
 
@@ -27,7 +26,9 @@ namespace App
             //ShowEmployees();
             //GetGetContactInfo();
 
-            CreatioGetEmployees();
+            //CreatioGetEmployees();
+
+            ShowIRContactInfo();
         }
 
         public static void CreatioGetEmployees()
@@ -36,9 +37,54 @@ namespace App
             ITIS.Employee mZorin = contacts.FirstOrDefault(x => x.ITISSurName.Contains("Зорін"));
         }
 
+        public static void ShowIRContactInfo()
+        {
+            Console.WriteLine("————— #1 ————————————————————");
+            OneCHttpClient.GetObjs<OneC.IRContactInfo>("$filter=cast(Объект, 'Catalog_ФизическиеЛица') eq guid'23d75280-5b29-11e7-80cb-00155d65b717'")
+                .ShowOneCObjects();
+
+            Console.WriteLine("————— #1a ————————————————————");
+            OneCHttpClient.GetObjs<OneC.IRContactInfo>("$filter=Объект_Type eq 'StandardODATA.Catalog_ФизическиеЛица' and cast(Вид, 'Catalog_ВидыКонтактнойИнформации') eq guid'6b1ae98e-bb91-11ea-80c7-00155d65b747'")
+                .ShowOneCObjects();
+
+            Console.WriteLine("————— #2 ————————————————————");
+            OneCHttpClient.GetObjs<OneC.ContactInfoType>("$filter=Ref_Key eq guid'08188400-bb94-11ea-80c7-00155d65b747'").ShowOneCObjects();
+            OneCHttpClient.GetObjs<OneC.ContactInfoType>("$filter=Ref_Key eq guid'f1862c22-bb94-11ea-80c7-00155d65b747'").ShowOneCObjects();
+            OneCHttpClient.GetObjs<OneC.ContactInfoType>("$filter=Ref_Key eq guid'6b1ae98e-bb91-11ea-80c7-00155d65b747'").ShowOneCObjects();
+
+            Console.WriteLine("————— #3 ————————————————————");
+            OneCHttpClient.GetObjs<OneC.Person>("$top=20&$filter=Ref_Key eq guid'23d75280-5b29-11e7-80cb-00155d65b717'")
+                .ShowOneCObjects();
+
+            Console.WriteLine("————— #4 ————————————————————");
+            //OneCHttpClient.GetObjs<OneC.IRNamesOfPersons>("$top=20&$filter=ФизЛицо_Type eq 'StandardODATA.Catalog_ФизическиеЛица' and ФизЛицо like '23d75280-5b29-11e7-80cb-00155d65b717'")
+            OneCHttpClient.GetObjs<OneC.IRNamesOfPersons>("$top=20&$filter=cast(ФизЛицо, 'Catalog_ФизическиеЛица') eq guid'23d75280-5b29-11e7-80cb-00155d65b717'")
+                .ShowOneCObjects();
+
+            Console.WriteLine("————— #5 ————————————————————");
+            OneCHttpClient.GetObjs<OneC.Employee>("$top=20&$filter=Физлицо_Key eq guid'23d75280-5b29-11e7-80cb-00155d65b717'")
+                .ShowOneCObjects();
+
+            
+
+            //List<OneC.IRContactInfo> objs = OneCHttpClient.GetObjs<OneC.IRContactInfo>("$top=20");            
+        }
+
+        public static void SyncEmployees(Guid? guidOfAddressInfoOfTypeEmail = null)
+        {
+            // Так как ключевое свойство для синхронизации информации о сотрудниках начинаем поиск с InformationRegister_КонтактнаяИнформация
+            // и ищем объекты которые связанны с записью Catalog_ВидыКонтактнойИнформации електронная почта,
+            // то есть по следующему Guid:
+            guidOfAddressInfoOfTypeEmail ??= new Guid("6b1ae98e-bb91-11ea-80c7-00155d65b747");
+            // Указанный идентификатор нужно будет добавить в настройки Creatio, чтобы иметь возпожность изменить его на продуктиве
+
+            OneCHttpClient.GetObjs<OneC.IRContactInfo>("$filter=Объект_Type eq 'StandardODATA.Catalog_ФизическиеЛица' and cast(Вид, 'Catalog_ВидыКонтактнойИнформации') eq guid'6b1ae98e-bb91-11ea-80c7-00155d65b747'")
+                .ShowOneCObjects();
+        }
+
         public static void ShowEmployees()
         {
-            List<Guid> ids = OneCHttpClient.GetIdsOfEmployees();
+            List<Guid> ids = OneCHttpClient.GetIdsOfObjs<OneC.Employee>();
 
             ConsoleKeyInfo input;
             Int32 index = 0;
@@ -49,7 +95,7 @@ namespace App
                 Console.WriteLine($"Index: {index,4}; Count: {count,4}\n\n");
                 List<Guid> idsPage = ids.GetRange(index, count);
                 //ClientOf1C.GetEmployeesByIds(idsPage).ShowOneCObjects();
-                OneCHttpClient.GetEmployeesByIds(new Guid("f9e7b11f-609a-11e7-80cb-00155d65b717")).ShowOneCObjects();
+                OneCHttpClient.GetObjsByIds<OneC.Employee>(new Guid("f9e7b11f-609a-11e7-80cb-00155d65b717")).ShowOneCObjects();
                 //ClientOf1C.GetEmployeesLike("Зорін").ShowOneCObjects();
                 input = Console.ReadKey();
                 index += count;
@@ -58,7 +104,7 @@ namespace App
 
         public static void ShowContractors()
         {
-            List<Guid> ids = OneCHttpClient.GetIdsOfContractors();
+            List<Guid> ids = OneCHttpClient.GetIdsOfObjs<OneC.Contractor>();
 
             ConsoleKeyInfo input;
             Int32 index = 0;
@@ -68,15 +114,10 @@ namespace App
                 Console.Clear();
                 Console.WriteLine($"Index: {index,4}; Count: {count,4}\n\n");
                 List<Guid> idsPage = ids.GetRange(index, count);
-                OneCHttpClient.GetContracorsByIds(idsPage).ShowOneCObjects();
+                OneCHttpClient.GetObjsByIds<OneC.Contractor>(idsPage).ShowOneCObjects();
                 input = Console.ReadKey();
                 index += count;
             } while(input.Key != ConsoleKey.Escape);
-        }
-
-        public static void GetGetContactInfo()
-        {
-            OneCHttpClient.GetContactInfo().ShowOneCObjects();
         }
 
         public static void GetContractorByCodesOfEdrpo()
@@ -99,7 +140,7 @@ namespace App
 
         public static void GetContractorsByIdentifier()
         {
-            OneCHttpClient.GetContracorsByIds(new Guid("848b5acf-83ed-11e6-80ba-00155d65b717")).ShowOneCObjects();
+            OneCHttpClient.GetObjsByIds<OneC.Contractor>(new Guid("848b5acf-83ed-11e6-80ba-00155d65b717")).ShowOneCObjects();
         }
 
         public static void GetContractorsByIdentifiers()
@@ -112,7 +153,7 @@ namespace App
                 new Guid("3c2d8c7f-7670-11e6-80ba-00155d65b717"),
                 new Guid("86569aec-7f0d-11e6-80ba-00155d65b717"),
             };
-            OneCHttpClient.GetContracorsByIds(identifiers).ShowOneCObjects();
+            OneCHttpClient.GetObjsByIds<OneC.Contractor>(identifiers).ShowOneCObjects();
         }
 
         // ————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -131,7 +172,7 @@ namespace App
 
     public static class Ext_OneCObject
     {
-        public static void ShowOneCObjects<T>(this IEnumerable<T> objects) where T : OneCBase
+        public static void ShowOneCObjects<T>(this IEnumerable<T> objects) where T : OneC.OneCObject
         {
             foreach(T obj in objects)
             {
