@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DatEx._1C.DataModel.Auxilary;
+using DatEx.OneC.DataModel.Auxilary;
 using Newtonsoft.Json;
 
-namespace DatEx._1C.DataModel
+namespace DatEx.OneC.DataModel
 {
     public class OneCBase
     {

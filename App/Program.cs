@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DatEx._1C;
-using DatEx._1C.DataModel;
+using DatEx.OneC;
+using DatEx.OneC.DataModel;
 using DatEx.Creatio;
 using DatEx.Creatio.DataModel.Terrasoft.Base;
 using ITIS = DatEx.Creatio.DataModel.ITIS;
@@ -11,8 +11,8 @@ namespace App
 {
     class Program
     {
-        private static ClientOfCreatio CreatioHttpClient = ClientOfCreatio.LogIn("http://creatio-dev3/", "Supervisor", "Supervisor");
-        private static SettingsForClientOf1C settings = new SettingsForClientOf1C("http://creatio-dev3:81/Dev03_1C/odata/standard.odata/", "Администратор", "");
+        private static ClientOfCreatio CreatioHttpClient = ClientOfCreatio.LogIn("http://185.59.101.152:50080/", "Supervisor", "Supervisor");
+        private static SettingsForClientOf1C settings = new SettingsForClientOf1C("http://185.59.101.152:50081/Dev03_1C/odata/standard.odata/", "Администратор", "");
         public static ClientOf1C OneCHttpClient = new ClientOf1C(settings);
 
 
@@ -24,10 +24,10 @@ namespace App
             //GetContractorsByCodesOfEdrpo();
             //GetContractorByCodesOfEdrpo();
             //ShowContractors();
-            ShowEmployees();
+            //ShowEmployees();
             //GetGetContactInfo();
 
-            //CreatioGetEmployees();
+            CreatioGetEmployees();
         }
 
         public static void CreatioGetEmployees()
@@ -113,6 +113,18 @@ namespace App
                 new Guid("86569aec-7f0d-11e6-80ba-00155d65b717"),
             };
             OneCHttpClient.GetContracorsByIds(identifiers).ShowOneCObjects();
+        }
+
+        // ————————————————————————————————————————————————————————————————————————————————————————————————————
+
+        public static void SyncEmployes(String employeeEmail)
+        {
+            if (String.IsNullOrEmpty(employeeEmail) || !employeeEmail.EndsWith("@kustoagro.com")) return;
+        }
+
+        public static void SyncContractor(String codeOfEdrpo)
+        {
+
         }
 
     }

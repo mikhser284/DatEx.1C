@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DatEx._1C
+namespace DatEx.OneC
 {
     public class SettingsForClientOf1C
     {

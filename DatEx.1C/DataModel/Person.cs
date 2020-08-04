@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DatEx.OneC.DataModel
 {
-    public class ContactInfo : OneCBase
+    class Person
     {
     }
 }

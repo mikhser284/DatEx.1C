@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using DatEx._1C.DataModel.Auxilary;
+using DatEx.OneC.DataModel.Auxilary;
 using Newtonsoft.Json;
 
-namespace DatEx._1C.DataModel
+namespace DatEx.OneC.DataModel
 {
     [CreatioTypeMap("DatEx.Creatio.DataModel.ITIS.Contact", "Catalog_СотрудникиОрганизаций")]
     [JsonObject("Catalog_СотрудникиОрганизаций")]
@@ -128,71 +128,71 @@ namespace DatEx._1C.DataModel
 
         [CreatioIgnore]
         [JsonProperty("ГрафикРаботы_Key")]
-        public Guid? ГрафикРаботы_Key { get; set; }
+        public Guid? WorkSheduleId { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ЗанимаемыхСтавок")]
-        public Double? ЗанимаемыхСтавок { get; set; }
+        public Double? OccupiedBets { get; set; }
 
 
         [CreatioIgnore]
         [JsonProperty("ДатаДоговора")]
-        public DateTime? ДатаДоговора { get; set; }
+        public DateTime? ContractDate { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ИспытательныйСрок")]
-        public Double? ИспытательныйСрок { get; set; }
+        public Double? TrialPeriod { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ВидРасчета_Key")]
-        public Guid? ВидРасчета_Key { get; set; }
+        public Guid? CalculationTypeId { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ТарифнаяСтавка")]
-        public Double? ТарифнаяСтавка { get; set; }
+        public Double? TariffRate { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ВалютаТарифнойСтавки_Key")]
-        public Guid? ВалютаТарифнойСтавки_Key { get; set; }
+        public Guid? TariffRateCurrencyId { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ПостфиксНаименования")]
-        public String ПостфиксНаименования { get; set; }
+        public String NamePostfix { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ТарифныйРазряд_Key")]
-        public Guid? ТарифныйРазряд_Key { get; set; }
+        public Guid? TariffCategoryId { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ОсновноеНазначение_Key")]
-        public Guid? ОсновноеНазначение_Key { get; set; }
+        public Guid? PrimaryPurposeId { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ГруппаВзносов_Key")]
-        public Guid? ГруппаВзносов_Key { get; set; }
+        public Guid? ContributionGroupId { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ТекущееПодразделениеКомпании_Key")]
-        public Guid? ТекущееПодразделениеКомпании_Key { get; set; }
+        public Guid? CurrentCompanyDivisionId { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ТекущаяДолжностьКомпании_Key")]
-        public Guid? ТекущаяДолжностьКомпании_Key { get; set; }
+        public Guid? CurrentCompanyPositionId { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ДатаПриемаНаРаботуВКомпанию")]
-        public DateTime? ДатаПриемаНаРаботуВКомпанию { get; set; }
+        public DateTime? DateOfEmploymentInCompany { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ДатаУвольненияИзКомпании")]
-        public DateTime? ДатаУвольненияИзКомпании { get; set; }
+        public DateTime? DateOfDismisalFromCompany { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ПоНаправлениюОргановЗанятости")]
-        public Boolean? ПоНаправлениюОргановЗанятости { get; set; }
+        public Boolean? ByDirectionOfEmploymentOrganizations { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ПерсональныеНадбавки")]
-        public object[] ПерсональныеНадбавки { get; set; }
+        public object[] PersonalAllowances { get; set; }
     }
 }

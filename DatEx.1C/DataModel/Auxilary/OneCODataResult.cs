@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace DatEx._1C
+namespace DatEx.OneC
 {
     class OneCODataResult<T>
     {

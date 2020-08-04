@@ -4,11 +4,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using DatEx._1C.DataModel;
+using DatEx.OneC.DataModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace DatEx._1C
+namespace DatEx.OneC
 {
     /// <summary> Сотрудники организаций </summary>
     public partial class ClientOf1C

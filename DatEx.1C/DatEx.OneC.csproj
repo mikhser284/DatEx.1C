@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>DatEx._1C</RootNamespace>
+    <RootNamespace>DatEx.OneC</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DatEx.1C\DatEx.1C.csproj" />
+    <ProjectReference Include="..\DatEx.1C\DatEx.OneC.csproj" />
     <ProjectReference Include="..\DatEx.Creatio\DatEx.Creatio.csproj" />
   </ItemGroup>
 
