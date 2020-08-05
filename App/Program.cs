@@ -5,6 +5,8 @@ using DatEx.OneC;
 using OneC = DatEx.OneC.DataModel;
 using DatEx.Creatio;
 using ITIS = DatEx.Creatio.DataModel.ITIS;
+using System.Security.Cryptography.X509Certificates;
+using Newtonsoft.Json.Linq;
 
 namespace App
 {
@@ -28,13 +30,85 @@ namespace App
 
             //CreatioGetEmployees();
 
-            ShowIRContactInfo();
+            //ShowIRContactInfo();
+
+        
+            SyncEmployees();
         }
+
+        
 
         public static void CreatioGetEmployees()
         {
             List<ITIS.Employee> contacts = CreatioHttpClient.ODataGet<ITIS.Employee>();
             ITIS.Employee mZorin = contacts.FirstOrDefault(x => x.ITISSurName.Contains("Зорін"));
+        }
+
+        public static void SyncEmployees(Guid? guidOfAddressInfoOfTypeEmail = null, String domain = null)
+        {
+            // Так как ключевое свойство для синхронизации информации о сотрудниках начинаем поиск с InformationRegister_КонтактнаяИнформация
+            // и ищем объекты которые связанны с записью Catalog_ВидыКонтактнойИнформации електронная почта,
+            // то есть по нижеследующему Guid:
+            // Указанный идентификатор нужно будет добавить в настройки Creatio, чтобы иметь возпожность изменить его на продуктиве
+            guidOfAddressInfoOfTypeEmail ??= new Guid("6b1ae98e-bb91-11ea-80c7-00155d65b747");
+
+            // Домен почты. Также нужно будет добавить в настройки Creatio, чтобы иметь возможность изменить при необходимости
+            domain ??= "@kustoagro.com";
+
+            // Получаем идентификаторы физ. лиц из 1С с почтовыми адресами, которые оканчиваются на указанный домен
+            List<Guid> idsPersonsWithEmails = OneCHttpClient.GetIdsOfObjs<OneC.IRContactInfo>(
+                "$filter=Объект_Type eq 'StandardODATA.Catalog_ФизическиеЛица'"
+                + $" and cast(Вид, 'Catalog_ВидыКонтактнойИнформации') eq guid'{guidOfAddressInfoOfTypeEmail}'"
+                + $" and endswith(Представление, '{domain}') eq true" , "Объект");
+
+            // Одновременно получаем связанную контактрую информацию, типы контактной информации, физ. лица и сотрудников
+            List<OneC.IRContactInfo> contactInfos = OneCHttpClient.GetObjsByIds<OneC.IRContactInfo>(idsPersonsWithEmails, "cast(Объект, 'Catalog_ФизическиеЛица')");
+            contactInfos.ShowOneCObjects();            
+            {
+                Dictionary<Guid, OneC.ContactInfoType> contactInfoTypes = 
+                    OneCHttpClient.GetObjsByIds<OneC.ContactInfoType>(contactInfos.Select(x => new Guid(x.KeyKind)).Distinct().ToList())
+                    .ToDictionary(k => k.Ref_Key);
+                foreach(var contactInfo in contactInfos) contactInfo.TypeOfContactInfo = contactInfoTypes[new Guid(contactInfo.KeyKind)];
+            }
+            List<OneC.Person> personsWithEmails = OneCHttpClient.GetObjsByIds<OneC.Person>(idsPersonsWithEmails);
+
+            // Сгрупировать контактную информацию по физ. лицу
+            Dictionary<Guid, List<OneC.IRContactInfo>> groupedContactInfo = new Dictionary<Guid, List<OneC.IRContactInfo>>();
+            foreach(var item in contactInfos)
+            {
+                Guid idPerson = new Guid(item.KeyObject);
+                if(!groupedContactInfo.ContainsKey(idPerson))
+                    groupedContactInfo.Add(idPerson, new List<OneC.IRContactInfo> { item });
+                else
+                    groupedContactInfo[idPerson].Add(item);
+            }
+
+            Guid kindOfEmailContactInfo = new Guid("6b1ae98e-bb91-11ea-80c7-00155d65b747");
+            Guid kindOfPhoneContactInfo = new Guid("f1862c22-bb94-11ea-80c7-00155d65b747");
+            Guid kindOfWorkPhoneContactInfo = new Guid("08188400-bb94-11ea-80c7-00155d65b747");
+
+            foreach(var person in personsWithEmails)
+            {
+                List<OneC.IRContactInfo> contactInfoOfPerson = groupedContactInfo[person.Ref_Key];
+                foreach(var contactInfo in contactInfoOfPerson)
+                {
+                    Guid kindOfInfo = new Guid(contactInfo.KeyKind);
+                    if(kindOfInfo == kindOfEmailContactInfo)
+                        person.ContactInfoEmail = contactInfo;
+                    else if(kindOfInfo == kindOfPhoneContactInfo)
+                        person.ContactInfoPhone = contactInfo;
+                    else if(kindOfInfo == kindOfWorkPhoneContactInfo)
+                        person.ContactInfoWorkPhone = contactInfo;
+                    else continue;
+                }
+            }
+
+
+            List<OneC.Employee> employeesWithEmails = OneCHttpClient.GetObjsByIds<OneC.Employee>(idsPersonsWithEmails, "Физлицо_Key");
+
+            // Получаем связанные физические лица
+            //List<OneC.Person> persons = OneCHttpClient.GetObjsByIds<OneC.Person>(emails.Keys);
+            
         }
 
         public static void ShowIRContactInfo()
@@ -70,17 +144,7 @@ namespace App
             //List<OneC.IRContactInfo> objs = OneCHttpClient.GetObjs<OneC.IRContactInfo>("$top=20");            
         }
 
-        public static void SyncEmployees(Guid? guidOfAddressInfoOfTypeEmail = null)
-        {
-            // Так как ключевое свойство для синхронизации информации о сотрудниках начинаем поиск с InformationRegister_КонтактнаяИнформация
-            // и ищем объекты которые связанны с записью Catalog_ВидыКонтактнойИнформации електронная почта,
-            // то есть по следующему Guid:
-            guidOfAddressInfoOfTypeEmail ??= new Guid("6b1ae98e-bb91-11ea-80c7-00155d65b747");
-            // Указанный идентификатор нужно будет добавить в настройки Creatio, чтобы иметь возпожность изменить его на продуктиве
-
-            OneCHttpClient.GetObjs<OneC.IRContactInfo>("$filter=Объект_Type eq 'StandardODATA.Catalog_ФизическиеЛица' and cast(Вид, 'Catalog_ВидыКонтактнойИнформации') eq guid'6b1ae98e-bb91-11ea-80c7-00155d65b747'")
-                .ShowOneCObjects();
-        }
+        
 
         public static void ShowEmployees()
         {
@@ -172,13 +236,14 @@ namespace App
 
     public static class Ext_OneCObject
     {
-        public static void ShowOneCObjects<T>(this IEnumerable<T> objects) where T : OneC.OneCObject
+        public static List<T> ShowOneCObjects<T>(this List<T> objects) where T : OneC.OneCObject
         {
             foreach(T obj in objects)
             {
                 obj.Show();
                 Console.WriteLine($"\n\n");
             }
+            return objects;
         }
     }
 }

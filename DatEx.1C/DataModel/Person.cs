@@ -76,5 +76,14 @@
         [CreatioAux]
         [JsonProperty("Parent")]
         public Person Parent { get; set; }
+
+        [JsonIgnore]
+        public IRContactInfo ContactInfoEmail { get; set; }
+
+        [JsonIgnore]
+        public IRContactInfo ContactInfoPhone { get; set; }
+
+        [JsonIgnore]
+        public IRContactInfo ContactInfoWorkPhone { get; set; }
     }
 }

@@ -15,7 +15,9 @@ namespace DatEx.OneC
     {
         #region Общие методы
 
-        public List<T> GetObjs<T>(String query = default(String)) where T : OneCObject
+        public List<T> GetObjs<T>(String query = default(String)) where T : OneCObject => GetObjs<T, T>(query);
+
+        public List<R> GetObjs<T, R>(String query = default(String)) where T : OneCObject
         {
             String typeName = TypesMap[typeof(T)];
             String separator = !String.IsNullOrEmpty(query) ? "&" : "";
@@ -26,32 +28,33 @@ namespace DatEx.OneC
 #if DEBUG
             result = JToken.Parse(result).ToString(Formatting.Indented);
 #endif
-            return JsonConvert.DeserializeObject<OneCODataResult<T>>(result).Values;
+            return JsonConvert.DeserializeObject<OneCODataResult<R>>(result).Values;
         }
+        
 
-        public List<Guid> GetIdsOfObjs<T>(String query = default(String)) where T : OneCBaseLookup
+        public List<Guid> GetIdsOfObjs<T>(String query = null, String nameOfGuidFieldToSelect = "Ref_Key") where T : OneCObject
         {
             String typeName = TypesMap[typeof(T)];
             String separator = !String.IsNullOrEmpty(query) ? "&" : "";
-            String fullQuery = $"{typeName}/?{query}{separator}$select=Ref_Key&{AsJson}";
+            String fullQuery = $"{typeName}/?{query}{separator}$select={nameOfGuidFieldToSelect}&{AsJson}";
             HttpResponseMessage response = HttpClient.GetAsync(fullQuery).Result;
             response.EnsureSuccessStatusCode();
             String result = response.Content.ReadAsStringAsync().Result;
 #if DEBUG
             result = JToken.Parse(result).ToString(Formatting.Indented);
 #endif
-            return JsonConvert.DeserializeObject<ODataIdentifiersResult>(result).Identifiers.Select(x => x.Id).ToList();
+            //return JsonConvert.DeserializeObject<ODataIdentifiersResult>(result).Identifiers.Select(x => x.Id).ToList();
+            return JObject.Parse(result)["value"].Select(i => i[nameOfGuidFieldToSelect]).Select(x => new Guid(x.Value<String>())).ToList();
         }
 
-        public List<T> GetObjsByIds<T>(IEnumerable<Guid> identifiers) where T : OneCBaseLookup
+        public List<T> GetObjsByIds<T>(IEnumerable<Guid> identifiers, String nameOfGuidFieldToCompare = "Ref_Key") where T : OneCObject
         {
-            String typeName = TypesMap[typeof(T)];
-            String filter = String.Join(" or \n", identifiers.Select(id => $"Ref_Key eq guid'{id}'"));
-            String query = $"{typeName}/?$filter=\n{filter}{AsJson}";
+            String filter = String.Join(" or \n", identifiers.Select(id => $"{nameOfGuidFieldToCompare} eq guid'{id}'"));
+            String query = $"$filter={filter}";
             return GetObjs<T>(query);
         }
 
-        public List<T> GetObjsByIds<T>(Guid identifier, params Guid[] identifiers) where T : OneCBaseLookup
+        public List<T> GetObjsByIds<T>(Guid identifier, params Guid[] identifiers) where T : OneCObject
         {
             List<Guid> ids = new List<Guid>(identifiers);
             ids.Add(identifier);

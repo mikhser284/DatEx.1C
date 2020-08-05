@@ -96,5 +96,8 @@ namespace DatEx.OneC.DataModel
         [CreatioAux]
         [JsonProperty("ТипКвартиры")]
         public String TypeOfFlat { get; set; }
+
+        [JsonIgnore]
+        public ContactInfoType TypeOfContactInfo { get; set; }
     }
 }
