@@ -99,5 +99,11 @@ namespace DatEx.OneC.DataModel
 
         [JsonIgnore]
         public ContactInfoType TypeOfContactInfo { get; set; }
+
+        public override String ToString()
+        {
+
+            return $"{(TypeOfContactInfo is null ? KeyType : $"{TypeOfContactInfo.Type} ({TypeOfContactInfo.Description})")} = {View}";
+        }
     }
 }

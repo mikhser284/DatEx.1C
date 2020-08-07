@@ -31,6 +31,6 @@
         [JsonProperty("Отчество")]
         public String MiddleName { get; set; }
 
-
+        public override String ToString() => $"{Surname} {GivenName} {MiddleName}";
     }
 }

@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 namespace DatEx.OneC
 {   
     /// <summary> Получение контрагентов </summary>
-    public partial class ClientOfOneC
+    public partial class HttpClientOfOneC
     {
         #region Общие методы
 
@@ -83,15 +83,23 @@ namespace DatEx.OneC
 
         #region Служебные
 
-        public ClientOfOneC(SettingsForClientOf1C settings)
+        public HttpClientOfOneC(HttpClientOfOneCSettings settings)
         {
             HttpClient = GetConfiguredClient(settings);
+            Domain = settings.Domain;
+            GuidOfEmailContactInfo = settings.GuidOfEmailContactInfo;
+            GuidOfPhoneContactInfo = settings.GuidOfPhoneContactInfo;
+            GuidOfWorkPhoneContactInfo = settings.GuidOfWorkPhoneContactInfo;
         }
 
         private readonly HttpClient HttpClient;
         private const String AsJson = "$format=application/json";
+        public String Domain { get; set; }
+        public Guid GuidOfEmailContactInfo { get; set; }
+        public Guid GuidOfPhoneContactInfo { get; set; }
+        public Guid GuidOfWorkPhoneContactInfo { get; set; }
 
-        private HttpClient GetConfiguredClient(SettingsForClientOf1C settings)
+        private HttpClient GetConfiguredClient(HttpClientOfOneCSettings settings)
         {
             HttpClient httpClient = new HttpClient();
             httpClient.BaseAddress = new Uri(settings.ServiceBaseAddress);

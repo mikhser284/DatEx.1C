@@ -12,9 +12,10 @@ namespace App
 {
     class Program
     {
-        private static ClientOfCreatio CreatioHttpClient = ClientOfCreatio.LogIn("http://185.59.101.152:50080/", "Supervisor", "Supervisor");
-        private static SettingsForClientOf1C settings = new SettingsForClientOf1C("http://185.59.101.152:50081/Dev03_1C/odata/standard.odata/", "Администратор", "");
-        public static ClientOfOneC OneCHttpClient = new ClientOfOneC(settings);
+        private static HttpClientOfCreatio CreatioHttpClient = 
+            HttpClientOfCreatio.LogIn("http://185.59.101.152:50080/", "Supervisor", "Supervisor");
+        public static HttpClientOfOneC OneCHttpClient = 
+            new HttpClientOfOneC(HttpClientOfOneCSettings.GetDefaultSettings("http://185.59.101.152:50081/Dev03_1C/odata/standard.odata/", "Администратор", ""));
 
 
 
@@ -44,22 +45,13 @@ namespace App
             ITIS.Employee mZorin = contacts.FirstOrDefault(x => x.ITISSurName.Contains("Зорін"));
         }
 
-        public static void SyncEmployees(Guid? guidOfAddressInfoOfTypeEmail = null, String domain = null)
+        public static void SyncEmployees()
         {
-            // Так как ключевое свойство для синхронизации информации о сотрудниках начинаем поиск с InformationRegister_КонтактнаяИнформация
-            // и ищем объекты которые связанны с записью Catalog_ВидыКонтактнойИнформации електронная почта,
-            // то есть по нижеследующему Guid:
-            // Указанный идентификатор нужно будет добавить в настройки Creatio, чтобы иметь возпожность изменить его на продуктиве
-            guidOfAddressInfoOfTypeEmail ??= new Guid("6b1ae98e-bb91-11ea-80c7-00155d65b747");
-
-            // Домен почты. Также нужно будет добавить в настройки Creatio, чтобы иметь возможность изменить при необходимости
-            domain ??= "@kustoagro.com";
-
             // Получаем идентификаторы физ. лиц из 1С с почтовыми адресами, которые оканчиваются на указанный домен
             List<Guid> idsPersonsWithEmails = OneCHttpClient.GetIdsOfObjs<OneC.IRContactInfo>(
                 "$filter=Объект_Type eq 'StandardODATA.Catalog_ФизическиеЛица'"
-                + $" and cast(Вид, 'Catalog_ВидыКонтактнойИнформации') eq guid'{guidOfAddressInfoOfTypeEmail}'"
-                + $" and endswith(Представление, '{domain}') eq true" , "Объект");
+                + $" and cast(Вид, 'Catalog_ВидыКонтактнойИнформации') eq guid'{OneCHttpClient.GuidOfEmailContactInfo}'"
+                + $" and endswith(Представление, '{OneCHttpClient.Domain}') eq true" , "Объект");
 
             // Одновременно получаем связанную контактрую информацию, типы контактной информации, физ. лица и сотрудников
             List<OneC.IRContactInfo> contactInfos = OneCHttpClient.GetObjsByIds<OneC.IRContactInfo>(idsPersonsWithEmails, "cast(Объект, 'Catalog_ФизическиеЛица')");
@@ -70,7 +62,7 @@ namespace App
                     .ToDictionary(k => k.Ref_Key);
                 foreach(var contactInfo in contactInfos) contactInfo.TypeOfContactInfo = contactInfoTypes[new Guid(contactInfo.KeyKind)];
             }
-            List<OneC.Person> personsWithEmails = OneCHttpClient.GetObjsByIds<OneC.Person>(idsPersonsWithEmails);
+            Dictionary<Guid, OneC.Person> personsWithEmails = OneCHttpClient.GetObjsByIds<OneC.Person>(idsPersonsWithEmails).ToDictionary(k => k.Ref_Key);
 
             // Сгрупировать контактную информацию по физ. лицу
             Dictionary<Guid, List<OneC.IRContactInfo>> groupedContactInfo = new Dictionary<Guid, List<OneC.IRContactInfo>>();
@@ -83,32 +75,34 @@ namespace App
                     groupedContactInfo[idPerson].Add(item);
             }
 
-            Guid kindOfEmailContactInfo = new Guid("6b1ae98e-bb91-11ea-80c7-00155d65b747");
-            Guid kindOfPhoneContactInfo = new Guid("f1862c22-bb94-11ea-80c7-00155d65b747");
-            Guid kindOfWorkPhoneContactInfo = new Guid("08188400-bb94-11ea-80c7-00155d65b747");
-
-            foreach(var person in personsWithEmails)
+            foreach(var person in personsWithEmails.Values)
             {
                 List<OneC.IRContactInfo> contactInfoOfPerson = groupedContactInfo[person.Ref_Key];
                 foreach(var contactInfo in contactInfoOfPerson)
                 {
                     Guid kindOfInfo = new Guid(contactInfo.KeyKind);
-                    if(kindOfInfo == kindOfEmailContactInfo)
+                    if(kindOfInfo == OneCHttpClient.GuidOfEmailContactInfo)
                         person.ContactInfoEmail = contactInfo;
-                    else if(kindOfInfo == kindOfPhoneContactInfo)
+                    else if(kindOfInfo == OneCHttpClient.GuidOfPhoneContactInfo)
                         person.ContactInfoPhone = contactInfo;
-                    else if(kindOfInfo == kindOfWorkPhoneContactInfo)
+                    else if(kindOfInfo == OneCHttpClient.GuidOfWorkPhoneContactInfo)
                         person.ContactInfoWorkPhone = contactInfo;
                     else continue;
                 }
             }
 
-
             List<OneC.Employee> employeesWithEmails = OneCHttpClient.GetObjsByIds<OneC.Employee>(idsPersonsWithEmails, "Физлицо_Key");
 
+            foreach(var employee in employeesWithEmails) employee.Person = personsWithEmails[(Guid)employee.PersonId];
+
+
+            CreatioHttpClient.ODataGet<ITIS.Contact>("$filter=Email eq ''");
+
+            ITIS.Employee empl = new ITIS.Employee();
+            empl.Contact.Email
+
             // Получаем связанные физические лица
-            //List<OneC.Person> persons = OneCHttpClient.GetObjsByIds<OneC.Person>(emails.Keys);
-            
+            //List<OneC.Person> persons = OneCHttpClient.GetObjsByIds<OneC.Person>(emails.Keys);           
         }
 
         public static void ShowIRContactInfo()

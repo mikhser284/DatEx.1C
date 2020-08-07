@@ -14,10 +14,12 @@ namespace DatEx.OneC.DataModel
         [JsonProperty("IdCreatio")]
         public String IdCreatio { get; set; }
 
-        [CreatioPropertyMap("Раздел<Контакты>", "ContactId", "Физлицо_Key")]
+        [CreatioPropertyMap("Раздел<Контакты>", "PersonId", "Физлицо_Key")]
         [JsonProperty("Физлицо_Key")]
-        public Guid? ContactId { get; set; }
+        public Guid? PersonId { get; set; }
 
+        [JsonIgnore]
+        public Person Person { get; set; }
 
         [CreatioIgnore]
         [JsonProperty("ДатаНачала")]
@@ -151,5 +153,7 @@ namespace DatEx.OneC.DataModel
         [CreatioIgnore]
         [JsonProperty("ПерсональныеНадбавки")]
         public object[] PersonalAllowances { get; set; }
+
+        public override String ToString() => $"{Description}";
     }
 }

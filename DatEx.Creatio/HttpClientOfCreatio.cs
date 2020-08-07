@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace DatEx.Creatio
 {
-    public class ClientOfCreatio
+    public class HttpClientOfCreatio
     {
         private readonly Uri BaseUri;
         private readonly Uri AuthServiceUri;
@@ -20,16 +20,16 @@ namespace DatEx.Creatio
         private HttpClient CreatioClient;
         //private Dictionary<String, Cookie> Cookies { get; set; } = new Dictionary<string, Cookie>();
 
-        private ClientOfCreatio(String baseUri)
+        private HttpClientOfCreatio(String baseUri)
         {
             BaseUri = new Uri(baseUri);
             AuthServiceUri = new Uri(BaseUri, "ServiceModel/AuthService.svc/Login");
             OdataUri = new Uri(BaseUri, "0/odata/");
         }
 
-        private static ClientOfCreatio GetConfiguredClient(String baseAddress, HttpClientHandler handler = null)
+        private static HttpClientOfCreatio GetConfiguredClient(String baseAddress, HttpClientHandler handler = null)
         {
-            ClientOfCreatio client = new ClientOfCreatio(baseAddress);
+            HttpClientOfCreatio client = new HttpClientOfCreatio(baseAddress);
             HttpClient httpClient = handler is null ? new HttpClient() : new HttpClient(handler);
             httpClient.BaseAddress = client.BaseUri;
             httpClient.DefaultRequestHeaders.Accept.Clear();
@@ -38,11 +38,11 @@ namespace DatEx.Creatio
             return client;
         }
 
-        public static ClientOfCreatio LogIn(String baseAddress, String userName, String userPassword)
+        public static HttpClientOfCreatio LogIn(String baseAddress, String userName, String userPassword)
         {
             AuthResponse loginStatus;
             HttpClientHandler handler = new HttpClientHandler() { CookieContainer = new CookieContainer() };
-            ClientOfCreatio creatioClient = GetConfiguredClient(baseAddress, handler);
+            HttpClientOfCreatio creatioClient = GetConfiguredClient(baseAddress, handler);
             HttpClient client = creatioClient.CreatioClient;
             String authData = JsonConvert.SerializeObject(new AuthRequest(userName, userPassword));
             StringContent content = new StringContent(authData, Encoding.UTF8, "application/json");
@@ -80,7 +80,7 @@ namespace DatEx.Creatio
 
         public List<T> ODataGet<T>(String query = default(String))
         {
-            String fullQueryString = $"{OdataUri}{typeof(T).Name}{query}";
+            String fullQueryString = $"{OdataUri}{typeof(T).Name}/?{query}";
             String requestResult = GetRequest(fullQueryString);
             CreatioOdataRequestResult<T> result = JsonConvert.DeserializeObject<CreatioOdataRequestResult<T>>(requestResult);
             if(result.Values.Count == 0)
@@ -96,6 +96,20 @@ namespace DatEx.Creatio
         {
             CreatioOdataRequestResult<TB> oDataRequestResult = GetRequest<CreatioOdataRequestResult<TB>>($"{OdataUri}{typeof(TA).Name}{query}");
             return oDataRequestResult.Values;
+        }
+
+        public List<T> ODataGet<T, P>()
+        {
+            String fullQueryString = $"{OdataUri}{typeof(T).Name}/?{query}";
+            String requestResult = GetRequest(fullQueryString);
+            CreatioOdataRequestResult<T> result = JsonConvert.DeserializeObject<CreatioOdataRequestResult<T>>(requestResult);
+            if(result.Values.Count == 0)
+            {
+                T singleValue = JsonConvert.DeserializeObject<T>(requestResult);
+                return new List<T> { singleValue };
+            }
+
+            return result.Values;
         }
 
         public T ODataAdd<T>(T entity) where T : BaseEntity
@@ -144,6 +158,8 @@ namespace DatEx.Creatio
             HttpResponseMessage response = CreatioClient.DeleteAsync(odataUri).Result;
             response.EnsureSuccessStatusCode();
         }
+
+
     }
 
 

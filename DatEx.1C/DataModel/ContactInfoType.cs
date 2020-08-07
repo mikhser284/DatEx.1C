@@ -16,5 +16,7 @@ namespace DatEx.OneC.DataModel
         [CreatioAux]
         [JsonProperty("ВидОбъектаКонтактнойИнформации")]
         public String KindOfContactInfoObject { get; set; }
+
+        public override String ToString() => $"{Type} {KindOfContactInfoObject}";
     }
 }

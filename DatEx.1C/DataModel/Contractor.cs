@@ -135,5 +135,7 @@ namespace DatEx.OneC.DataModel
         [CreatioIgnore]
         [JsonProperty("ГоловнойКонтрагентnavigationLinkUrl")]
         public String HeadContractorNavigationLinkUrl { get; set; }
+
+        public override String ToString() => $"{FullName} {CodeOfEdrpo}";
     }
 }

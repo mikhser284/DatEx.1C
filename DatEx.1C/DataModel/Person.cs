@@ -85,5 +85,7 @@
 
         [JsonIgnore]
         public IRContactInfo ContactInfoWorkPhone { get; set; }
+
+        public override String ToString() => $"{Description}";
     }
 }
