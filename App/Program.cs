@@ -107,8 +107,20 @@ namespace App
             foreach (var employee in employeesWithEmails) employee.XxxOrganization = organizations[(Guid)employee.OrganizationId];
 
             // Связать сотрудников с подразделениями
-            Dictionary<Guid, OneC.OrganizationSubdivision> subdivisions = OneCHttpClient.GetObjs<OneC.OrganizationSubdivision>().ToDictionary(k => k.Id);
-            foreach (var employee in employeesWithEmails) employee.XxxOrganizationSubdivision = subdivisions[(Guid)employee.OrganizationSubdivisionId];
+            //Dictionary<Guid, OneC.OrganizationSubdivision> subdivisions = OneCHttpClient.GetObjsByIds<OneC.OrganizationSubdivision>().GetObjs<OneC.OrganizationSubdivision>().ToDictionary(k => k.Id);
+            //var s = subdivisions.Values.OrderBy(x => x.Description).ToList();
+
+            Dictionary<Guid, OneC.OrganizationSubdivision> subdivisions = OneCHttpClient.GetObjsByIds<OneC.OrganizationSubdivision>(
+                employeesWithEmails
+                .Where(x => x.CurrentOrganizationSubdivisionId != null)
+                .Select(x => (Guid)x.CurrentOrganizationSubdivisionId))
+                .ToDictionary(k => k.Id);
+
+
+            foreach(var employee in employeesWithEmails)
+            {
+                employee.XxxOrganizationSubdivision = subdivisions[(Guid)employee.CurrentOrganizationSubdivisionId];
+            }
 
             Dictionary<String, OneC.Employee> emailsAndPersons = employeesWithEmails.ToDictionary(k => k.Person.ContactInfoEmail.View);
             employeesWithEmails.FirstOrDefault()?.Show();
@@ -143,8 +155,9 @@ namespace App
                 c.Surname = c1.Person.NameInfo.Surname;
                 c.MiddleName = c1.Person.NameInfo.MiddleName;
                 c.Name = $"{c.Surname} {c.MiddleName} {c.GivenName}";
-
             }
+
+            Terrasoft.Account account = CreatioHttpClient.GetObjById<Terrasoft.Account>(new Guid("b404c1c6-0508-489e-8b35-a02daca2066c"));
 
             // Создать контакты, которые существуют в 1С но еще не существуют в Creatio
 
