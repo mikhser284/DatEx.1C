@@ -9,6 +9,10 @@
     [JsonObject("Catalog_ФизическиеЛица")]
     public class Person : OneCBaseHierarchicalLookup
     {
+        [CreatioAux]
+        [JsonIgnore]
+        public IRNamesOfPersons NameInfo { get; set; }
+
         [CreatioPropertyMap("Guid", "Id", "IdCreatio")]
         [JsonProperty("IdCreatio")]
         public String IdCreatio { get; set; }

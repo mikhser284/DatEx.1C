@@ -16,5 +16,10 @@
 
         /// <summary> Полное название </summary>
         public String FullName { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

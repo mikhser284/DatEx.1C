@@ -134,5 +134,10 @@
 
         /// <summary> КПП </summary>
         public String KPP { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

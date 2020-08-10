@@ -7,6 +7,7 @@ using DatEx.Creatio;
 using ITIS = DatEx.Creatio.DataModel.ITIS;
 using System.Security.Cryptography.X509Certificates;
 using Newtonsoft.Json.Linq;
+using Terrasoft = DatEx.Creatio.DataModel.Terrasoft.Base;
 
 namespace App
 {
@@ -15,12 +16,14 @@ namespace App
         private static HttpClientOfCreatio CreatioHttpClient = 
             HttpClientOfCreatio.LogIn("http://185.59.101.152:50080/", "Supervisor", "Supervisor");
         public static HttpClientOfOneC OneCHttpClient = 
-            new HttpClientOfOneC(HttpClientOfOneCSettings.GetDefaultSettings("http://185.59.101.152:50081/Dev03_1C/odata/standard.odata/", "Администратор", ""));
+            new HttpClientOfOneC(new HttpClientOfOneCSettings("http://185.59.101.152:50081/Dev03_1C/odata/standard.odata/", "Администратор", ""));
 
 
 
         static void Main(string[] args)
         {
+            //List<Terrasoft.ContactType> contactTypes = CreatioHttpClient.ODataGet<Terrasoft.ContactType>();
+
             //GetContractorsByIdentifiers();
             //GetContractorsByIdentifier();
             //GetContractorsByCodesOfEdrpo();
@@ -33,8 +36,9 @@ namespace App
 
             //ShowIRContactInfo();
 
-        
-            SyncEmployees();
+
+            SyncSettings settings = SyncSettings.GetDefaultSettings();
+            SyncEmployees(settings);
         }
 
         
@@ -45,24 +49,27 @@ namespace App
             ITIS.Employee mZorin = contacts.FirstOrDefault(x => x.ITISSurName.Contains("Зорін"));
         }
 
-        public static void SyncEmployees()
+        public static void SyncEmployees(SyncSettings settings)
         {
             // Получаем идентификаторы физ. лиц из 1С с почтовыми адресами, которые оканчиваются на указанный домен
             List<Guid> idsPersonsWithEmails = OneCHttpClient.GetIdsOfObjs<OneC.IRContactInfo>(
                 "$filter=Объект_Type eq 'StandardODATA.Catalog_ФизическиеЛица'"
-                + $" and cast(Вид, 'Catalog_ВидыКонтактнойИнформации') eq guid'{OneCHttpClient.GuidOfEmailContactInfo}'"
-                + $" and endswith(Представление, '{OneCHttpClient.Domain}') eq true" , "Объект");
+                + $" and cast(Вид, 'Catalog_ВидыКонтактнойИнформации') eq guid'{settings.OneCGuidOfEmailContactInfo}'"
+                + $" and endswith(Представление, '{settings.EmailDomain}') eq true" , "Объект");
 
-            // Одновременно получаем связанную контактрую информацию, типы контактной информации, физ. лица и сотрудников
+            // Получаем связанную контактрую информацию, типы контактной информации, физ. лица и сотрудников
             List<OneC.IRContactInfo> contactInfos = OneCHttpClient.GetObjsByIds<OneC.IRContactInfo>(idsPersonsWithEmails, "cast(Объект, 'Catalog_ФизическиеЛица')");
-            contactInfos.ShowOneCObjects();            
             {
                 Dictionary<Guid, OneC.ContactInfoType> contactInfoTypes = 
                     OneCHttpClient.GetObjsByIds<OneC.ContactInfoType>(contactInfos.Select(x => new Guid(x.KeyKind)).Distinct().ToList())
-                    .ToDictionary(k => k.Ref_Key);
+                    .ToDictionary(k => k.Id);
                 foreach(var contactInfo in contactInfos) contactInfo.TypeOfContactInfo = contactInfoTypes[new Guid(contactInfo.KeyKind)];
             }
-            Dictionary<Guid, OneC.Person> personsWithEmails = OneCHttpClient.GetObjsByIds<OneC.Person>(idsPersonsWithEmails).ToDictionary(k => k.Ref_Key);
+            Dictionary<Guid, OneC.Person> personsWithEmails = OneCHttpClient.GetObjsByIds<OneC.Person>(idsPersonsWithEmails).ToDictionary(k => k.Id);
+
+            // Получаем данные из регистра InformationRegister_ФИОФизЛиц и связываем з физлицами
+            List<OneC.IRNamesOfPersons> namesOfPersons = OneCHttpClient.GetObjsByIds<OneC.IRNamesOfPersons>(idsPersonsWithEmails, "cast(ФизЛицо, 'Catalog_ФизическиеЛица')");
+            foreach (var personName in namesOfPersons) personsWithEmails[personName.KeyPerson].NameInfo = personName;
 
             // Сгрупировать контактную информацию по физ. лицу
             Dictionary<Guid, List<OneC.IRContactInfo>> groupedContactInfo = new Dictionary<Guid, List<OneC.IRContactInfo>>();
@@ -77,29 +84,75 @@ namespace App
 
             foreach(var person in personsWithEmails.Values)
             {
-                List<OneC.IRContactInfo> contactInfoOfPerson = groupedContactInfo[person.Ref_Key];
+                List<OneC.IRContactInfo> contactInfoOfPerson = groupedContactInfo[person.Id];
                 foreach(var contactInfo in contactInfoOfPerson)
                 {
                     Guid kindOfInfo = new Guid(contactInfo.KeyKind);
-                    if(kindOfInfo == OneCHttpClient.GuidOfEmailContactInfo)
+                    if(kindOfInfo == settings.OneCGuidOfEmailContactInfo)
                         person.ContactInfoEmail = contactInfo;
-                    else if(kindOfInfo == OneCHttpClient.GuidOfPhoneContactInfo)
+                    else if(kindOfInfo == settings.OneCGuidOfPhoneContactInfo)
                         person.ContactInfoPhone = contactInfo;
-                    else if(kindOfInfo == OneCHttpClient.GuidOfWorkPhoneContactInfo)
+                    else if(kindOfInfo == settings.OneCGuidOfWorkPhoneContactInfo)
                         person.ContactInfoWorkPhone = contactInfo;
                     else continue;
                 }
             }
 
+            // Связать физлица с сотрудниками
             List<OneC.Employee> employeesWithEmails = OneCHttpClient.GetObjsByIds<OneC.Employee>(idsPersonsWithEmails, "Физлицо_Key");
-
             foreach(var employee in employeesWithEmails) employee.Person = personsWithEmails[(Guid)employee.PersonId];
 
+            // Связать сотрудников с организациями
+            Dictionary<Guid, OneC.Organization> organizations = OneCHttpClient.GetObjs<OneC.Organization>().ToDictionary(k => k.Id);
+            foreach (var employee in employeesWithEmails) employee.XxxOrganization = organizations[(Guid)employee.OrganizationId];
 
-            CreatioHttpClient.ODataGet<ITIS.Contact>("$filter=Email eq ''");
+            // Связать сотрудников с подразделениями
+            Dictionary<Guid, OneC.OrganizationSubdivision> subdivisions = OneCHttpClient.GetObjs<OneC.OrganizationSubdivision>().ToDictionary(k => k.Id);
+            foreach (var employee in employeesWithEmails) employee.XxxOrganizationSubdivision = subdivisions[(Guid)employee.OrganizationSubdivisionId];
 
-            ITIS.Employee empl = new ITIS.Employee();
-            empl.Contact.Email
+            Dictionary<String, OneC.Employee> emailsAndPersons = employeesWithEmails.ToDictionary(k => k.Person.ContactInfoEmail.View);
+            employeesWithEmails.FirstOrDefault()?.Show();
+
+            // Получить контакты по соответствующим Email и с типом Сотрудник нашей организации
+            List<ITIS.Contact> contacts = CreatioHttpClient.GetObjsWherePropIn<ITIS.Contact, String>("Email", emailsAndPersons.Keys.ToList()).ToList();
+            contacts = contacts.Where(x => x.TypeId == settings.CreatioGuidOfContactsWithTypeOurEmployees).ToList();
+
+            var contact = contacts.FirstOrDefault();
+            contact.ITISEmployeePosition = CreatioHttpClient.GetObjById<ITIS.EmployeeJob>(contact.ITISEmployeePositionId);
+            contact.ITISSubdivision = CreatioHttpClient.GetObjById<Terrasoft.AccountOrganizationChart>(contact.ITISSubdivisionId);
+            contact.ITISOrganizationSubdivision = CreatioHttpClient.GetObjById<Terrasoft.OrgStructureUnit>(contact.ITISOrganizationSubdivisionId);
+            contact.Account = CreatioHttpClient.GetObjById<Terrasoft.Account>(contact.AccountId);
+            contact.Gender = CreatioHttpClient.GetObjById<Terrasoft.Gender>(contact.GenderId);
+            contact.Type = CreatioHttpClient.GetObjById<Terrasoft.ContactType>(contact.TypeId);
+            contact.Job = CreatioHttpClient.GetObjById<Terrasoft.Job>(contact.JobId);
+            contact.Department = CreatioHttpClient.GetObjById<Terrasoft.Department>(contact.DepartmentId);
+
+            // синхронизировать инфо. для контактов, которые существуют в 1С и Creatio
+            foreach (ITIS.Contact c in contacts)
+            {
+                OneC.Employee c1 = null;
+                // Если контакт есть только в Creatio но отсутсвует в 1С - пропустить
+                if (!emailsAndPersons.TryGetValue(c.Email, out c1)) continue;
+                // Если в настройках синхронизации указанно не синхронизировать - пропустить
+                // Todo
+
+                c.IdOneC = c1.Id;
+                c.Name = c1.Person.Description;
+                //c.TypeId = settings.CreatioGuidOfContactsWithTypeOurEmployees; // Для новых объектов
+                c.GivenName = c1.Person.NameInfo.GivenName;
+                c.Surname = c1.Person.NameInfo.Surname;
+                c.MiddleName = c1.Person.NameInfo.MiddleName;
+                c.Name = $"{c.Surname} {c.MiddleName} {c.GivenName}";
+
+            }
+
+            // Создать контакты, которые существуют в 1С но еще не существуют в Creatio
+
+
+            contact.Show();
+
+            //ITIS.Employee empl = new ITIS.Employee();
+            //empl.Contact.Email
 
             // Получаем связанные физические лица
             //List<OneC.Person> persons = OneCHttpClient.GetObjsByIds<OneC.Person>(emails.Keys);           

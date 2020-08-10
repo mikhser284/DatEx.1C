@@ -54,6 +54,8 @@
         [JsonIgnoreSerialization]
         public Int32 ProcesListeners { get; set; }
 
+
+
         public void Show()
         {
             var properties = this.GetType().GetProperties();
@@ -70,12 +72,18 @@
                 {
                     var attribute = (CreatioPropAttribute)p.GetCustomAttributes(typeof(CreatioPropAttribute), false).FirstOrDefault();
                     String propValue = p.GetValue(obj)?.ToString();
-                    if (p.PropertyType != typeof(String) && typeof(ICollection).IsAssignableFrom(p.PropertyType))
+                    if (p.GetValue(obj) == null) propValue = "---";
+                    else if (p.PropertyType != typeof(String) && typeof(ICollection).IsAssignableFrom(p.PropertyType))
                     {
                         var val = (ICollection)p.GetValue(obj);
                         propValue = $"{val.Count} шт.";
                     }
-                    Console.WriteLine($" {p.Name.PadRight(maxPropNameLen)} │ {attribute.Title.PadRight(maxPropTitleLen)} │ {propValue}");
+                    else if (p.PropertyType == typeof(Guid))
+                    {
+                        Guid val = (Guid)p.GetValue(obj);
+                        propValue = Guid.Empty == (Guid)p.GetValue(obj) ? "---" : val.ToString();
+                    }                    
+                    Console.WriteLine($" {p.Name.PadRight(maxPropNameLen)} │ {(attribute?.Title ?? "<Не указанно>").PadRight(maxPropTitleLen)} │ {propValue}");
                 }
             }
         }

@@ -8,8 +8,17 @@ namespace DatEx.OneC.DataModel
 {
     [CreatioTypeMap("DatEx.Creatio.DataModel.ITIS.Contact", "Catalog_СотрудникиОрганизаций")]
     [JsonObject("Catalog_СотрудникиОрганизаций")]
-    public class Employee : OneCBaseLookup
+    public class Employee : OneCBaseHierarchicalLookup
     {
+
+        [CreatioIgnore]
+        [JsonIgnore]
+        public Organization XxxOrganization { get; set; }
+
+        [CreatioIgnore]
+        [JsonIgnore]
+        public OrganizationSubdivision XxxOrganizationSubdivision { get; set; }
+
         [CreatioPropertyMap("Guid", "Id", "IdCreatio")]
         [JsonProperty("IdCreatio")]
         public String IdCreatio { get; set; }
@@ -18,6 +27,7 @@ namespace DatEx.OneC.DataModel
         [JsonProperty("Физлицо_Key")]
         public Guid? PersonId { get; set; }
 
+        [CreatioAux] // Catalog_ФизическиеЛица
         [JsonIgnore]
         public Person Person { get; set; }
 

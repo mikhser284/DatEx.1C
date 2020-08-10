@@ -85,19 +85,12 @@ namespace DatEx.OneC
 
         public HttpClientOfOneC(HttpClientOfOneCSettings settings)
         {
-            HttpClient = GetConfiguredClient(settings);
-            Domain = settings.Domain;
-            GuidOfEmailContactInfo = settings.GuidOfEmailContactInfo;
-            GuidOfPhoneContactInfo = settings.GuidOfPhoneContactInfo;
-            GuidOfWorkPhoneContactInfo = settings.GuidOfWorkPhoneContactInfo;
+            HttpClient = GetConfiguredClient(settings);            
         }
 
         private readonly HttpClient HttpClient;
         private const String AsJson = "$format=application/json";
-        public String Domain { get; set; }
-        public Guid GuidOfEmailContactInfo { get; set; }
-        public Guid GuidOfPhoneContactInfo { get; set; }
-        public Guid GuidOfWorkPhoneContactInfo { get; set; }
+        
 
         private HttpClient GetConfiguredClient(HttpClientOfOneCSettings settings)
         {
@@ -118,7 +111,9 @@ namespace DatEx.OneC
             { typeof(Person), "Catalog_ФизическиеЛица" },
             { typeof(IRNamesOfPersons), "InformationRegister_ФИОФизЛиц" },
             { typeof(IRContactInfo), "InformationRegister_КонтактнаяИнформация" },
-            { typeof(ContactInfoType), "Catalog_ВидыКонтактнойИнформации" }
+            { typeof(ContactInfoType), "Catalog_ВидыКонтактнойИнформации" },
+            { typeof(Organization), "Catalog_Организации" },
+            { typeof(OrganizationSubdivision), "Catalog_ПодразделенияОрганизаций" },
         };
 
         #endregion Служебные

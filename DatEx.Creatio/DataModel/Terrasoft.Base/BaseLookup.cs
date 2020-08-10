@@ -10,5 +10,10 @@
 
         /// <summary> Описание </summary>
         public String Description { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Name}";
+        }
     }
 }

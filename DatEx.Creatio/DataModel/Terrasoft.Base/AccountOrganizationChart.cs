@@ -36,5 +36,10 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
 
         /// <summary> Родительское подразделение </summary>
         public AccountOrganizationChart Parent { get; set; }
+
+        public override string ToString()
+        {
+            return CustomDepartmentName;
+        }
     }
 }

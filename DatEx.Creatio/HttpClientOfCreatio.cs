@@ -98,9 +98,11 @@ namespace DatEx.Creatio
             return oDataRequestResult.Values;
         }
 
-        public List<T> ODataGet<T, P>()
+        public List<T> GetObjsWherePropIn<T, P>(String propName, List<P> values)
         {
-            String fullQueryString = $"{OdataUri}{typeof(T).Name}/?{query}";
+            String filter = String.Join(" or \n", values.Select(p => $"{propName} eq '{p}'"));
+
+            String fullQueryString = $"{OdataUri}{typeof(T).Name}/?$filter={filter}";
             String requestResult = GetRequest(fullQueryString);
             CreatioOdataRequestResult<T> result = JsonConvert.DeserializeObject<CreatioOdataRequestResult<T>>(requestResult);
             if(result.Values.Count == 0)
@@ -110,6 +112,15 @@ namespace DatEx.Creatio
             }
 
             return result.Values;
+        }
+
+        public T GetObjById<T>(Guid id)
+        {
+            String fullQueryString = $"{OdataUri}{typeof(T).Name}({id})";
+            String requestResult = GetRequest(fullQueryString);
+            CreatioOdataRequestResult<T> result = JsonConvert.DeserializeObject<CreatioOdataRequestResult<T>>(requestResult);
+            T res = JsonConvert.DeserializeObject<T>(requestResult);
+            return res;
         }
 
         public T ODataAdd<T>(T entity) where T : BaseEntity

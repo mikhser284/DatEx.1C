@@ -10,9 +10,10 @@ namespace DatEx.OneC.DataModel
 {
     public class OneCBaseLookup : OneCObject
     {
+        /// <summary> Id </summary>
         [CreatioPropertyMap("Guid", "IdOneC", "Ref_Key")]
         [JsonProperty("Ref_Key")]
-        public Guid Ref_Key { get; set; }
+        public Guid Id { get; set; }
 
         [CreatioAux]
         [JsonProperty("Predefined")]
@@ -27,16 +28,17 @@ namespace DatEx.OneC.DataModel
         [JsonProperty("DataVersion")]
         public String DataVersion { get; set; }
 
-
+        /// <summary> Наименование </summary>
         [CreatioPropertyMap("String", "Name", "Description")]
         [JsonProperty("Description")]
         public String Description { get; set; }
 
-
+        /// <summary> Код </summary>
         [CreatioAux]
         [JsonProperty("Code")]
         public String Code { get; set; }
 
+        /// <summary> Пометка удаления </summary>
         [CreatioAux]
         [JsonProperty("DeletionMark")]
         public Boolean? DeletionMark { get; set; }
@@ -44,10 +46,12 @@ namespace DatEx.OneC.DataModel
 
     public class OneCBaseHierarchicalLookup : OneCBaseLookup
     {
+        /// <summary> Родитель </summary>
         [CreatioAux]
         [JsonProperty("Parent_Key")]
         public Guid? ParentId { get; set; }
 
+        /// <summary> Является папкой </summary>
         [CreatioAux]
         [JsonProperty("IsFolder")]
         public Boolean? IsFolder { get; set; }
@@ -80,12 +84,18 @@ namespace DatEx.OneC.DataModel
                 {
                     var attribute = (JsonPropertyAttribute)p.GetCustomAttributes(typeof(JsonPropertyAttribute), false).FirstOrDefault();
                     String propValue = p.GetValue(obj)?.ToString();
-                    if(p.PropertyType != typeof(String) && typeof(ICollection).IsAssignableFrom(p.PropertyType))
+                    if (p.GetValue(obj) == null) propValue = "---";
+                    else if (p.PropertyType != typeof(String) && typeof(ICollection).IsAssignableFrom(p.PropertyType))
                     {
                         var val = (ICollection)p.GetValue(obj);
                         propValue = $"{val.Count} шт.";
                     }
-                    Console.WriteLine($" {p.Name.PadRight(maxCreatioPropNameLen)} │ {attribute.PropertyName.PadRight(maxOneCPropNameLen)} │ {propValue}");
+                    else if (p.PropertyType == typeof(Guid))
+                    {
+                        Guid val = (Guid)p.GetValue(obj);
+                        propValue = Guid.Empty == (Guid)p.GetValue(obj) ? "---" : val.ToString();
+                    }
+                    Console.WriteLine($" {p.Name.PadRight(maxCreatioPropNameLen)} │ {(attribute?.PropertyName ?? "<Не указано>").PadRight(maxOneCPropNameLen)} │ {propValue}");
                 }
             }
         }
