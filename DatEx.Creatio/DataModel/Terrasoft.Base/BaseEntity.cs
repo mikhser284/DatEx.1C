@@ -83,7 +83,7 @@
                         Guid val = (Guid)p.GetValue(obj);
                         propValue = Guid.Empty == (Guid)p.GetValue(obj) ? "---" : val.ToString();
                     }                    
-                    Console.WriteLine($" {p.Name.PadRight(maxPropNameLen)} │ {(attribute?.Title ?? "<Не указанно>").PadRight(maxPropTitleLen)} │ {propValue}");
+                    Console.WriteLine($" {p.Name.PadRight(maxPropNameLen)} │ {(attribute?.Title ?? "---").PadRight(maxPropTitleLen)} │ {propValue}");
                 }
             }
         }

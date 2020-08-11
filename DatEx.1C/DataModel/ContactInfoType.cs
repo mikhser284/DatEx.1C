@@ -9,11 +9,11 @@ namespace DatEx.OneC.DataModel
     [JsonObject("Catalog_ВидыКонтактнойИнформации")]
     public class ContactInfoType : OneCBaseLookup
     {
-        [CreatioAux]
+        
         [JsonProperty("Тип")]
         public String Type { get; set; }
 
-        [CreatioAux]
+        
         [JsonProperty("ВидОбъектаКонтактнойИнформации")]
         public String KindOfContactInfoObject { get; set; }
 

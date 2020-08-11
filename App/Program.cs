@@ -63,13 +63,13 @@ namespace App
                 Dictionary<Guid, OneC.ContactInfoType> contactInfoTypes = 
                     OneCHttpClient.GetObjsByIds<OneC.ContactInfoType>(contactInfos.Select(x => new Guid(x.KeyKind)).Distinct().ToList())
                     .ToDictionary(k => k.Id);
-                foreach(var contactInfo in contactInfos) contactInfo.TypeOfContactInfo = contactInfoTypes[new Guid(contactInfo.KeyKind)];
+                foreach(var contactInfo in contactInfos) contactInfo._TypeOfContactInfo = contactInfoTypes[new Guid(contactInfo.KeyKind)];
             }
             Dictionary<Guid, OneC.Person> personsWithEmails = OneCHttpClient.GetObjsByIds<OneC.Person>(idsPersonsWithEmails).ToDictionary(k => k.Id);
 
             // Получаем данные из регистра InformationRegister_ФИОФизЛиц и связываем з физлицами
             List<OneC.IRNamesOfPersons> namesOfPersons = OneCHttpClient.GetObjsByIds<OneC.IRNamesOfPersons>(idsPersonsWithEmails, "cast(ФизЛицо, 'Catalog_ФизическиеЛица')");
-            foreach (var personName in namesOfPersons) personsWithEmails[personName.KeyPerson].NameInfo = personName;
+            foreach (var personName in namesOfPersons) personsWithEmails[personName.KeyPerson].NameInfo_ = personName;
 
             // Сгрупировать контактную информацию по физ. лицу
             Dictionary<Guid, List<OneC.IRContactInfo>> groupedContactInfo = new Dictionary<Guid, List<OneC.IRContactInfo>>();
@@ -89,22 +89,22 @@ namespace App
                 {
                     Guid kindOfInfo = new Guid(contactInfo.KeyKind);
                     if(kindOfInfo == settings.OneCGuidOfEmailContactInfo)
-                        person.ContactInfoEmail = contactInfo;
+                        person.ContactInfoEmail_ = contactInfo;
                     else if(kindOfInfo == settings.OneCGuidOfPhoneContactInfo)
-                        person.ContactInfoPhone = contactInfo;
+                        person._ContactInfoPhone = contactInfo;
                     else if(kindOfInfo == settings.OneCGuidOfWorkPhoneContactInfo)
-                        person.ContactInfoWorkPhone = contactInfo;
+                        person._ContactInfoWorkPhone = contactInfo;
                     else continue;
                 }
             }
 
             // Связать физлица с сотрудниками
             List<OneC.Employee> employeesWithEmails = OneCHttpClient.GetObjsByIds<OneC.Employee>(idsPersonsWithEmails, "Физлицо_Key");
-            foreach(var employee in employeesWithEmails) employee.Person = personsWithEmails[(Guid)employee.PersonId];
+            foreach(var employee in employeesWithEmails) employee.NavProp_Person = personsWithEmails[(Guid)employee.PersonId];
 
             // Связать сотрудников с организациями
             Dictionary<Guid, OneC.Organization> organizations = OneCHttpClient.GetObjs<OneC.Organization>().ToDictionary(k => k.Id);
-            foreach (var employee in employeesWithEmails) employee.XxxOrganization = organizations[(Guid)employee.OrganizationId];
+            foreach (var employee in employeesWithEmails) employee.NavProp_Organization = organizations[(Guid)employee.OrganizationId];
 
             // Связать сотрудников с подразделениями
             //Dictionary<Guid, OneC.OrganizationSubdivision> subdivisions = OneCHttpClient.GetObjsByIds<OneC.OrganizationSubdivision>().GetObjs<OneC.OrganizationSubdivision>().ToDictionary(k => k.Id);
@@ -119,10 +119,10 @@ namespace App
 
             foreach(var employee in employeesWithEmails)
             {
-                employee.XxxOrganizationSubdivision = subdivisions[(Guid)employee.CurrentOrganizationSubdivisionId];
+                employee.NavProp_OrganizationSubdivision = subdivisions[(Guid)employee.CurrentOrganizationSubdivisionId];
             }
 
-            Dictionary<String, OneC.Employee> emailsAndPersons = employeesWithEmails.ToDictionary(k => k.Person.ContactInfoEmail.View);
+            Dictionary<String, OneC.Employee> emailsAndPersons = employeesWithEmails.ToDictionary(k => k.NavProp_Person.ContactInfoEmail_.View);
             employeesWithEmails.FirstOrDefault()?.Show();
 
             // Получить контакты по соответствующим Email и с типом Сотрудник нашей организации
@@ -149,11 +149,11 @@ namespace App
                 // Todo
 
                 c.IdOneC = c1.Id;
-                c.Name = c1.Person.Description;
+                c.Name = c1.NavProp_Person.Description;
                 //c.TypeId = settings.CreatioGuidOfContactsWithTypeOurEmployees; // Для новых объектов
-                c.GivenName = c1.Person.NameInfo.GivenName;
-                c.Surname = c1.Person.NameInfo.Surname;
-                c.MiddleName = c1.Person.NameInfo.MiddleName;
+                c.GivenName = c1.NavProp_Person.NameInfo_.GivenName;
+                c.Surname = c1.NavProp_Person.NameInfo_.Surname;
+                c.MiddleName = c1.NavProp_Person.NameInfo_.MiddleName;
                 c.Name = $"{c.Surname} {c.MiddleName} {c.GivenName}";
             }
 

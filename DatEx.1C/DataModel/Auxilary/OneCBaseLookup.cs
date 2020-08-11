@@ -11,35 +11,35 @@ namespace DatEx.OneC.DataModel
     public class OneCBaseLookup : OneCObject
     {
         /// <summary> Id </summary>
-        [CreatioPropertyMap("Guid", "IdOneC", "Ref_Key")]
+        [OneC("Guid", "Ref_Key", "-", "-", Color = ConsoleColor.DarkBlue)]
         [JsonProperty("Ref_Key")]
         public Guid Id { get; set; }
 
-        [CreatioAux]
+        [OneC("Boolean?", "Predefined", "Булево", "?")]
         [JsonProperty("Predefined")]
         public Boolean? Predefined { get; set; }
 
-        [CreatioAux]
+        [OneC("String", "PredefinedDataName", "Строка", "?")]
         [JsonProperty("PredefinedDataName")]
         public String PredefinedDataName { get; set; }
 
 
-        [CreatioAux]
+        [OneC("String", "DataVersion", "Строка", "?")]
         [JsonProperty("DataVersion")]
         public String DataVersion { get; set; }
 
         /// <summary> Наименование </summary>
-        [CreatioPropertyMap("String", "Name", "Description")]
+        [OneC("String", "Description", "Строка", "Наименование", Color = ConsoleColor.DarkBlue)]
         [JsonProperty("Description")]
         public String Description { get; set; }
 
         /// <summary> Код </summary>
-        [CreatioAux]
+        [OneC("String", "Code", "Строка", "Код", Color = ConsoleColor.DarkBlue)]
         [JsonProperty("Code")]
         public String Code { get; set; }
 
         /// <summary> Пометка удаления </summary>
-        [CreatioAux]
+        [OneC("Boolean?", "DeletionMark", "Булево", "Пометка удаления", Color = ConsoleColor.DarkBlue)]
         [JsonProperty("DeletionMark")]
         public Boolean? DeletionMark { get; set; }
     }
@@ -47,12 +47,12 @@ namespace DatEx.OneC.DataModel
     public class OneCBaseHierarchicalLookup : OneCBaseLookup
     {
         /// <summary> Родитель </summary>
-        [CreatioAux]
+        [OneC("Guid?", "Parent_Key", "?", "Родитель", Color = ConsoleColor.DarkBlue)]
         [JsonProperty("Parent_Key")]
         public Guid? ParentId { get; set; }
 
         /// <summary> Является папкой </summary>
-        [CreatioAux]
+        [OneC("Boolean?", "IsFolder", "Булево", "Является папкой", Color = ConsoleColor.DarkBlue)]
         [JsonProperty("IsFolder")]
         public Boolean? IsFolder { get; set; }
     }
@@ -61,28 +61,32 @@ namespace DatEx.OneC.DataModel
     {
         public void Show()
         {
-            Int32 maxCreatioPropNameLen = this.GetType().GetProperties().Max(x => x.Name.Length);
-            Int32 maxOneCPropNameLen = this.GetType().GetProperties()
-                .Select(p => ((JsonPropertyAttribute)p.GetCustomAttributes(typeof(JsonPropertyAttribute), false)
-                .FirstOrDefault())?.PropertyName.Length).Max(x => x) ?? 0;
+            Int32 maxPropNameLen = this.GetType().GetProperties().Max(x => x.Name.Length);
+            
+            Int32 maxOneCODataTypeLen = this.GetType().GetProperties()
+                .Select(p => ((OneCAttribute)p.GetCustomAttributes(typeof(OneCAttribute), false)
+                .FirstOrDefault())?.ODataType.Length).Max(x => x) ?? 0;
+            Int32 maxOneCODataName = this.GetType().GetProperties()
+                .Select(p => ((OneCAttribute)p.GetCustomAttributes(typeof(OneCAttribute), false)
+                .FirstOrDefault())?.ODataName.Length).Max(x => x) ?? 0;
 
-            var mapableProperties = this.GetType().GetProperties().Where(p => p.IsDefined(typeof(CreatioPropertyMapAttribute), false));
-            var auxProperties = this.GetType().GetProperties().Where(p => p.IsDefined(typeof(CreatioAuxAttribute), false));
-            var unmapableProperties = this.GetType().GetProperties().Where(p => p.IsDefined(typeof(CreatioIgnoreAttribute), false));
+            Int32 maxOneCTypeLen = this.GetType().GetProperties()
+                .Select(p => ((OneCAttribute)p.GetCustomAttributes(typeof(OneCAttribute), false)
+                .FirstOrDefault())?.OneCType.Length).Max(x => x) ?? 0;
+            Int32 maxOneCNameLen = this.GetType().GetProperties()
+                .Select(p => ((OneCAttribute)p.GetCustomAttributes(typeof(OneCAttribute), false)
+                .FirstOrDefault())?.OneCName.Length).Max(x => x) ?? 0;
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            ShowPropertiesBlock(this, mapableProperties, maxCreatioPropNameLen, maxOneCPropNameLen);
-            Console.ForegroundColor = ConsoleColor.Blue;
-            ShowPropertiesBlock(this, auxProperties, maxCreatioPropNameLen, maxOneCPropNameLen);
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            ShowPropertiesBlock(this, unmapableProperties, maxCreatioPropNameLen, maxOneCPropNameLen);
+            var oneC = this.GetType().GetProperties().Where(p => p.IsDefined(typeof(OneCAttribute), false));
+
+            ShowPropertiesBlock(this, oneC, maxOneCODataTypeLen, maxOneCODataName, maxOneCTypeLen, maxOneCNameLen, maxPropNameLen);
             Console.ResetColor();
 
-            static void ShowPropertiesBlock<T>(T obj, IEnumerable<PropertyInfo> propsInfo, Int32 maxCreatioPropNameLen, Int32 maxOneCPropNameLen)
+            static void ShowPropertiesBlock<T>(T obj, IEnumerable<PropertyInfo> propsInfo, Int32 maxOneCODataTypeLen, Int32 maxOneCODataName, Int32 maxOneCTypeLen, Int32 maxOneCNameLen, Int32 maxPropNameLen)
             {
                 foreach(var p in propsInfo)
                 {
-                    var attribute = (JsonPropertyAttribute)p.GetCustomAttributes(typeof(JsonPropertyAttribute), false).FirstOrDefault();
+                    var attribute = (OneCAttribute)p.GetCustomAttributes(typeof(OneCAttribute), false).FirstOrDefault();
                     String propValue = p.GetValue(obj)?.ToString();
                     if (p.GetValue(obj) == null) propValue = "---";
                     else if (p.PropertyType != typeof(String) && typeof(ICollection).IsAssignableFrom(p.PropertyType))
@@ -95,7 +99,9 @@ namespace DatEx.OneC.DataModel
                         Guid val = (Guid)p.GetValue(obj);
                         propValue = Guid.Empty == (Guid)p.GetValue(obj) ? "---" : val.ToString();
                     }
-                    Console.WriteLine($" {p.Name.PadRight(maxCreatioPropNameLen)} │ {(attribute?.PropertyName ?? "<Не указано>").PadRight(maxOneCPropNameLen)} │ {propValue}");
+                    Console.ForegroundColor = attribute?.Color ?? ConsoleColor.DarkGray;
+
+                    Console.WriteLine($" {(attribute?.ODataType ?? "---").PadRight(maxOneCODataTypeLen)} | {(attribute?.ODataName ?? "---").PadRight(maxOneCODataName)} | {(attribute?.OneCType ?? "---").PadRight(maxOneCTypeLen)} │ {(attribute?.OneCName ?? "---").PadRight(maxOneCNameLen)} │ {p.Name.PadRight(maxPropNameLen)} │ {propValue}");
                 }
             }
         }
