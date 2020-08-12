@@ -10,7 +10,7 @@ namespace DatEx.OneC.DataModel
     [JsonObject("Catalog_СотрудникиОрганизаций")]
     public class Employee : OneCBaseHierarchicalLookup
     {
-        [OneC("Guid?", "Физлицо_Key", "-", "-", Color = ConsoleColor.Green)]
+        [OneC("Guid?", "Физлицо_Key", "-", "-", Color = ConsoleColor.DarkBlue)]
         [JsonProperty("Физлицо_Key")]
         public Guid? PersonId { get; set; }
 
@@ -22,7 +22,7 @@ namespace DatEx.OneC.DataModel
         [JsonProperty("Актуальность")]
         public Boolean? IsActual { get; set; }
 
-        [OneC("Guid?", "Организация_Key", "-", "-", Color = ConsoleColor.Green)]
+        [OneC("Guid?", "Организация_Key", "-", "-", Color = ConsoleColor.DarkBlue)]
         [JsonProperty("Организация_Key")]
         public Guid? OrganizationId { get; set; }
 
@@ -62,7 +62,7 @@ namespace DatEx.OneC.DataModel
         [JsonIgnore]
         public Object WorkShedule_ { get; set; }
 
-        [OneC("Guid?", "ПодразделениеОрганизации_Key", "-", "-", Color = ConsoleColor.Green)]
+        [OneC("Guid?", "ПодразделениеОрганизации_Key", "-", "-", Color = ConsoleColor.DarkBlue)]
         [JsonProperty("ПодразделениеОрганизации_Key")]
         public Guid? OrganizationSubdivisionId { get; set; }
 
@@ -70,7 +70,7 @@ namespace DatEx.OneC.DataModel
         [JsonIgnore]
         public OrganizationSubdivision NavProp_OrganizationSubdivision { get; set; }
 
-        [OneC("Guid?", "Должность_Key", "-", "-", Color = ConsoleColor.Green)]
+        [OneC("Guid?", "Должность_Key", "-", "-", Color = ConsoleColor.DarkBlue)]
         [JsonProperty("Должность_Key")]
         public Guid? PositionId { get; set; }
 
@@ -142,7 +142,7 @@ namespace DatEx.OneC.DataModel
         [JsonIgnore]
         public Object NavProp_ContributionGroup { get; set; }
         
-        [OneC("Guid?", "ТекущееПодразделениеОрганизации_Key", "-", "-", Color = ConsoleColor.Green)]
+        [OneC("Guid?", "ТекущееПодразделениеОрганизации_Key", "-", "-", Color = ConsoleColor.DarkBlue)]
         [JsonProperty("ТекущееПодразделениеОрганизации_Key")]
         public Guid? CurrentOrganizationSubdivisionId { get; set; }
 
@@ -150,7 +150,7 @@ namespace DatEx.OneC.DataModel
         [JsonIgnore]
         public OrganizationSubdivision NavProp_CurrentOrganizationSubdivision { get; set; }
 
-        [OneC("Guid?", "ТекущаяДолжностьОрганизации_Key", "-", "-", Color = ConsoleColor.Green)]
+        [OneC("Guid?", "ТекущаяДолжностьОрганизации_Key", "-", "-", Color = ConsoleColor.DarkBlue)]
         [JsonProperty("ТекущаяДолжностьОрганизации_Key")]
         public Guid? CurrentPositionInOrganizationId { get; set; }
 

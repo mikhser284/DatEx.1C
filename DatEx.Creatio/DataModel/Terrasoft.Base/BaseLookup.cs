@@ -1,8 +1,10 @@
 ﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
     using System;
+    using DatEx.Creatio.DataModel.Auxilary;
 
     /// <summary> Базовый справочник </summary>
+    [CreatioType("Базовый справочник")]
     public class BaseLookup : BaseEntity
     {
         /// <summary> Название </summary>

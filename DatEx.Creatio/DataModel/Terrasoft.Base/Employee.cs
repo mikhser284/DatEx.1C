@@ -1,8 +1,10 @@
 ﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
     using System;
+    using DatEx.Creatio.DataModel.Auxilary;
 
     /// <summary> Сотрудник </summary>
+    [CreatioType("Сотрудник")]
     public class Employee : BaseEntity
     {
         /// <summary> Контакт </summary>

@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DatEx.Creatio.DataModel.Terrasoft.Base
+﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
+    using DatEx.Creatio.DataModel.Auxilary;
+
     /// <summary> Должность сотрудника </summary>
+    [CreatioType("Должность сотрудника")]
     public class EmployeeJob : BaseLookup
     {
     }

@@ -1,8 +1,10 @@
-﻿using System;
-
-namespace DatEx.Creatio.DataModel.Terrasoft.Base
+﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
+    using System;
+    using DatEx.Creatio.DataModel.Auxilary;
+    
     /// <summary> Годовой оборот контрагента </summary>
+    [CreatioType("Годовой оборот контрагента")]
     public class AccountAnnualRevenue : BaseLookup
     {
         /// <summary> От, базовая валюта </summary>

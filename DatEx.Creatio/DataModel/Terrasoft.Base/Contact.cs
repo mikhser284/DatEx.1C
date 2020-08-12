@@ -1,12 +1,11 @@
-﻿
-
-namespace DatEx.Creatio.DataModel.Terrasoft.Base
+﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
+    using System;
     using DatEx.Creatio.DataModel.Auxilary;
     using DatEx.Creatio.DataModel.Terrasoft.Calendar;
-    using System;
 
-    /// <summary> Контакт </summary>
+    /// <summary> Контакт </summary>    
+    [CreatioType("Контакт")]
     public class Contact : BaseEntity
     {
         /// <summary> ФИО </summary>        

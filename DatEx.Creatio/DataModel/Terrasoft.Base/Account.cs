@@ -1,7 +1,9 @@
 ﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
     using System;
-
+    using DatEx.Creatio.DataModel.Auxilary;
+    
+    [CreatioType("Контрагент")]
     /// <summary> Контрагент </summary>
     public class Account : BaseEntity
     {

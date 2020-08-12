@@ -1,6 +1,9 @@
 ﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
+    using DatEx.Creatio.DataModel.Auxilary;
+
     /// <summary> Области/штаты </summary>
+    [CreatioType("Области/штаты")]
     public class Region : BaseLookup
     {
         /// <summary> Страна </summary>

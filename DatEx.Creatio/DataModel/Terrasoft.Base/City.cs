@@ -1,6 +1,9 @@
 ﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
+    using DatEx.Creatio.DataModel.Auxilary;
+
     /// <summary> Город </summary>
+    [CreatioType("Город")]
     public class City : BaseLookup
     {
         /// <summary> Страна </summary>

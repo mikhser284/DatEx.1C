@@ -9,5 +9,24 @@
     public class Division
     {
         //TODO
+
+        // ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+        //[OneC("String", "", "Строка", "")]
+        //[JsonProperty("")]
+        //public String Prop { get; set; }
+
+        //[OneC("Boolean", "", "Булево", "")]
+        //[JsonProperty("")]
+        //public Boolean? Prop { get; set; }
+
+
+        //[OneC("Guid?", "", "-", "-")]
+        //[JsonProperty("")]
+        //public Guid? PropId { get; set; }
+
+        //[OneC("?", "NavProp()", "", "")]
+        //[JsonIgnore]
+        //public Object NavProp_ { get; set; }
     }
 }

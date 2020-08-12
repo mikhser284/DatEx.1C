@@ -1,7 +1,10 @@
 ﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
     using System;
+    using DatEx.Creatio.DataModel.Auxilary;
+
     /// <summary> Страна </summary>
+    [CreatioType("Страна")]
     public class Country : BaseImageLookup
     {
         /// <summary> Платежные реквизиты </summary>

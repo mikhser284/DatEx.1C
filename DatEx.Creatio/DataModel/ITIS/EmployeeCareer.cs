@@ -2,10 +2,10 @@
 namespace DatEx.Creatio.DataModel.ITIS
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
+    using DatEx.Creatio.DataModel.Auxilary;
 
     /// <summary> Карьера сотрудника в нашей компании </summary>
+    [CreatioType("Карьера сотрудника в нашей компании")]
     public class EmployeeCareer : DatEx.Creatio.DataModel.Terrasoft.Base.EmployeeCareer
     {
         /// <summary> Основное </summary>

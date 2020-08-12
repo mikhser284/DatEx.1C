@@ -1,8 +1,10 @@
 ﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
     using System;
+    using DatEx.Creatio.DataModel.Auxilary;
 
     /// <summary> Учетные записи во внешних ресурсах </summary>
+    [CreatioType("Учетные записи во внешних ресурсах")]
     public class SocialAccount : BaseEntityNotes
     {
         /// <summary> Логин </summary>

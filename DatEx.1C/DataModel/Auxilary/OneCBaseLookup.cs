@@ -29,7 +29,7 @@ namespace DatEx.OneC.DataModel
         public String DataVersion { get; set; }
 
         /// <summary> Наименование </summary>
-        [OneC("String", "Description", "Строка", "Наименование", Color = ConsoleColor.DarkBlue)]
+        [OneC("String", "Description", "Строка", "Наименование", Color = ConsoleColor.Green)]
         [JsonProperty("Description")]
         public String Description { get; set; }
 
@@ -42,6 +42,8 @@ namespace DatEx.OneC.DataModel
         [OneC("Boolean?", "DeletionMark", "Булево", "Пометка удаления", Color = ConsoleColor.DarkBlue)]
         [JsonProperty("DeletionMark")]
         public Boolean? DeletionMark { get; set; }
+
+        public override string ToString() => Description;
     }
 
     public class OneCBaseHierarchicalLookup : OneCBaseLookup
@@ -59,30 +61,35 @@ namespace DatEx.OneC.DataModel
 
     public class OneCObject
     {
-        public void Show()
+        public void Show(Int32 indentLevel = 0)
         {
-            Int32 maxPropNameLen = this.GetType().GetProperties().Max(x => x.Name.Length);
-            
-            Int32 maxOneCODataTypeLen = this.GetType().GetProperties()
+            IEnumerable<PropertyInfo> properties = this.GetType().GetProperties();
+
+            Int32 maxOneCODataTypeLen = properties
                 .Select(p => ((OneCAttribute)p.GetCustomAttributes(typeof(OneCAttribute), false)
                 .FirstOrDefault())?.ODataType.Length).Max(x => x) ?? 0;
-            Int32 maxOneCODataName = this.GetType().GetProperties()
+            Int32 maxOneCODataName = properties
                 .Select(p => ((OneCAttribute)p.GetCustomAttributes(typeof(OneCAttribute), false)
                 .FirstOrDefault())?.ODataName.Length).Max(x => x) ?? 0;
-
-            Int32 maxOneCTypeLen = this.GetType().GetProperties()
+            Int32 maxOneCTypeLen = properties
                 .Select(p => ((OneCAttribute)p.GetCustomAttributes(typeof(OneCAttribute), false)
                 .FirstOrDefault())?.OneCType.Length).Max(x => x) ?? 0;
-            Int32 maxOneCNameLen = this.GetType().GetProperties()
+            Int32 maxOneCNameLen = properties
                 .Select(p => ((OneCAttribute)p.GetCustomAttributes(typeof(OneCAttribute), false)
-                .FirstOrDefault())?.OneCName.Length).Max(x => x) ?? 0;
+                .FirstOrDefault())?.OneCName.Length).Max(x => x) ?? 0;            
+            Int32 maxPropNameLen = properties.Max(x => x.Name.Length);
+            Int32 totalWidth = 16 + maxOneCODataTypeLen + maxOneCODataName + maxOneCTypeLen + maxOneCNameLen + maxPropNameLen;
 
-            var oneC = this.GetType().GetProperties().Where(p => p.IsDefined(typeof(OneCAttribute), false));
+            var typeAtribure = (OneCAttribute)this.GetType().GetCustomAttributes(typeof(OneCAttribute), false).FirstOrDefault();
+            String indent = new String(' ', indentLevel * 4);
+            Console.WriteLine($"\n{indent}{new String('─', totalWidth)}");
+            Console.WriteLine($"{indent}   {(typeAtribure?.ODataType ?? "---")} * {(typeAtribure?.OneCType ?? "---")}");
+            Console.WriteLine($"{indent}{new String('─', totalWidth)}");
 
-            ShowPropertiesBlock(this, oneC, maxOneCODataTypeLen, maxOneCODataName, maxOneCTypeLen, maxOneCNameLen, maxPropNameLen);
-            Console.ResetColor();
-
-            static void ShowPropertiesBlock<T>(T obj, IEnumerable<PropertyInfo> propsInfo, Int32 maxOneCODataTypeLen, Int32 maxOneCODataName, Int32 maxOneCTypeLen, Int32 maxOneCNameLen, Int32 maxPropNameLen)
+            //var oneC = this.GetType().GetProperties();//.Where(p => p.IsDefined(typeof(OneCAttribute)));
+            ShowPropertiesBlock(this, properties, maxOneCODataTypeLen, maxOneCODataName, maxOneCTypeLen, maxOneCNameLen, maxPropNameLen, indent);
+            
+            static void ShowPropertiesBlock<T>(T obj, IEnumerable<PropertyInfo> propsInfo, Int32 maxOneCODataTypeLen, Int32 maxOneCODataName, Int32 maxOneCTypeLen, Int32 maxOneCNameLen, Int32 maxPropNameLen, String indent)
             {
                 foreach(var p in propsInfo)
                 {
@@ -94,15 +101,21 @@ namespace DatEx.OneC.DataModel
                         var val = (ICollection)p.GetValue(obj);
                         propValue = $"{val.Count} шт.";
                     }
-                    else if (p.PropertyType == typeof(Guid))
+                    else if (p.PropertyType == typeof(Guid) || p.PropertyType == typeof(Guid?))
                     {
                         Guid val = (Guid)p.GetValue(obj);
-                        propValue = Guid.Empty == (Guid)p.GetValue(obj) ? "---" : val.ToString();
+                        propValue = default(Guid) == (Guid)p.GetValue(obj) ? "---" : val.ToString();
                     }
+                    else if (p.PropertyType == typeof(DateTime) || p.PropertyType == typeof(DateTime?))
+                    {
+                        DateTime val = (DateTime)p.GetValue(obj);
+                        propValue = default(DateTime) == (DateTime)p.GetValue(obj) ? "---" : val.ToString();
+                    }
+                    
                     Console.ForegroundColor = attribute?.Color ?? ConsoleColor.DarkGray;
-
-                    Console.WriteLine($" {(attribute?.ODataType ?? "---").PadRight(maxOneCODataTypeLen)} | {(attribute?.ODataName ?? "---").PadRight(maxOneCODataName)} | {(attribute?.OneCType ?? "---").PadRight(maxOneCTypeLen)} │ {(attribute?.OneCName ?? "---").PadRight(maxOneCNameLen)} │ {p.Name.PadRight(maxPropNameLen)} │ {propValue}");
+                    Console.WriteLine($"{indent} {(attribute?.ODataType ?? "---").PadRight(maxOneCODataTypeLen)} | {(attribute?.ODataName ?? "---").PadRight(maxOneCODataName)} | {(attribute?.OneCType ?? "---").PadRight(maxOneCTypeLen)} │ {(attribute?.OneCName ?? "---").PadRight(maxOneCNameLen)} │ {p.Name.PadRight(maxPropNameLen)} │ {propValue}");
                 }
+                Console.ResetColor();
             }
         }
     }

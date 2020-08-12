@@ -114,6 +114,7 @@ namespace DatEx.OneC
             { typeof(ContactInfoType), "Catalog_ВидыКонтактнойИнформации" },
             { typeof(Organization), "Catalog_Организации" },
             { typeof(OrganizationSubdivision), "Catalog_ПодразделенияОрганизаций" },
+            { typeof(PositionInOrganization), "Catalog_ДолжностиОрганизаций" }
         };
 
         #endregion Служебные

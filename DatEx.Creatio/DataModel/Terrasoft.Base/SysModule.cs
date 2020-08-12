@@ -1,8 +1,10 @@
 ﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
     using System;
+    using DatEx.Creatio.DataModel.Auxilary;
 
     /// <summary> Раздел </summary>
+    [CreatioType("Раздел")]
     public class SysModule : BaseEntity
     {
         /// <summary> Заголовок </summary>

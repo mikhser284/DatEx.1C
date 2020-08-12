@@ -1,8 +1,10 @@
 ﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
     using System;
+    using DatEx.Creatio.DataModel.Auxilary;
 
     /// <summary> Тип средства связи </summary>
+    [CreatioType("Тип средства связи")]
     public class CommunicationType : BaseImageLookup
     {
         /// <summary> Шаблон для формирования гиперссылки в реестре </summary>

@@ -1,8 +1,11 @@
 ﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
     using System;
+    using DatEx.Creatio.DataModel.Auxilary;
+
 
     /// <summary> Объект администрирования </summary>
+    [CreatioType("Объект администрирования")]
     public class SysAdminUnit : BaseLookup
     {
         /// <summary> Тип </summary>

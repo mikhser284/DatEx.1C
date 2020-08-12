@@ -1,8 +1,10 @@
-﻿using System;
-
-namespace DatEx.Creatio.DataModel.Terrasoft.Base
+﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
+    using System;
+    using DatEx.Creatio.DataModel.Auxilary;
+    
     /// <summary> Платежный реквизит контрагента </summary>
+    [CreatioType("Платежный реквизит контрагента")]
     public class AccountBilling : BaseLookup
     {
         /// <summary> Контрагент </summary>

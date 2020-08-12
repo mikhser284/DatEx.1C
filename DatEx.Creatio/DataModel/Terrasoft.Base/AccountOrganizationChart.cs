@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DatEx.Creatio.DataModel.Terrasoft.Base
+﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
+    using System;
+    using DatEx.Creatio.DataModel.Auxilary;
+
     /// <summary> Структура организации контрагента </summary>
+    [CreatioType("Структура организации контрагента")]
     public class AccountOrganizationChart : BaseEntity
     {
         /// <summary> Контрагент (Id) </summary>

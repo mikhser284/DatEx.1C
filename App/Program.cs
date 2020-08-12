@@ -63,13 +63,13 @@ namespace App
                 Dictionary<Guid, OneC.ContactInfoType> contactInfoTypes = 
                     OneCHttpClient.GetObjsByIds<OneC.ContactInfoType>(contactInfos.Select(x => new Guid(x.KeyKind)).Distinct().ToList())
                     .ToDictionary(k => k.Id);
-                foreach(var contactInfo in contactInfos) contactInfo._TypeOfContactInfo = contactInfoTypes[new Guid(contactInfo.KeyKind)];
+                foreach(var contactInfo in contactInfos) contactInfo.RelatedObj_TypeOfContactInfo = contactInfoTypes[new Guid(contactInfo.KeyKind)];
             }
             Dictionary<Guid, OneC.Person> personsWithEmails = OneCHttpClient.GetObjsByIds<OneC.Person>(idsPersonsWithEmails).ToDictionary(k => k.Id);
 
             // Получаем данные из регистра InformationRegister_ФИОФизЛиц и связываем з физлицами
             List<OneC.IRNamesOfPersons> namesOfPersons = OneCHttpClient.GetObjsByIds<OneC.IRNamesOfPersons>(idsPersonsWithEmails, "cast(ФизЛицо, 'Catalog_ФизическиеЛица')");
-            foreach (var personName in namesOfPersons) personsWithEmails[personName.KeyPerson].NameInfo_ = personName;
+            foreach (var personName in namesOfPersons) personsWithEmails[personName.KeyPerson].RelatedObj_NameInfo = personName;
 
             // Сгрупировать контактную информацию по физ. лицу
             Dictionary<Guid, List<OneC.IRContactInfo>> groupedContactInfo = new Dictionary<Guid, List<OneC.IRContactInfo>>();
@@ -89,11 +89,11 @@ namespace App
                 {
                     Guid kindOfInfo = new Guid(contactInfo.KeyKind);
                     if(kindOfInfo == settings.OneCGuidOfEmailContactInfo)
-                        person.ContactInfoEmail_ = contactInfo;
+                        person.RelatedObj_ContactInfoEmail = contactInfo;
                     else if(kindOfInfo == settings.OneCGuidOfPhoneContactInfo)
-                        person._ContactInfoPhone = contactInfo;
+                        person.RelatedObj_ContactInfoPhone = contactInfo;
                     else if(kindOfInfo == settings.OneCGuidOfWorkPhoneContactInfo)
-                        person._ContactInfoWorkPhone = contactInfo;
+                        person.RelatedObj_ContactInfoWorkPhone = contactInfo;
                     else continue;
                 }
             }
@@ -102,42 +102,62 @@ namespace App
             List<OneC.Employee> employeesWithEmails = OneCHttpClient.GetObjsByIds<OneC.Employee>(idsPersonsWithEmails, "Физлицо_Key");
             foreach(var employee in employeesWithEmails) employee.NavProp_Person = personsWithEmails[(Guid)employee.PersonId];
 
+            // Связать сотрудников с дожностями
+            Dictionary<Guid, OneC.PositionInOrganization> positions = OneCHttpClient
+                .GetObjsByIds<OneC.PositionInOrganization>(employeesWithEmails.DistinctValuesExcluding(default(Guid), x => x.PositionId).Cast<Guid>())
+                .ToDictionary(k => k.Id);
+            foreach (var employee in employeesWithEmails) employee.NavProp_Position = positions[(Guid)employee.PositionId];
+
             // Связать сотрудников с организациями
             Dictionary<Guid, OneC.Organization> organizations = OneCHttpClient.GetObjs<OneC.Organization>().ToDictionary(k => k.Id);
             foreach (var employee in employeesWithEmails) employee.NavProp_Organization = organizations[(Guid)employee.OrganizationId];
 
             // Связать сотрудников с подразделениями
+            List<Guid> subdivisionIds = employeesWithEmails.DistinctValuesExcluding(default(Guid), x => x.OrganizationSubdivisionId).Cast<Guid>().ToList();
+            subdivisionIds.AddRange(employeesWithEmails.DistinctValuesExcluding(default(Guid), x => x.CurrentOrganizationSubdivisionId).Cast<Guid>());
+            Dictionary <Guid, OneC.OrganizationSubdivision> subdivisions = OneCHttpClient.GetObjsByIds<OneC.OrganizationSubdivision>(subdivisionIds).ToDictionary(k => k.Id);
+            foreach (var employee in employeesWithEmails)
+            {
+                employee.NavProp_OrganizationSubdivision = subdivisions[(Guid)employee.OrganizationSubdivisionId];
+                employee.NavProp_CurrentOrganizationSubdivision = subdivisions[(Guid)employee.CurrentOrganizationSubdivisionId];
+            }
+
             //Dictionary<Guid, OneC.OrganizationSubdivision> subdivisions = OneCHttpClient.GetObjsByIds<OneC.OrganizationSubdivision>().GetObjs<OneC.OrganizationSubdivision>().ToDictionary(k => k.Id);
             //var s = subdivisions.Values.OrderBy(x => x.Description).ToList();
 
-            Dictionary<Guid, OneC.OrganizationSubdivision> subdivisions = OneCHttpClient.GetObjsByIds<OneC.OrganizationSubdivision>(
-                employeesWithEmails
-                .Where(x => x.CurrentOrganizationSubdivisionId != null)
-                .Select(x => (Guid)x.CurrentOrganizationSubdivisionId))
-                .ToDictionary(k => k.Id);
 
 
-            foreach(var employee in employeesWithEmails)
+            foreach (var employee in employeesWithEmails)
             {
                 employee.NavProp_OrganizationSubdivision = subdivisions[(Guid)employee.CurrentOrganizationSubdivisionId];
             }
 
-            Dictionary<String, OneC.Employee> emailsAndPersons = employeesWithEmails.ToDictionary(k => k.NavProp_Person.ContactInfoEmail_.View);
-            employeesWithEmails.FirstOrDefault()?.Show();
+            Dictionary<String, OneC.Employee> emailsAndPersons = employeesWithEmails.ToDictionary(k => k.NavProp_Person.RelatedObj_ContactInfoEmail.View);
+            var oneC_Employee = employeesWithEmails.FirstOrDefault();
+            oneC_Employee?.Show();
+            oneC_Employee?.NavProp_Person?.Show(1);
+            oneC_Employee?.NavProp_Person?.RelatedObj_NameInfo.Show(2);
+            oneC_Employee?.NavProp_Person?.RelatedObj_ContactInfoEmail?.Show(2);
+            oneC_Employee?.NavProp_Person?.RelatedObj_ContactInfoEmail?.RelatedObj_TypeOfContactInfo?.Show(3);
+            oneC_Employee?.NavProp_Person?.RelatedObj_ContactInfoWorkPhone?.Show(2);
+            oneC_Employee?.NavProp_Person?.RelatedObj_ContactInfoWorkPhone?.RelatedObj_TypeOfContactInfo?.Show(3);
+            oneC_Employee?.NavProp_Person?.RelatedObj_ContactInfoPhone?.Show(2);
+            oneC_Employee?.NavProp_Person?.RelatedObj_ContactInfoPhone?.RelatedObj_TypeOfContactInfo?.Show(3);
+            oneC_Employee.NavProp_Organization?.Show(1);
 
             // Получить контакты по соответствующим Email и с типом Сотрудник нашей организации
             List<ITIS.Contact> contacts = CreatioHttpClient.GetObjsWherePropIn<ITIS.Contact, String>("Email", emailsAndPersons.Keys.ToList()).ToList();
             contacts = contacts.Where(x => x.TypeId == settings.CreatioGuidOfContactsWithTypeOurEmployees).ToList();
 
-            var contact = contacts.FirstOrDefault();
-            contact.ITISEmployeePosition = CreatioHttpClient.GetObjById<ITIS.EmployeeJob>(contact.ITISEmployeePositionId);
-            contact.ITISSubdivision = CreatioHttpClient.GetObjById<Terrasoft.AccountOrganizationChart>(contact.ITISSubdivisionId);
-            contact.ITISOrganizationSubdivision = CreatioHttpClient.GetObjById<Terrasoft.OrgStructureUnit>(contact.ITISOrganizationSubdivisionId);
-            contact.Account = CreatioHttpClient.GetObjById<Terrasoft.Account>(contact.AccountId);
-            contact.Gender = CreatioHttpClient.GetObjById<Terrasoft.Gender>(contact.GenderId);
-            contact.Type = CreatioHttpClient.GetObjById<Terrasoft.ContactType>(contact.TypeId);
-            contact.Job = CreatioHttpClient.GetObjById<Terrasoft.Job>(contact.JobId);
-            contact.Department = CreatioHttpClient.GetObjById<Terrasoft.Department>(contact.DepartmentId);
+            var CreatioContact = contacts.FirstOrDefault();
+            CreatioContact.ITISEmployeePosition = CreatioHttpClient.GetObjById<ITIS.EmployeeJob>(CreatioContact.ITISEmployeePositionId);
+            CreatioContact.ITISSubdivision = CreatioHttpClient.GetObjById<Terrasoft.AccountOrganizationChart>(CreatioContact.ITISSubdivisionId);
+            CreatioContact.ITISOrganizationSubdivision = CreatioHttpClient.GetObjById<Terrasoft.OrgStructureUnit>(CreatioContact.ITISOrganizationSubdivisionId);
+            CreatioContact.Account = CreatioHttpClient.GetObjById<Terrasoft.Account>(CreatioContact.AccountId);
+            CreatioContact.Gender = CreatioHttpClient.GetObjById<Terrasoft.Gender>(CreatioContact.GenderId);
+            CreatioContact.Type = CreatioHttpClient.GetObjById<Terrasoft.ContactType>(CreatioContact.TypeId);
+            CreatioContact.Job = CreatioHttpClient.GetObjById<Terrasoft.Job>(CreatioContact.JobId);
+            CreatioContact.Department = CreatioHttpClient.GetObjById<Terrasoft.Department>(CreatioContact.DepartmentId);
 
             // синхронизировать инфо. для контактов, которые существуют в 1С и Creatio
             foreach (ITIS.Contact c in contacts)
@@ -151,9 +171,9 @@ namespace App
                 c.IdOneC = c1.Id;
                 c.Name = c1.NavProp_Person.Description;
                 //c.TypeId = settings.CreatioGuidOfContactsWithTypeOurEmployees; // Для новых объектов
-                c.GivenName = c1.NavProp_Person.NameInfo_.GivenName;
-                c.Surname = c1.NavProp_Person.NameInfo_.Surname;
-                c.MiddleName = c1.NavProp_Person.NameInfo_.MiddleName;
+                c.GivenName = c1.NavProp_Person.RelatedObj_NameInfo.GivenName;
+                c.Surname = c1.NavProp_Person.RelatedObj_NameInfo.Surname;
+                c.MiddleName = c1.NavProp_Person.RelatedObj_NameInfo.MiddleName;
                 c.Name = $"{c.Surname} {c.MiddleName} {c.GivenName}";
             }
 
@@ -162,7 +182,7 @@ namespace App
             // Создать контакты, которые существуют в 1С но еще не существуют в Creatio
 
 
-            contact.Show();
+            CreatioContact.Show();
 
             //ITIS.Employee empl = new ITIS.Employee();
             //empl.Contact.Email

@@ -1,8 +1,10 @@
 ﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
     using System;
+    using DatEx.Creatio.DataModel.Auxilary;
 
     /// <summary> Объект раздела </summary>
+    [CreatioType("Объект раздела")]
     public class SysModuleEntry : BaseEntity
     {
         /// <summary> Колонка типа </summary>

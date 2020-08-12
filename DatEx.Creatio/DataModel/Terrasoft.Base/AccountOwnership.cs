@@ -3,9 +3,10 @@
     using Newtonsoft.Json;
     using System;
     using System.Runtime.Serialization;
-
+    using DatEx.Creatio.DataModel.Auxilary;
 
     /// <summary> Форма собственности контрагента </summary>
+    [CreatioType("Форма собственности контрагента")]
     public class AccountOwnership : BaseLookup
     {
         private Guid? _countryId;

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DatEx.Creatio.DataModel.ITIS
+﻿namespace DatEx.Creatio.DataModel.ITIS
 {
+    using System;
+    using DatEx.Creatio.DataModel.Auxilary;
+
     /// <summary> Сотрудник </summary>
+    [CreatioType("Сотрудник")]
     public class Employee : DatEx.Creatio.DataModel.Terrasoft.Base.Employee
     {
         /// <summary> Фамилия </summary>

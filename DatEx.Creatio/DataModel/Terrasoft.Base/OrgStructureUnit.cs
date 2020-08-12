@@ -1,8 +1,10 @@
 ﻿namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
     using System;
+    using DatEx.Creatio.DataModel.Auxilary;
 
     /// <summary> Элемент организационной струкруры </summary>
+    [CreatioType("Элемент организационной струкруры")]
     public class OrgStructureUnit : BaseEntity
     {
         /// <summary> Название </summary>

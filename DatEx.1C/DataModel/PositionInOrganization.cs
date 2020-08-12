@@ -9,7 +9,7 @@ namespace DatEx.OneC.DataModel
 
     [OneC("Catalog_ДолжностиОрганизаций", "Catalog_ДолжностиОрганизаций", "Справочник.ДолжностиОрганизаций", "Справочник.ДолжностиОрганизаций")]
     [JsonObject()]
-    public class PositionInOrganization : OneCObject
+    public class PositionInOrganization : OneCBaseLookup
     {
         [OneC("Boolean?", "АУП", "Булево", "АУП")]
         [JsonProperty("АУП")]
@@ -62,23 +62,7 @@ namespace DatEx.OneC.DataModel
         [OneC("Boolean", "Кусто_Заправщики", "Булево", "Кусто_Заправщики")]
         [JsonProperty("Кусто_Заправщики")]
         public Boolean? KustoRefuellers { get; set; }
-        // ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
-        //[OneC("String", "", "Строка", "")]
-        //[JsonProperty("")]
-        //public String Prop { get; set; }
-
-        //[OneC("Boolean", "", "Булево", "")]
-        //[JsonProperty("")]
-        //public Boolean? Prop { get; set; }
-
-
-        //[OneC("Guid?", "", "-", "-")]
-        //[JsonProperty("")]
-        //public Guid? PropId { get; set; }
-
-        //[OneC("?", "NavProp()", "", "")]
-        //[JsonIgnore]
-        //public Object NavProp_ { get; set; }
+        
     }
 }
