@@ -113,7 +113,7 @@ namespace DatEx.OneC.DataModel
                     }
                     
                     Console.ForegroundColor = attribute?.Color ?? ConsoleColor.DarkGray;
-                    Console.WriteLine($"{indent} {(attribute?.ODataType ?? "---").PadRight(maxOneCODataTypeLen)} | {(attribute?.ODataName ?? "---").PadRight(maxOneCODataName)} | {(attribute?.OneCType ?? "---").PadRight(maxOneCTypeLen)} │ {(attribute?.OneCName ?? "---").PadRight(maxOneCNameLen)} │ {p.Name.PadRight(maxPropNameLen)} │ {propValue}");
+                    Console.WriteLine($"{indent} {(attribute?.ODataType ?? "---").PadRight(maxOneCODataTypeLen)} │ {(attribute?.ODataName ?? "---").PadRight(maxOneCODataName)} │ {(attribute?.OneCType ?? "---").PadRight(maxOneCTypeLen)} │ {(attribute?.OneCName ?? "---").PadRight(maxOneCNameLen)} │ {p.Name.PadRight(maxPropNameLen)} │ {propValue}");
                 }
                 Console.ResetColor();
             }

@@ -23,6 +23,7 @@
         public DateTime? CreatedOn { get; set; }
 
         private Guid? _createdById;
+        
         /// <summary> Создал (Id) </summary>
         [CreatioProp("Guid", "Создал (Id)")]
         [JsonIgnoreSerialization]
@@ -102,8 +103,8 @@
 
                     var propType = GetCreatioTypeName(p);
 
-                    Console.WriteLine($"{indent} {(String.IsNullOrEmpty(propType) ? "---" : propType).PadRight(maxTypeTitleLen)} | {(attribute?.CreatioTitle ?? "---").PadRight(maxPropTitleLen)} " +
-                        $"| {GetTypeName(p).PadRight(maxPropTypeLen)} | {p.Name.PadRight(maxPropNameLen)} │ {propValue}");
+                    Console.WriteLine($"{indent} {(String.IsNullOrEmpty(propType) ? "---" : propType).PadRight(maxTypeTitleLen)} │ {(attribute?.CreatioTitle ?? "---").PadRight(maxPropTitleLen)} " +
+                        $"│ {GetTypeName(p).PadRight(maxPropTypeLen)} │ {p.Name.PadRight(maxPropNameLen)} │ {propValue}");
                 }
                 Console.ResetColor();
             }

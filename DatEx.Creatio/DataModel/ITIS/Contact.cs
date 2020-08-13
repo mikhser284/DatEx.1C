@@ -11,7 +11,7 @@
     {
         /// <summary> 1C Id </summary>
         /// <remarks> ■ Поле отсутствует? </remarks>
-        [CreatioProp("1C Id", Color = ConsoleColor.Blue)]
+        [CreatioProp("Guid", "1C Id", Color = ConsoleColor.Green)]
         public Guid IdOneC { get; set; }
 
         /// <summary> Деактивирована </summary>
@@ -23,7 +23,7 @@
         public String ITISIndividualTaxCode { get; set; }
 
         /// <summary> Должность сотрудника (Id) </summary>
-        [CreatioProp("Должность сотрудника (Id)", Color = ConsoleColor.Blue)]
+        [CreatioProp("Guid", "Должность сотрудника (Id)", Color = ConsoleColor.Blue)]
         public Guid ITISEmployeePositionId { get; set; }
 
         /// <summary> Должность сотрудника </summary>
@@ -31,7 +31,7 @@
         public ITIS.EmployeeJob ITISEmployeePosition { get; set; }
 
         /// <summary> Подразделение (Id) </summary>
-        [CreatioProp("Подразделение (Id)", Color = ConsoleColor.Blue)]
+        [CreatioProp("Guid", "Подразделение (Id)", Color = ConsoleColor.Blue)]
         public Guid ITISSubdivisionId { get; set; }
 
         /// <summary> Подразделение </summary>
@@ -43,7 +43,7 @@
         public DateTime ITISCareeStartDate { get; set; }
 
         /// <summary> Вид занятости (Id) </summary>
-        [CreatioProp("Вид занятости (Id)", Color = ConsoleColor.Blue)]
+        [CreatioProp("Guid", "Вид занятости (Id)", Color = ConsoleColor.Blue)]
         public Guid ITISEmploymentTypeId { get; set; }
 
         /// <summary> Вид занятости </summary>
@@ -51,7 +51,7 @@
         public ITISEmploymentType ITISEmploymentType { get; set; }
 
         /// <summary> Подразделение организации (Id) </summary>
-        [CreatioProp("Подразделение организации (Id)", Color = ConsoleColor.Blue)]
+        [CreatioProp("Guid", "Подразделение организации (Id)", Color = ConsoleColor.Blue)]
         public Guid ITISOrganizationSubdivisionId { get; set; }
 
         /// <summary> Подразделение организации </summary>

@@ -159,6 +159,7 @@ namespace App
             CreatioContact.Job = CreatioHttpClient.GetObjById<Terrasoft.Job>(CreatioContact.JobId);
             CreatioContact.Department = CreatioHttpClient.GetObjById<Terrasoft.Department>(CreatioContact.DepartmentId);
 
+            //CreatioContact.Show();
             // синхронизировать инфо. для контактов, которые существуют в 1С и Creatio
             foreach (ITIS.Contact c in contacts)
             {
@@ -169,12 +170,15 @@ namespace App
                 // Todo
 
                 c.IdOneC = c1.Id;
-                c.Name = c1.NavProp_Person.Description;
                 //c.TypeId = settings.CreatioGuidOfContactsWithTypeOurEmployees; // Для новых объектов
                 c.GivenName = c1.NavProp_Person.RelatedObj_NameInfo.GivenName;
                 c.Surname = c1.NavProp_Person.RelatedObj_NameInfo.Surname;
                 c.MiddleName = c1.NavProp_Person.RelatedObj_NameInfo.MiddleName;
                 c.Name = $"{c.Surname} {c.MiddleName} {c.GivenName}";
+                c.Email = c1.NavProp_Person?.RelatedObj_ContactInfoEmail?.View;
+                c.Phone = c1.NavProp_Person?.RelatedObj_ContactInfoPhone?.View;
+                c.MobilePhone = c1.NavProp_Person?.RelatedObj_ContactInfoWorkPhone?.View;
+                c.BirthDate = c1.NavProp_Person.BirthDate ?? new DateTime();
             }
 
             Terrasoft.Account account = CreatioHttpClient.GetObjById<Terrasoft.Account>(new Guid("b404c1c6-0508-489e-8b35-a02daca2066c"));

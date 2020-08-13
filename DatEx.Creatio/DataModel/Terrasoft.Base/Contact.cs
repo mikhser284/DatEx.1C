@@ -9,11 +9,11 @@
     public class Contact : BaseEntity
     {
         /// <summary> ФИО </summary>        
-        [CreatioProp("ФИО")]
+        [CreatioProp("ФИО", Color = ConsoleColor.Magenta)]
         public String Name { get; set; }
 
         /// <summary> Ответственный (Id) </summary>
-        [CreatioProp("Ответственный (Id)")]
+        [CreatioProp("Guid", "Ответственный (Id)")]
         public Guid OwnerId { get; set; }
 
         /// <summary> Ответственный </summary>
@@ -25,7 +25,7 @@
         public String Dear { get; set; }
 
         /// <summary> Обращение (Id) </summary>
-        [CreatioProp("Обращение (Id)")]
+        [CreatioProp("Guid", "Обращение (Id)")]
         public Guid SalutationTypeId { get; set; }
 
         /// <summary> Обращение </summary>
@@ -33,23 +33,23 @@
         public ContactSalutationType SalutationType { get; set; }
 
         /// <summary> Пол (Id) </summary>
-        [CreatioProp("Пол (Id)")]
+        [CreatioProp("Guid", "Пол (Id)", Color = ConsoleColor.Blue)]
         public Guid GenderId { get; set; }
 
         /// <summary> Пол </summary>
-        [CreatioProp("Пол")]
+        [CreatioProp("Пол", Color = ConsoleColor.Magenta)]
         public Gender Gender { get; set; }
 
         /// <summary> Контрагент (Id) </summary>
-        [CreatioProp("Контрагент (Id)")]
+        [CreatioProp("Guid", "Контрагент (Id)", Color = ConsoleColor.Blue)]
         public Guid AccountId { get; set; }
 
         /// <summary> Контрагент </summary>
-        [CreatioProp("Контрагент")]
+        [CreatioProp("Контрагент", Color = ConsoleColor.Magenta)]
         public Account Account { get; set; }
 
         /// <summary> Роль (Id) </summary>
-        [CreatioProp("Роль (Id)")]
+        [CreatioProp("Guid", "Роль (Id)")]
         public Guid DecisionRoleId { get; set; }
 
         /// <summary> Роль </summary>
@@ -57,43 +57,43 @@
         public ContactDecisionRole DecisionRole { get; set; }
 
         /// <summary> Тип (Id) </summary>
-        [CreatioProp("Тип (Id)")]
+        [CreatioProp("Guid", "Тип (Id)", Color = ConsoleColor.Blue)]
         public Guid TypeId { get; set; }
 
         /// <summary> Тип </summary>
-        [CreatioProp("Тип")]
+        [CreatioProp("Тип", Color = ConsoleColor.Magenta)]
         public ContactType Type { get; set; }
 
         /// <summary> Должность (Id) </summary>
-        [CreatioProp("Должность (Id)")]
+        [CreatioProp("Guid", "Должность (Id)", Color = ConsoleColor.Blue)]
         public Guid JobId { get; set; }
 
         /// <summary> Должность </summary>
-        [CreatioProp("Должность")]
+        [CreatioProp("Должность", Color = ConsoleColor.Magenta)]
         public Job Job { get; set; }
 
         /// <summary> Полное название должности </summary>
-        [CreatioProp("Полное название должности")]
+        [CreatioProp("Полное название должности", Color = ConsoleColor.Magenta)]
         public String JobTitle { get; set; }
 
         /// <summary> Департамент (Id) </summary>
-        [CreatioProp("Департамент (Id)")]
+        [CreatioProp("Guid", "Департамент (Id)", Color = ConsoleColor.Blue)]
         public Guid DepartmentId { get; set; }
 
         /// <summary> Департамент </summary>
-        [CreatioProp("Департамент")]
+        [CreatioProp("Департамент", Color = ConsoleColor.Magenta)]
         public Department Department { get; set; }
 
         /// <summary> Дата рождения </summary>
-        [CreatioProp("Дата рождения")]
+        [CreatioProp("Дата рождения", Color = ConsoleColor.Green)]
         public DateTime BirthDate { get; set; }
 
         /// <summary> Рабочий телефон </summary>
-        [CreatioProp("Рабочий телефон")]
+        [CreatioProp("Рабочий телефон", Color = ConsoleColor.Green)]
         public String Phone { get; set; }
 
         /// <summary> Мобильный телефон </summary>
-        [CreatioProp("Мобильный телефон")]
+        [CreatioProp("Мобильный телефон", Color = ConsoleColor.Green)]
         public String MobilePhone { get; set; }
 
         /// <summary> Домашний телефон </summary>
@@ -105,11 +105,11 @@
         public String Skype { get; set; }
 
         /// <summary> Email </summary>
-        [CreatioProp("Email")]
+        [CreatioProp("Email", Color = ConsoleColor.Green)]
         public String Email { get; set; }
 
         /// <summary> Тип адреса (Id) </summary>
-        [CreatioProp("Тип адреса (Id)")]
+        [CreatioProp("Guid", "Тип адреса (Id)")]
         public Guid AddressTypeId { get; set; }
 
         /// <summary> Тип адреса </summary>
@@ -121,7 +121,7 @@
         public String Address { get; set; }
 
         /// <summary> Город (Id) </summary>
-        [CreatioProp("Город (Id)")]
+        [CreatioProp("Guid", "Город (Id)")]
         public Guid CityId { get; set; }
 
         /// <summary> Город </summary>
@@ -129,7 +129,7 @@
         public City City { get; set; }
 
         /// <summary> Область/штат (Id) </summary>
-        [CreatioProp("Область/штат (Id)")]
+        [CreatioProp("Guid", "Область/штат (Id)")]
         public Guid RegionId { get; set; }
 
         /// <summary> Область/штат </summary>
@@ -141,11 +141,11 @@
         public String Zip { get; set; }
 
         /// <summary> Страна (Id) </summary>
-        [CreatioProp("Страна (Id)в")]
+        [CreatioProp("Guid", "Страна (Id)в")]
         public Guid CountryId { get; set; }
 
         /// <summary> Страна </summary>
-        [CreatioProp("Страна")]
+        [CreatioProp("Guid", "Страна")]
         public Country Country { get; set; }
 
         /// <summary> Не использовать Email </summary>
@@ -197,7 +197,7 @@
         public String TwitterId { get; set; }
 
         /// <summary> Аккаунт Twitter для доступа к данным (Id) </summary>
-        [CreatioProp("Аккаунт Twitter для доступа к данным (Id)")]
+        [CreatioProp("Guid", "Аккаунт Twitter для доступа к данным (Id)")]
         public Guid TwitterAFDAId { get; set; }
 
         /// <summary> Аккаунт Twitter для доступа к данным </summary>
@@ -205,7 +205,7 @@
         public SocialAccount TwitterAFDA { get; set; }
 
         /// <summary> Аккаунт Facebook для доступа к данным (Id) </summary>
-        [CreatioProp("Аккаунт Facebook для доступа к данным (Id)")]
+        [CreatioProp("Guid", "Аккаунт Facebook для доступа к данным (Id)")]
         public Guid FacebookAFDAId { get; set; }
 
         /// <summary> Аккаунт Facebook для доступа к данным </summary>
@@ -213,7 +213,7 @@
         public SocialAccount FacebookAFDA { get; set; }
 
         /// <summary> Аккаунт LinkedIn для доступа к данным (Id) </summary>
-        [CreatioProp("Аккаунт LinkedIn для доступа к данным (Id)")]
+        [CreatioProp("Guid", "Аккаунт LinkedIn для доступа к данным (Id)")]
         public Guid LinkedInAFDAId { get; set; }
 
         /// <summary> Аккаунт LinkedIn для доступа к данным </summary>
@@ -221,7 +221,7 @@
         public SocialAccount LinkedInAFDA { get; set; }
 
         /// <summary> Фото (Id) </summary>
-        [CreatioProp("Фото (Id)")]
+        [CreatioProp("Guid", "Фото (Id)")]
         public Guid PhotoId { get; set; }
 
         /// <summary> Фото </summary>
@@ -237,15 +237,15 @@
         public String GPSE { get; set; }
 
         /// <summary> Фамилия </summary>
-        [CreatioProp("Фамилия")]
+        [CreatioProp("Фамилия", Color = ConsoleColor.Green)]
         public String Surname { get; set; }
 
         /// <summary> Имя </summary>
-        [CreatioProp("Имя")]
+        [CreatioProp("Имя", Color = ConsoleColor.Green)]
         public String GivenName { get; set; }
 
         /// <summary> Отчество </summary>
-        [CreatioProp("Отчество")]
+        [CreatioProp("Отчество", Color = ConsoleColor.Green)]
         public String MiddleName { get; set; }
 
         /// <summary> Подтвержден </summary>
@@ -257,7 +257,7 @@
         public Double Completeness { get; set; }
 
         /// <summary> Язык общения (Id) </summary>
-        [CreatioProp("Язык общения (Id)")]
+        [CreatioProp("Guid", "Язык общения (Id)")]
         public Guid LanguageId { get; set; }
 
         /// <summary> Язык общения </summary>
@@ -265,7 +265,7 @@
         public SysLanguage Language { get; set; }
 
         /// <summary> Календарь (Id) </summary>
-        [CreatioProp("Календарь (Id)")]
+        [CreatioProp("Guid", "Календарь (Id)")]
         public Guid CalendarId { get; set; }
 
         /// <summary> Календарь </summary>

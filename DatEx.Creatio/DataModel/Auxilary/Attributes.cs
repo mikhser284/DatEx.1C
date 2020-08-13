@@ -50,4 +50,11 @@ namespace DatEx.Creatio.DataModel.Auxilary
             Title = title;
         }
     }
+
+    public class MapAttribute : Attribute
+    {
+        public String Link { get; set; }
+
+        public String Comment { get; set; }
+    }
 }

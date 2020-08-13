@@ -26,7 +26,7 @@
 
         [OneC("DateTime?", "ДатаРождения", "Дата", "ДатаРождения", Color = ConsoleColor.Green)]
         [JsonProperty("ДатаРождения")]
-        public DateTime? DateOfBirth { get; set; }
+        public DateTime? BirthDate { get; set; }
 
         [OneC("String", "ИНН", "Строка", "ИНН", Color = ConsoleColor.Green)]
         [JsonProperty("ИНН")]
