@@ -13,7 +13,7 @@ namespace DatEx.OneC
     /// <summary> Получение контрагентов </summary>
     public partial class HttpClientOfOneC
     {
-        #region Общие методы
+        #region ————— Общие методы ——————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
         public List<T> GetObjs<T>(String query = default(String)) where T : OneCObject => GetObjs<T, T>(query);
 
@@ -61,9 +61,9 @@ namespace DatEx.OneC
             return GetObjsByIds<T>(ids);
         }
 
-        #endregion Общие методы
+        #endregion ————— Общие методы
 
-        #region Получение контрагентов
+        #region ————— Получение контрагентов ————————————————————————————————————————————————————————————————————————————————————————————————————————
 
         public List<Contractor> GetContractorsByCodeOfEdrpo(String codeOfEdrpo, params String[] codesOfEdrpo)
         {
@@ -79,9 +79,9 @@ namespace DatEx.OneC
             return GetObjs<Contractor>(query);
         }
 
-        #endregion Получение контрагентов
+        #endregion ————— Получение контрагентов
 
-        #region Служебные
+        #region ————— Служебные —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
         public HttpClientOfOneC(HttpClientOfOneCSettings settings)
         {
@@ -117,6 +117,6 @@ namespace DatEx.OneC
             { typeof(PositionInOrganization), "Catalog_ДолжностиОрганизаций" }
         };
 
-        #endregion Служебные
+        #endregion ————— Служебные
     }
 }

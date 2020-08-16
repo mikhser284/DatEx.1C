@@ -180,7 +180,7 @@ namespace DatEx.OneC.DataModel
 
         [OneC("Catalog_ДолжностиОрганизаций", "NavProp(ТекущаяДолжностьКомпании)", "Справочник.ДолжностиОрганизаций", "ТекущаяДолжностьКомпании")]
         [JsonIgnore]
-        public PositionInOrganization NavProp_CurrentCompanyPositionId { get; set; }
+        public PositionInOrganization NavProp_CurrentCompanyPosition { get; set; }
 
         [OneC("DateTime?", "ДатаПриемаНаРаботуВКомпанию", "Дата", "ДатаПриемаНаРаботуВКомпанию")]
         [JsonProperty("ДатаПриемаНаРаботуВКомпанию")]

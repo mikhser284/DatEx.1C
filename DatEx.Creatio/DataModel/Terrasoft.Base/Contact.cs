@@ -3,13 +3,18 @@
     using System;
     using DatEx.Creatio.DataModel.Auxilary;
     using DatEx.Creatio.DataModel.Terrasoft.Calendar;
+    using Newtonsoft.Json;
 
     /// <summary> Контакт </summary>    
     [CreatioType("Контакт")]
     public class Contact : BaseEntity
     {
+        [CreatioProp("Employee", "Сотрудник", Remarks ="Не существует в oData, создано для удобства")]
+        [JsonIgnore]
+        public Employee Employee { get; set; }
+
         /// <summary> ФИО </summary>        
-        [CreatioProp("ФИО", Color = ConsoleColor.Magenta)]
+        [CreatioProp("ФИО", Color = ConsoleColor.Green)]
         public String Name { get; set; }
 
         /// <summary> Ответственный (Id) </summary>
@@ -37,7 +42,7 @@
         public Guid GenderId { get; set; }
 
         /// <summary> Пол </summary>
-        [CreatioProp("Пол", Color = ConsoleColor.Magenta)]
+        [CreatioProp("Пол", Color = ConsoleColor.Green)]
         public Gender Gender { get; set; }
 
         /// <summary> Контрагент (Id) </summary>

@@ -12,14 +12,137 @@ using Newtonsoft.Json.Linq;
 
 namespace DatEx.Creatio
 {
-    public class HttpClientOfCreatio
+    public partial class HttpClientOfCreatio
     {
+        #region ————— Общие методы ——————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+        /// <summary> Получить одиночный объект по его идентификатору </summary>
+        public T GetSingleObjById<T>(Guid id) where T : BaseEntity
+        {
+            String fullQueryString = $"{OdataUri}{typeof(T).Name}({id})";
+            String requestResult = GetRequest(fullQueryString);
+            CreatioOdataRequestResult<T> result = JsonConvert.DeserializeObject<CreatioOdataRequestResult<T>>(requestResult);
+            T res = JsonConvert.DeserializeObject<T>(requestResult);
+            return res;
+        }
+
+        /// <summary> ■ Получить объекты упорядоченные по их Id по их идентификаторам </summary>
+        public Dictionary<Guid, T> GetObjsByIds<T>(IEnumerable<Guid> identifiers, String nameOfGuidFieldToCompare = "Id") where T : BaseEntity
+        {
+            String filter = String.Join(" or ", identifiers.Select(id => $"{nameOfGuidFieldToCompare} eq {id} "));
+            String query = $"$filter={filter}";
+            return GetObjs<T>(query).ToDictionary(k => (Guid)k.Id);
+        }
+
+        /// <summary> Получить объекты упорядоченные по их Id по их идентификаторам </summary>
+        public Dictionary<Guid, T> GetObjsByIds<T>(Guid id, params Guid[] ids) where T : BaseEntity
+        {
+            HashSet<Guid> identifiers = new HashSet<Guid>(ids);
+            identifiers.Add(id);
+            return GetObjsByIds<T>(identifiers);
+        }
+
+        /// <summary> Получить объекты указанного типа </summary>
+        public List<T> GetObjs<T>(String query = default(String)) where T : BaseEntity
+        {
+            String fullQueryString = $"{OdataUri}{typeof(T).Name}/?{query}";
+            String requestResult = GetRequest(fullQueryString);
+            CreatioOdataRequestResult<T> result = JsonConvert.DeserializeObject<CreatioOdataRequestResult<T>>(requestResult);
+            if (result.Values.Count == 0)
+            {
+                T singleValue = JsonConvert.DeserializeObject<T>(requestResult);
+                return new List<T> { singleValue };
+            }
+
+            return result.Values;
+        }
+
+        /// <summary> Получить проекцию объектов указанного типа </summary>
+        public List<ProjectionType> GetObjsProjection<T, ProjectionType>(String query = default(String)) where T : BaseEntity
+        {
+            CreatioOdataRequestResult<ProjectionType> oDataRequestResult = GetRequestResult<CreatioOdataRequestResult<ProjectionType>>($"{OdataUri}{typeof(T).Name}{query}");
+            return oDataRequestResult.Values;
+        }
+
+        /// <summary> Получить объекты указанного типа у которых значение указанного свойства входить в список значений </summary>
+        public List<T> GetObjsWherePropIn<T, P>(String propName, IEnumerable<P> values) where T : BaseEntity
+        {
+            String filter = String.Join(" or \n", values.Select(p => $"{propName} eq '{p}'"));
+
+            String fullQueryString = $"{OdataUri}{typeof(T).Name}/?$filter={filter}";
+            String requestResult = GetRequest(fullQueryString);
+            CreatioOdataRequestResult<T> result = JsonConvert.DeserializeObject<CreatioOdataRequestResult<T>>(requestResult);
+            if (result.Values.Count == 0)
+            {
+                T singleValue = JsonConvert.DeserializeObject<T>(requestResult);
+                result.Values = new List<T> { singleValue };
+            }
+
+            return result.Values;
+        }
+
+
+        /// <summary> Добавить объект </summary>
+        public T AddObj<T>(T obj) where T : BaseEntity
+        {
+            String serializedEntity = JsonConvert.SerializeObject(obj,
+                new JsonSerializerSettings
+                {
+                    ContractResolver = new JsonPropertiesResolver(),
+                    NullValueHandling = NullValueHandling.Ignore,
+                    //Formatting = Formatting.Indented
+                });
+
+            StringContent content = new StringContent(serializedEntity, Encoding.UTF8, "application/json");
+            Uri odataUri = new Uri(OdataUri, typeof(T).Name);
+            HttpResponseMessage response = CreatioClient.PostAsync(odataUri, content).Result;
+            response.EnsureSuccessStatusCode();
+            String result = response.Content.ReadAsStringAsync().Result;
+#if DEBUG
+            result = JToken.Parse(result).ToString(Formatting.Indented);
+#endif
+            T operationResult = JsonConvert.DeserializeObject<T>(result);
+            return operationResult;
+        }
+
+        /// <summary> Модифицировать объект </summary>
+        public void ModifyObj<T>(T obj) where T : BaseEntity
+        {
+            if (obj.Id == null) throw new InvalidOperationException("Не указан идентификатор изменяемого объекта");
+
+            String serializedEntity = JsonConvert.SerializeObject(obj,
+                new JsonSerializerSettings
+                {
+                    ContractResolver = new JsonPropertiesResolver(),
+                    NullValueHandling = NullValueHandling.Ignore
+                });
+
+            StringContent content = new StringContent(serializedEntity, Encoding.UTF8, "application/json");
+            Uri odataUri = new Uri(OdataUri, $"{typeof(T).Name}({obj.Id})");
+            HttpResponseMessage response = CreatioClient.PatchAsync(odataUri, content).Result;
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary> Удалить объект </summary>
+        public void DeleteObj<T>(T obj) where T : BaseEntity
+        {
+            if (obj.Id == null) throw new InvalidOperationException("Не указан идентификатор изменяемого объекта");
+            Uri odataUri = new Uri(OdataUri, $"{typeof(T).Name}({obj.Id})");
+            HttpResponseMessage response = CreatioClient.DeleteAsync(odataUri).Result;
+            response.EnsureSuccessStatusCode();
+        }
+
+        #endregion ————— Общие методы
+
+
+
+        #region ————— Служебные —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
         private readonly Uri BaseUri;
         private readonly Uri AuthServiceUri;
         private readonly Uri OdataUri;
         private HttpClient CreatioClient;
-        //private Dictionary<String, Cookie> Cookies { get; set; } = new Dictionary<string, Cookie>();
-
+        
         private HttpClientOfCreatio(String baseUri)
         {
             BaseUri = new Uri(baseUri);
@@ -37,7 +160,8 @@ namespace DatEx.Creatio
             client.CreatioClient = httpClient;
             return client;
         }
-
+        
+        /// <summary> Залогиниться в Creatio </summary>
         public static HttpClientOfCreatio LogIn(String baseAddress, String userName, String userPassword)
         {
             AuthResponse loginStatus;
@@ -71,107 +195,20 @@ namespace DatEx.Creatio
 #endif
             return result;
         }
+        private T GetRequestResult<T>(String query) => JsonConvert.DeserializeObject<T>(GetRequest(query));
 
-        private T GetRequest<T>(String query) => JsonConvert.DeserializeObject<T>(GetRequest(query));
+        #endregion ————— Служебные
 
+
+
+        #region ————— Временные (удалить) ———————————————————————————————————————————————————————————————————————————————————————————————————————————
         public String GetContactIdByName(String name) => GetRequest($"0/rest/UsrCustomConfigurationService/GetContactIdByName?Name={name}");
 
-        public String GetOData(String dataSource, String query) => GetRequest($"{OdataUri}{dataSource}{query}");
+        public String GetODataRequestResult(String dataSource, String query) => GetRequest($"{OdataUri}{dataSource}{query}");
 
-        public List<T> ODataGet<T>(String query = default(String))
-        {
-            String fullQueryString = $"{OdataUri}{typeof(T).Name}/?{query}";
-            String requestResult = GetRequest(fullQueryString);
-            CreatioOdataRequestResult<T> result = JsonConvert.DeserializeObject<CreatioOdataRequestResult<T>>(requestResult);
-            if(result.Values.Count == 0)
-            {
-                T singleValue = JsonConvert.DeserializeObject<T>(requestResult);
-                return new List<T> { singleValue };
-            }
-
-            return result.Values;
-        }
-
-        public List<TB> ODataGet<TA, TB>(String query = default(String))
-        {
-            CreatioOdataRequestResult<TB> oDataRequestResult = GetRequest<CreatioOdataRequestResult<TB>>($"{OdataUri}{typeof(TA).Name}{query}");
-            return oDataRequestResult.Values;
-        }
-
-        public List<T> GetObjsWherePropIn<T, P>(String propName, List<P> values)
-        {
-            String filter = String.Join(" or \n", values.Select(p => $"{propName} eq '{p}'"));
-
-            String fullQueryString = $"{OdataUri}{typeof(T).Name}/?$filter={filter}";
-            String requestResult = GetRequest(fullQueryString);
-            CreatioOdataRequestResult<T> result = JsonConvert.DeserializeObject<CreatioOdataRequestResult<T>>(requestResult);
-            if(result.Values.Count == 0)
-            {
-                T singleValue = JsonConvert.DeserializeObject<T>(requestResult);
-                return new List<T> { singleValue };
-            }
-
-            return result.Values;
-        }
-
-        public T GetObjById<T>(Guid id)
-        {
-            String fullQueryString = $"{OdataUri}{typeof(T).Name}({id})";
-            String requestResult = GetRequest(fullQueryString);
-            CreatioOdataRequestResult<T> result = JsonConvert.DeserializeObject<CreatioOdataRequestResult<T>>(requestResult);
-            T res = JsonConvert.DeserializeObject<T>(requestResult);
-            return res;
-        }
-
-        public T ODataAdd<T>(T entity) where T : BaseEntity
-        {
-            String serializedEntity = JsonConvert.SerializeObject(entity,
-                new JsonSerializerSettings
-                {
-                    ContractResolver = new JsonPropertiesResolver(),
-                    NullValueHandling = NullValueHandling.Ignore,
-                    //Formatting = Formatting.Indented
-                });
-
-            StringContent content = new StringContent(serializedEntity, Encoding.UTF8, "application/json");
-            Uri odataUri = new Uri(OdataUri, typeof(T).Name);
-            HttpResponseMessage response = CreatioClient.PostAsync(odataUri, content).Result;
-            response.EnsureSuccessStatusCode();
-            String result = response.Content.ReadAsStringAsync().Result;
-#if DEBUG
-            result = JToken.Parse(result).ToString(Formatting.Indented);
-#endif
-            T operationResult = JsonConvert.DeserializeObject<T>(result);
-            return operationResult;
-        }
-
-        public void ODataModify<T>(T entity) where T : BaseEntity
-        {
-            if(entity.Id == null) throw new InvalidOperationException("Не указан идентификатор изменяемого объекта");
-
-            String serializedEntity = JsonConvert.SerializeObject(entity,
-                new JsonSerializerSettings
-                {
-                    ContractResolver = new JsonPropertiesResolver(),
-                    NullValueHandling = NullValueHandling.Ignore
-                });
-
-            StringContent content = new StringContent(serializedEntity, Encoding.UTF8, "application/json");
-            Uri odataUri = new Uri(OdataUri, $"{typeof(T).Name}({entity.Id})");
-            HttpResponseMessage response = CreatioClient.PatchAsync(odataUri, content).Result;
-            response.EnsureSuccessStatusCode();
-        }
-
-        public void ODataDelete<T>(T entity) where T : BaseEntity
-        {
-            if(entity.Id == null) throw new InvalidOperationException("Не указан идентификатор изменяемого объекта");
-            Uri odataUri = new Uri(OdataUri, $"{typeof(T).Name}({entity.Id})");
-            HttpResponseMessage response = CreatioClient.DeleteAsync(odataUri).Result;
-            response.EnsureSuccessStatusCode();
-        }
-
-
+        #endregion ————— Временные (удалить)
     }
+
 
 
     public class AuthRequest
@@ -185,6 +222,7 @@ namespace DatEx.Creatio
             UserPassword = userPassword;
         }
     }
+
 
 
     public class AuthResponse

@@ -1,6 +1,8 @@
 ﻿namespace DatEx.OneC.DataModel
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using DatEx.OneC.DataModel.Auxilary;
     using Newtonsoft.Json;
 
@@ -8,6 +10,10 @@
     [JsonObject("Catalog_ФизическиеЛица")]
     public class Person : OneCBaseHierarchicalLookup
     {
+        /// <summary> Список соттудников (и их должностей) которые соответствуют одному физ. лицу </summary>
+        [JsonIgnore]
+        public List<Employee> RelatedObjs_RelatedEmployeePositions { get; set; } = new List<Employee>();
+
         [OneC("InformationRegister_ФИОФизЛиц", "-", "РегистрСведений.ФИОФизЛиц", "-", Remarks = "Прямая связь между объектами отсутствует", Color = ConsoleColor.Green)]
         [JsonIgnore]
         public IRNamesOfPersons RelatedObj_NameInfo { get; set; }
@@ -70,5 +76,13 @@
         public String IdCreatio { get; set; }
         
         public override String ToString() => $"{Description}";
+
+        public String GetShortNameAndActualPositions()
+        {
+            String shortNameString = $"{RelatedObj_NameInfo.Surname} {RelatedObj_NameInfo.GivenName?[0]}.{RelatedObj_NameInfo.MiddleName?[0]}.";
+            var actualPositions = RelatedObjs_RelatedEmployeePositions.Where(x => x.DateOfDismisal is null || x.DateOfDismisal == default(DateTime)).OrderBy(x => x.NavProp_Organization.Prefix).ToList();
+            String actualPositionsString = $"{String.Join("; ", actualPositions.Select(x => $"{x.NavProp_CurrentPositionInOrganization} [{x.NavProp_Organization.Prefix}]"))}";
+            return $"{shortNameString} ({actualPositionsString})";
+        }
     }
 }

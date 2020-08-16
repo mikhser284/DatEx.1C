@@ -14,9 +14,11 @@ namespace App
         public Guid OneCGuidOfWorkPhoneContactInfo { get; set; }
         public Guid CreatioGuidOfContactsWithTypeOurEmployees { get; set; }
 
+        public Dictionary<String, Guid> MapGenderInOneC_GenderGuidInCreatio = new Dictionary<string, Guid>();
+
         public static SyncSettings GetDefaultSettings()
         {
-            return new SyncSettings()
+            SyncSettings settings = new SyncSettings()
             {
                 EmailDomain = "@kustoagro.com",
                 OneCGuidOfEmailContactInfo = new Guid("6b1ae98e-bb91-11ea-80c7-00155d65b747"),
@@ -24,6 +26,11 @@ namespace App
                 OneCGuidOfWorkPhoneContactInfo = new Guid("08188400-bb94-11ea-80c7-00155d65b747"),
                 CreatioGuidOfContactsWithTypeOurEmployees = new Guid("60733efc-f36b-1410-a883-16d83cab0980"),
             };
+
+            settings.MapGenderInOneC_GenderGuidInCreatio.Add("Мужской", new Guid("eeac42ee-65b6-df11-831a-001d60e938c6"));
+            settings.MapGenderInOneC_GenderGuidInCreatio.Add("Женский", new Guid("fc2483f8-65b6-df11-831a-001d60e938c6"));
+
+            return settings;
         }
     }
 }

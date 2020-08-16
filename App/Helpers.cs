@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace App
 {
@@ -58,6 +62,43 @@ namespace App
                 ValType val = keySelector(element);
                 if (element != null && !excludableVals.Contains(val) && values.Add(keySelector(element))) yield return val;
             }
+        }
+
+        public static Dictionary<TKey, List<TValue>> GroupToDictionaryBy<TKey, TValue>(this IEnumerable<TValue> source, Func<TValue, TKey> keySelector)
+        {
+            Dictionary<TKey, List<TValue>> groupedSource = new Dictionary<TKey, List<TValue>>();
+            foreach(TValue value in source)
+            {
+                TKey key = keySelector(value);
+                if (!groupedSource.ContainsKey(key)) groupedSource.Add(key, new List<TValue> { value });
+                else groupedSource[key].Add(value);
+            }
+            return groupedSource;
+        }
+
+        public static IEnumerable<T> ForEach<T>(this IEnumerable<T> source, Action<T> action)
+        {
+            foreach (T item in source) action(item);
+            return source;
+        }
+    }
+
+    public static class Ext_Guid
+    {
+        private static readonly Guid DefaultValue = default(Guid);
+
+        public static Boolean IsNotNullOrDefault(this Guid? guid) => guid != null && guid != DefaultValue;
+
+        public static Boolean IsNotDefault(this Guid guid) => guid != DefaultValue;
+    }
+
+    public static class Ext_Task
+    {
+        public static Task[] StartAndWaitForAll(this Task[] tasks)
+        {
+            tasks.ForEach(task => task.Start());
+            Task.WaitAll(tasks);
+            return tasks;
         }
     }
 }

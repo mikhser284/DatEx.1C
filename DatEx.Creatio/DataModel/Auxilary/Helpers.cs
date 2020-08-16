@@ -24,4 +24,5 @@
         public static Guid? AsNullable(this Guid? guid) => guid == Guid.Empty ? null : guid;
     }
 
+    
 }
