@@ -9,6 +9,8 @@ using Terrasoft = DatEx.Creatio.DataModel.Terrasoft.Base;
 using System.Runtime;
 using DatEx.OneC.DataModel;
 using System.Runtime.CompilerServices;
+using DatEx.Creatio.DataModel.ITIS;
+using DatEx.Creatio;
 
 namespace App
 {
@@ -189,7 +191,7 @@ namespace App
                 if (employee.CurrentOrganizationSubdivisionId.IsNotNullOrDefault())
                     employee.NavProp_CurrentOrganizationSubdivision = subdivisions[(Guid)employee.CurrentOrganizationSubdivisionId];
             }
-        }        
+        }
     }
 
     /// <summary> Получение объектов из Creatio </summary>
@@ -199,16 +201,21 @@ namespace App
         public static Dictionary<Guid, ITIS.Contact> Creatio_GetContactsAcordingToPersonEmail(Dictionary<Guid, OneC.Person> personsWithEmailsOrderedById)
         {
             List<String> emails = personsWithEmailsOrderedById.Values.Select(x => x.RelatedObj_ContactInfoEmail.View).Distinct().ToList();
-            Dictionary<Guid, ITIS.Contact> creatio_ContactsOrderedById = CreatioHttpClient.GetObjsWherePropIn<ITIS.Contact, String>("Email", emails).ToDictionary(k => (Guid)k.Id);
+            List<ITIS.Contact> creatio_Contacts = CreatioHttpClient.GetObjsWherePropIn<ITIS.Contact, String>("Email", emails);
+            Dictionary<Guid, ITIS.Contact> creatio_ContactsOrderedById = creatio_Contacts.ToDictionary(k => (Guid)k.Id);
 
             Task[] tasks = new Task[]
             {
-                new Task(() => Creatio_GetEmployeeJobAndBindWithContact(creatio_ContactsOrderedById)),
-                //new Task(() => Creatio_GetEmployeeAndBindWithContact(creatio_ContactsOrderedById)),
-                //new Task(() => Creatio_GetSubdivisionsAndBindWithEmployees(creatio_ContactsOrderedById)),
-            }.StartAndWaitForAll();
-
-            Creatio_GetEmployeeAndBindWithContact(creatio_ContactsOrderedById);
+                new Task(() => Creatio_GetEmployeeJobAndBindWithContact(creatio_Contacts)),
+                new Task(() => Creatio_GetEmployeeAndBindWithContact(creatio_ContactsOrderedById)),
+                new Task(() => Creatio_GetSubdivisionsAndBindWithEmployees(creatio_Contacts)),
+                new Task(() => Creatio_GetEmploymentTypesAndBindWitEmployees(creatio_Contacts)),
+                new Task(() => Creatio_GetSubdivisionAndBindWithContact(creatio_Contacts)),
+                new Task(() => Creaio_GetAccountsAndBindWithContacts(creatio_Contacts)),
+                new Task(() => Creatio_GetContactTypesAndBindWithContacts(creatio_Contacts)),
+                new Task(() => Creatio_GetJobsAndBindWithContacts(creatio_Contacts)),
+                new Task(() => Creatio_GetDepartmentsAndBindWithContacts(creatio_Contacts)),
+            }.StartAndWaitForAll();            
 
             return creatio_ContactsOrderedById;
         }
@@ -216,9 +223,9 @@ namespace App
         /// <summary> Получить из Creatio сотрудников и связать с контактами </summary>
         public static void Creatio_GetEmployeeAndBindWithContact(Dictionary<Guid, ITIS.Contact> creatio_ContactsOrderedById)
         {
-            Dictionary<Guid, ITIS.Employee> employees = CreatioHttpClient.GetObjsByIds<ITIS.Employee>(creatio_ContactsOrderedById.Values.Select(x => (Guid)x.Id), "ContactId");
+            Dictionary<Guid, ITIS.Employee> employeesOrderedById = CreatioHttpClient.GetObjsByIds<ITIS.Employee>(creatio_ContactsOrderedById.Values.Select(x => (Guid)x.Id), "Contact");
 
-            foreach(var employee in employees.Values)
+            foreach (var employee in employeesOrderedById.Values)
             {
                 if (employee.ContactId.IsNotDefault())
                 {
@@ -227,35 +234,156 @@ namespace App
                     contact.Employee = employee;
                 }                
             }
+
+            Creatio_SyncEmployeesWithContact(employeesOrderedById.Values.ToList());
+            Creatio_GetEmployeeCareerAndBindWithEmploee(employeesOrderedById);
         }
 
         /// <summary> Получить из Creatio должности и связать с контактами </summary>
-        public static void Creatio_GetEmployeeJobAndBindWithContact(Dictionary<Guid, ITIS.Contact> creatio_ContactsOrderedById)
+        public static void Creatio_GetEmployeeJobAndBindWithContact(List<ITIS.Contact> creatio_Contacts)
         {
-            Dictionary<Guid, ITIS.EmployeeJob> jobs = CreatioHttpClient.GetObjsByIds<ITIS.EmployeeJob>(creatio_ContactsOrderedById.Values.Select(x => x.ITISEmployeePositionId));
+            Dictionary<Guid, ITIS.EmployeeJob> jobs = CreatioHttpClient.GetObjsByIds<ITIS.EmployeeJob>(creatio_Contacts.Select(x => x.ITISEmployeePositionId));
 
-            foreach(var contact in creatio_ContactsOrderedById.Values)
+            foreach(var contact in creatio_Contacts)
             {
                 if (contact.ITISEmployeePositionId.IsNotDefault())
                     contact.ITISEmployeePosition = jobs[contact.ITISEmployeePositionId];
             }
+
+            
         }
 
-        public static void Creatio_GetSubdivisionsAndBindWithEmployees(Dictionary<Guid, ITIS.Contact> creatio_ContactsOrderedById)
+        /// <summary> Получить из Creatio подразделения и связать с сотрудниками </summary>
+        public static void Creatio_GetSubdivisionsAndBindWithEmployees(List<ITIS.Contact> creatio_Contacts)
         {
-            Dictionary<Guid, Terrasoft.AccountOrganizationChart> subdivisions = CreatioHttpClient.GetObjsByIds<Terrasoft.AccountOrganizationChart>(creatio_ContactsOrderedById.Values.Select(x => x.ITISSubdivisionId));
+            Dictionary<Guid, Terrasoft.AccountOrganizationChart> subdivisions = CreatioHttpClient.GetObjsByIds<Terrasoft.AccountOrganizationChart>(creatio_Contacts.Select(x => x.ITISSubdivisionId));
             
-            foreach(var contact in creatio_ContactsOrderedById.Values)
+            foreach(var contact in creatio_Contacts)
             {
                 if (contact.ITISSubdivisionId.IsNotDefault())
                     contact.ITISSubdivision = subdivisions[contact.ITISSubdivisionId];
             }
         }
 
+        /// <summary> Получить из Creatio тип зайнятости и связать с контактами </summary>
+        public static void Creatio_GetEmploymentTypesAndBindWitEmployees(List<ITIS.Contact> creatio_Contacts)
+        {
+            Dictionary<Guid, ITISEmploymentType> employmentTypes = CreatioHttpClient.GetObjsByIds<ITISEmploymentType>(creatio_Contacts.Select(x => x.ITISEmploymentTypeId));
+            foreach(var contact in creatio_Contacts)
+            {
+                if (contact.ITISEmploymentTypeId.IsNotDefault())
+                    contact.ITISEmploymentType = employmentTypes[contact.ITISEmploymentTypeId];
+            }
+        }
+
+        /// <summary> Получить из Creatio подразделения организаций зайнятости и связать с контактами </summary>
+        public static void Creatio_GetSubdivisionAndBindWithContact(List<ITIS.Contact> creatio_Contacts)
+        {
+            Dictionary<Guid, Terrasoft.OrgStructureUnit> organizationSubdivisions = CreatioHttpClient.GetObjsByIds<Terrasoft.OrgStructureUnit>(creatio_Contacts.Select(x => x.ITISOrganizationSubdivisionId));
+            foreach(var contact in creatio_Contacts)
+            {
+                if (contact.ITISOrganizationSubdivisionId.IsNotDefault())
+                    contact.ITISOrganizationSubdivision = organizationSubdivisions[contact.ITISOrganizationSubdivisionId];
+            }
+        }
+
+        /// <summary> Получить из Creatio контрагентов и связать с контактами </summary>
+        public static void Creaio_GetAccountsAndBindWithContacts(List<ITIS.Contact> creatio_Contacts)
+        {
+            Dictionary<Guid, ITIS.Account> accounts = CreatioHttpClient.GetObjsByIds<ITIS.Account>(creatio_Contacts.Select(x => x.AccountId));
+            foreach(var contact in creatio_Contacts)
+            {
+                if (contact.AccountId.IsNotDefault())
+                    contact.Account = accounts[contact.AccountId];
+            }
+        }
+
+        /// <summary> Получить из Creatio типы контактов и связать с контактами </summary>
+        public static void Creatio_GetContactTypesAndBindWithContacts(List<ITIS.Contact> creatio_Contacts)
+        {
+            Dictionary<Guid, Terrasoft.ContactType> contactTypes = CreatioHttpClient.GetObjsByIds<Terrasoft.ContactType>(creatio_Contacts.Select(x => x.TypeId));
+            foreach(var contact in creatio_Contacts)
+            {
+                if (contact.TypeId.IsNotDefault())
+                    contact.Type = contactTypes[contact.TypeId];
+            }
+        }
+
+        /// <summary> Получить из Creatio должности и связать с контактами </summary>
+        public static void Creatio_GetJobsAndBindWithContacts(List<ITIS.Contact> creatio_Contacts)
+        {
+            Dictionary<Guid, Terrasoft.Job> jobs = CreatioHttpClient.GetObjsByIds<Terrasoft.Job>(creatio_Contacts.Select(x => x.JobId));
+            foreach(var contact in creatio_Contacts)
+            {
+                if (contact.JobId.IsNotDefault())
+                    contact.Job = jobs[contact.JobId];
+            }
+        }
+
+        /// <summary> Получить из Creatio подразделения и связать с контактами </summary>
+        public static void Creatio_GetDepartmentsAndBindWithContacts(List<ITIS.Contact> creatio_Contacts)
+        {
+            Dictionary<Guid, Terrasoft.Department> departmentns = CreatioHttpClient.GetObjsByIds<Terrasoft.Department>(creatio_Contacts.Select(x => x.DepartmentId));
+            foreach(var contact in creatio_Contacts)
+            {
+                if (contact.DepartmentId.IsNotDefault())
+                    contact.Department = departmentns[contact.DepartmentId];
+            }
+        }
+
+        /// <summary> Получить из Creatio подразделения и связать с контактами </summary>
+        public static void Creatio_SyncEmployeesWithContact(List<ITIS.Employee> creatio_Employees)
+        {
+            foreach(var employee in creatio_Employees)
+            {
+                ITIS.Contact contact = (ITIS.Contact)employee.Contact;
+                if (contact == null) continue;
+
+                employee.ITISSurName = contact.Surname;
+                employee.ITISGivenName = contact.GivenName;
+                employee.ITISMiddleName = contact.MiddleName;
+                employee.ITISEmploymentsTypeId = contact.ITISEmploymentTypeId;
+                employee.ITISEmploymentsType = contact.ITISEmploymentType;
+                employee.Name = $"{contact.Surname} {contact.GivenName} {contact.MiddleName}";
+                employee.OrgStructureUnitId = contact.ITISOrganizationSubdivisionId;
+                employee.OrgStructureUnit = contact.ITISOrganizationSubdivision;
+                employee.JobId = contact.JobId;
+                employee.Job = contact.Job;
+                employee.CareerStartDate = contact.ITISCareeStartDate;
+                //employee.CareerDueDate = contact.ItisCareerDueDate; // Поле contact.ItisCareerDueDate отсутствует
+                employee.AccountId = contact.AccountId;
+                employee.Account = contact.Account;
+            }
+        }
+
+        public static void Creatio_GetEmployeeCareerAndBindWithEmploee(Dictionary<Guid, ITIS.Employee> employeesOrderedById)
+        {          
+            Dictionary<Guid, List<ITIS.EmployeeCareer>> careersGroupedByEmployeeId = CreatioHttpClient.GetBindedObjsByParentIds<ITIS.EmployeeCareer>(employeesOrderedById.Keys, "Employee", x => x.EmployeeId);
+            foreach(var item in careersGroupedByEmployeeId)
+            {
+                ITIS.Employee employee;
+                if (!employeesOrderedById.TryGetValue(item.Key, out employee)) continue;
+                employee.Career.AddRange(item.Value);
+            }
+        }
+
         public static void Creatio_ShowContact(ITIS.Contact contact)
         {
-            contact.Show();
-            contact.Employee.Show(1);
+            contact?.Show();
+            
+            ITIS.Employee employee = (ITIS.Employee)contact?.Employee;
+            employee.Show(1);
+            employee.Career.ForEach(x => x.Show(2));
+
+            
+            contact?.ITISSubdivision?.Show(1);
+            contact?.ITISEmploymentType?.Show(1);
+            contact?.ITISOrganizationSubdivision?.Show(1);
+            contact?.Account?.Show(1);
+            contact?.Type?.Show(1);
+            contact?.Job?.Show(1);
+            contact?.Department?.Show(1);
+
         }
     }
 }

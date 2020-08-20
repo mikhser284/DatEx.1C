@@ -27,9 +27,10 @@ namespace DatEx.Creatio
         }
 
         /// <summary> ■ Получить объекты упорядоченные по их Id по их идентификаторам </summary>
-        public Dictionary<Guid, T> GetObjsByIds<T>(IEnumerable<Guid> identifiers, String nameOfGuidFieldToCompare = "Id") where T : BaseEntity
+        public Dictionary<Guid, T> GetObjsByIds<T>(IEnumerable<Guid> identifiers, String nameOfLinkedObject = default(String)) where T : BaseEntity
         {
-            String filter = String.Join(" or ", identifiers.Select(id => $"{nameOfGuidFieldToCompare} eq {id} "));
+            String linkedObj = $"{nameOfLinkedObject}{(String.IsNullOrEmpty(nameOfLinkedObject) ? "" : "/")}Id";
+            String filter = String.Join(" or ", identifiers.Select(id => $"{linkedObj} eq {id} "));
             String query = $"$filter={filter}";
             return GetObjs<T>(query).ToDictionary(k => (Guid)k.Id);
         }
@@ -40,6 +41,23 @@ namespace DatEx.Creatio
             HashSet<Guid> identifiers = new HashSet<Guid>(ids);
             identifiers.Add(id);
             return GetObjsByIds<T>(identifiers);
+        }
+
+        /// <summary> Получить связанные объекты по идентификаторам дочерних </summary>
+        public Dictionary<Guid, List<T>> GetBindedObjsByParentIds<T>(IEnumerable<Guid> identifiers, String nameOfParentObj, Func<T, Guid> parentKeySelector) where T : BaseEntity
+        {
+            String linkedObj = $"{nameOfParentObj}{(String.IsNullOrEmpty(nameOfParentObj) ? "" : "/")}Id";
+            String filter = String.Join(" or ", identifiers.Select(id => $"{linkedObj} eq {id} "));
+            String query = $"$filter={filter}";
+            List<T> queryResult = GetObjs<T>(query);
+            Dictionary<Guid, List<T>> bindedObjsGroupedByParentId = new Dictionary<Guid, List<T>>();
+            foreach(T item in queryResult)
+            {
+                Guid parentKey = parentKeySelector(item);
+                if (bindedObjsGroupedByParentId.ContainsKey(parentKey)) bindedObjsGroupedByParentId[parentKey].Add(item);
+                else bindedObjsGroupedByParentId.Add(parentKey, new List<T> { item });
+            }
+            return bindedObjsGroupedByParentId;
         }
 
         /// <summary> Получить объекты указанного типа </summary>
@@ -202,8 +220,7 @@ namespace DatEx.Creatio
 
 
         #region ————— Временные (удалить) ———————————————————————————————————————————————————————————————————————————————————————————————————————————
-        public String GetContactIdByName(String name) => GetRequest($"0/rest/UsrCustomConfigurationService/GetContactIdByName?Name={name}");
-
+        
         public String GetODataRequestResult(String dataSource, String query) => GetRequest($"{OdataUri}{dataSource}{query}");
 
         #endregion ————— Временные (удалить)
