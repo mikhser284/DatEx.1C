@@ -12,47 +12,48 @@
     [CreatioType("Базовый объект")]
     public class BaseEntity
     {
-        private Guid? _id;
         /// <summary> Id </summary>
-        [CreatioProp("Уникальный идентификатор", "Id", Color = ConsoleColor.Blue)]
-        public Guid? Id { get => _id; set => _id = value.AsNullable(); }
+        [JsonIgnoreSerialization]
+        [JsonConverter(typeof(JsonConverter_Guid))]
+        [CreatioProp("Уникальный идентификатор", "Id", Color = ConsoleColor.Magenta)]
+        public Guid? Id { get; set; }
 
         /// <summary> Дата создания </summary>
-        [CreatioProp("Дата/Время", "Дата создания")]
         [JsonIgnoreSerialization]
+        [CreatioProp("Дата/Время", "Дата создания")]
         public DateTime? CreatedOn { get; set; }
-
-        private Guid? _createdById;
         
         /// <summary> Создал (Id) </summary>
-        [CreatioProp("Guid", "Создал (Id)")]
         [JsonIgnoreSerialization]
-        public Guid? CreatedById { get => _createdById; set => _createdById = value.AsNullable(); }
+        [JsonConverter(typeof(JsonConverter_Guid))]
+        [CreatioProp("Guid", "Создал (Id)")]
+        public Guid? CreatedById { get; set; }
 
         /// <summary> Создал </summary>
-        [CreatioProp("Справочник", "Создал")]
         [JsonIgnore]
+        [CreatioProp("Справочник", "Создал")]
         public Contact CreatedBy { get; set; }
 
         /// <summary> Дата изменения </summary>
-        [CreatioProp("Дата/Время", "Дата изменения")]
         [JsonIgnoreSerialization]
+        [CreatioProp("Дата/Время", "Дата изменения")]
         public DateTime? ModifiedOn { get; set; }
 
-        [CreatioProp("Справочник", "Изменил")]
         [JsonIgnore]
+        [CreatioProp("Справочник", "Изменил")]
         /// <summary> Изменил </summary>
         public Contact ModifiedBy { get; set; }
 
-        private Guid? _modifiedById;
+        
         /// <summary> Изменил (Id) </summary>
-        [CreatioProp("Guid", "Изменил (Id)")]
         [JsonIgnoreSerialization]
-        public Guid? ModifiedById { get => _modifiedById; set => _modifiedById = value.AsNullable(); }
+        [JsonConverter(typeof(JsonConverter_Guid))]
+        [CreatioProp("Guid", "Изменил (Id)")]
+        public Guid? ModifiedById { get; set; }
 
         /// <summary> Активные процессы </summary>
-        [CreatioProp("Целое", "Активные процессы")]
         [JsonIgnoreSerialization]
+        [CreatioProp("Целое", "Активные процессы")]
         public Int32 ProcesListeners { get; set; }
 
 

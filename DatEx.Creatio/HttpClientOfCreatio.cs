@@ -29,10 +29,13 @@ namespace DatEx.Creatio
         /// <summary> ■ Получить объекты упорядоченные по их Id по их идентификаторам </summary>
         public Dictionary<Guid, T> GetObjsByIds<T>(IEnumerable<Guid> identifiers, String nameOfLinkedObject = default(String)) where T : BaseEntity
         {
+            Dictionary<Guid, T> result = new Dictionary<Guid, T>();
+            if (identifiers.Count() == 0) return result;
             String linkedObj = $"{nameOfLinkedObject}{(String.IsNullOrEmpty(nameOfLinkedObject) ? "" : "/")}Id";
             String filter = String.Join(" or ", identifiers.Select(id => $"{linkedObj} eq {id} "));
-            String query = $"$filter={filter}";
-            return GetObjs<T>(query).ToDictionary(k => (Guid)k.Id);
+            String query = $"filter={filter}";
+            result = GetObjs<T>(query).ToDictionary(k => (Guid)k.Id);
+            return result;
         }
 
         /// <summary> Получить объекты упорядоченные по их Id по их идентификаторам </summary>
@@ -46,11 +49,12 @@ namespace DatEx.Creatio
         /// <summary> Получить связанные объекты по идентификаторам дочерних </summary>
         public Dictionary<Guid, List<T>> GetBindedObjsByParentIds<T>(IEnumerable<Guid> identifiers, String nameOfParentObj, Func<T, Guid> parentKeySelector) where T : BaseEntity
         {
+            Dictionary<Guid, List<T>> bindedObjsGroupedByParentId = new Dictionary<Guid, List<T>>();
+            if (identifiers.Count() == 0) return bindedObjsGroupedByParentId;
             String linkedObj = $"{nameOfParentObj}{(String.IsNullOrEmpty(nameOfParentObj) ? "" : "/")}Id";
             String filter = String.Join(" or ", identifiers.Select(id => $"{linkedObj} eq {id} "));
-            String query = $"$filter={filter}";
+            String query = $"filter={filter}";
             List<T> queryResult = GetObjs<T>(query);
-            Dictionary<Guid, List<T>> bindedObjsGroupedByParentId = new Dictionary<Guid, List<T>>();
             foreach(T item in queryResult)
             {
                 Guid parentKey = parentKeySelector(item);
@@ -63,14 +67,14 @@ namespace DatEx.Creatio
         /// <summary> Получить объекты указанного типа </summary>
         public List<T> GetObjs<T>(String query = default(String)) where T : BaseEntity
         {
-            String fullQueryString = $"{OdataUri}{typeof(T).Name}/?{query}";
+            String fullQueryString = $"{OdataUri}{typeof(T).Name}/?${query}";
             String requestResult = GetRequest(fullQueryString);
             CreatioOdataRequestResult<T> result = JsonConvert.DeserializeObject<CreatioOdataRequestResult<T>>(requestResult);
-            if (result.Values.Count == 0)
-            {
-                T singleValue = JsonConvert.DeserializeObject<T>(requestResult);
-                return new List<T> { singleValue };
-            }
+            //if (result.Values.Count == 0)
+            //{
+            //    T singleValue = JsonConvert.DeserializeObject<T>(requestResult);
+            //    return new List<T> { singleValue };
+            //}
 
             return result.Values;
         }
@@ -90,25 +94,25 @@ namespace DatEx.Creatio
             String fullQueryString = $"{OdataUri}{typeof(T).Name}/?$filter={filter}";
             String requestResult = GetRequest(fullQueryString);
             CreatioOdataRequestResult<T> result = JsonConvert.DeserializeObject<CreatioOdataRequestResult<T>>(requestResult);
-            if (result.Values.Count == 0)
-            {
-                T singleValue = JsonConvert.DeserializeObject<T>(requestResult);
-                result.Values = new List<T> { singleValue };
-            }
+            //if (result.Values.Count == 0)
+            //{
+            //    T singleValue = JsonConvert.DeserializeObject<T>(requestResult);
+            //    result.Values = new List<T> { singleValue };
+            //}
 
             return result.Values;
         }
 
 
         /// <summary> Добавить объект </summary>
-        public T AddObj<T>(T obj) where T : BaseEntity
+        public T CreateObj<T>(T obj) where T : BaseEntity
         {
             String serializedEntity = JsonConvert.SerializeObject(obj,
                 new JsonSerializerSettings
                 {
                     ContractResolver = new JsonPropertiesResolver(),
                     NullValueHandling = NullValueHandling.Ignore,
-                    //Formatting = Formatting.Indented
+                    Formatting = Formatting.Indented
                 });
 
             StringContent content = new StringContent(serializedEntity, Encoding.UTF8, "application/json");
@@ -124,7 +128,7 @@ namespace DatEx.Creatio
         }
 
         /// <summary> Модифицировать объект </summary>
-        public void ModifyObj<T>(T obj) where T : BaseEntity
+        public void UpdateObj<T>(T obj) where T : BaseEntity
         {
             if (obj.Id == null) throw new InvalidOperationException("Не указан идентификатор изменяемого объекта");
 
@@ -134,6 +138,17 @@ namespace DatEx.Creatio
                     ContractResolver = new JsonPropertiesResolver(),
                     NullValueHandling = NullValueHandling.Ignore
                 });
+#if DEBUG
+            String entityForDebug = JsonConvert.SerializeObject(obj,
+                new JsonSerializerSettings
+                {
+                    ContractResolver = new JsonPropertiesResolver(),
+                    NullValueHandling = NullValueHandling.Ignore,
+                    Formatting = Formatting.Indented
+                });
+            //serializedEntity = "{\"Notes\": \"*****\"}";
+#endif
+
 
             StringContent content = new StringContent(serializedEntity, Encoding.UTF8, "application/json");
             Uri odataUri = new Uri(OdataUri, $"{typeof(T).Name}({obj.Id})");

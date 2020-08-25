@@ -34,7 +34,7 @@ namespace DatEx.OneC.DataModel
         [JsonProperty("Вид_Type")]
         public String KeyKindType { get; set; }
 
-        [OneC("String", "Представление", "Строка", "Представление", Color = ConsoleColor.Green)]
+        [OneC("String", "Представление", "Строка", "Представление", Color = ConsoleColor.Yellow)]
         [JsonProperty("Представление")]
         public String View { get; set; }
 

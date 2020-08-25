@@ -8,7 +8,7 @@
     public class EmployeeJob : DatEx.Creatio.DataModel.Terrasoft.Base.EmployeeJob
     {
         /// <summary> Внешний идентификатор</summary>
-        [CreatioProp("Guid", "Внешний идентификатор")]
-        public Guid ExternalId { get; set; }
+        [CreatioProp("Guid", "1C Id")]
+        public Guid ITISOneSId { get; set; }
     }
 }

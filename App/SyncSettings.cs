@@ -9,9 +9,13 @@ namespace App
         public SyncSettings() { }
 
         public String EmailDomain { get; set; }
+        
+        /// <summary> Guid типа записи информационного регистра котора хронит eMail </summary>
         public Guid OneCGuidOfEmailContactInfo { get; set; }
         public Guid OneCGuidOfPhoneContactInfo { get; set; }
         public Guid OneCGuidOfWorkPhoneContactInfo { get; set; }
+
+        /// <summary> Guid записи Справочника Тип контакта со значением "Сотрудник" </summary>
         public Guid CreatioGuidOfContactsWithTypeOurEmployees { get; set; }
 
         public Dictionary<String, Guid> MapGenderInOneC_GenderGuidInCreatio = new Dictionary<string, Guid>();

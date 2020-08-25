@@ -11,7 +11,7 @@ namespace DatEx.OneC.DataModel
     [JsonObject("Catalog_Организации")]
     public class Organization : OneCBaseHierarchicalLookup
     {
-        [OneC("String", "Префикс", "Строка", "Префикс", Color = ConsoleColor.Green)]
+        [OneC("String", "Префикс", "Строка", "Префикс", Color = ConsoleColor.Yellow)]
         [JsonProperty("Префикс")]
         public String Prefix { get; set; }
 
@@ -23,11 +23,11 @@ namespace DatEx.OneC.DataModel
         [JsonIgnore]
         public Object NavProp_PrimaryOrganization { get; set; }
 
-        [OneC("String", "НаименованиеПолное", "Строка", "НаименованиеПолное", Color = ConsoleColor.Green)]
+        [OneC("String", "НаименованиеПолное", "Строка", "НаименованиеПолное", Color = ConsoleColor.Yellow)]
         [JsonProperty("НаименованиеПолное")]
         public String FullName { get; set; }
 
-        [OneC("String", "ЮрФизЛицо", "Перечисление.ЮрФизЛицо", "ЮрФизЛицо", Color = ConsoleColor.Green)]
+        [OneC("String", "ЮрФизЛицо", "Перечисление.ЮрФизЛицо", "ЮрФизЛицо", Color = ConsoleColor.Yellow)]
         [JsonProperty("ЮрФизЛицо")]
         public String LegalOrNaturalPerson { get; set; }
 

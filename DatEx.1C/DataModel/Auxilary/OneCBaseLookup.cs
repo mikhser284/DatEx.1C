@@ -11,7 +11,7 @@ namespace DatEx.OneC.DataModel
     public class OneCBaseLookup : OneCObject
     {
         /// <summary> Id </summary>
-        [OneC("Guid", "Ref_Key", "-", "-", Color = ConsoleColor.DarkBlue)]
+        [OneC("Guid", "Ref_Key", "-", "-", Color = ConsoleColor.Magenta)]
         [JsonProperty("Ref_Key")]
         public Guid Id { get; set; }
 
@@ -29,17 +29,17 @@ namespace DatEx.OneC.DataModel
         public String DataVersion { get; set; }
 
         /// <summary> Наименование </summary>
-        [OneC("String", "Description", "Строка", "Наименование", Color = ConsoleColor.Green)]
+        [OneC("String", "Description", "Строка", "Наименование", Color = ConsoleColor.Yellow)]
         [JsonProperty("Description")]
         public String Description { get; set; }
 
         /// <summary> Код </summary>
-        [OneC("String", "Code", "Строка", "Код", Color = ConsoleColor.DarkBlue)]
+        [OneC("String", "Code", "Строка", "Код", Color = ConsoleColor.Blue)]
         [JsonProperty("Code")]
         public String Code { get; set; }
 
         /// <summary> Пометка удаления </summary>
-        [OneC("Boolean?", "DeletionMark", "Булево", "Пометка удаления", Color = ConsoleColor.DarkBlue)]
+        [OneC("Boolean?", "DeletionMark", "Булево", "Пометка удаления", Color = ConsoleColor.Blue)]
         [JsonProperty("DeletionMark")]
         public Boolean? DeletionMark { get; set; }
 
@@ -49,12 +49,12 @@ namespace DatEx.OneC.DataModel
     public class OneCBaseHierarchicalLookup : OneCBaseLookup
     {
         /// <summary> Родитель </summary>
-        [OneC("Guid?", "Parent_Key", "?", "Родитель", Color = ConsoleColor.DarkBlue)]
+        [OneC("Guid?", "Parent_Key", "?", "Родитель", Color = ConsoleColor.Blue)]
         [JsonProperty("Parent_Key")]
         public Guid? ParentId { get; set; }
 
         /// <summary> Является папкой </summary>
-        [OneC("Boolean?", "IsFolder", "Булево", "Является папкой", Color = ConsoleColor.DarkBlue)]
+        [OneC("Boolean?", "IsFolder", "Булево", "Является папкой", Color = ConsoleColor.Blue)]
         [JsonProperty("IsFolder")]
         public Boolean? IsFolder { get; set; }
     }

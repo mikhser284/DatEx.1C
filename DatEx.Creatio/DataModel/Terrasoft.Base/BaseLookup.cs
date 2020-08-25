@@ -8,9 +8,11 @@
     public class BaseLookup : BaseEntity
     {
         /// <summary> Название </summary>
+        [CreatioProp("Строка", "Название", Color = ConsoleColor.Yellow)]
         public String Name { get; set; }
 
         /// <summary> Описание </summary>
+        [CreatioProp("Строка", "Описание")]
         public String Description { get; set; }
 
         public override string ToString()

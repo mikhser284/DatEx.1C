@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using OneC = DatEx.OneC.DataModel;
 
 namespace App
 {
@@ -81,7 +82,36 @@ namespace App
             foreach (T item in source) action(item);
             return source;
         }
+
+        public static HashSet<Guid> SelectValuableGuids<T>(this IEnumerable<T> source, Func<T, Guid> guidSelector)
+        {
+            HashSet<Guid> valueableGuids = new HashSet<Guid>();
+
+            foreach(var item in source)
+            {
+                Guid guid = guidSelector(item);
+                if (guid == default(Guid)) continue;
+                valueableGuids.Add(guid);
+            }
+
+            return valueableGuids;
+        }
+
+        public static HashSet<Guid> SelectValuableGuids<T>(this IEnumerable<T> source, Func<T, Guid?> guidSelector)
+        {
+            HashSet<Guid> valueableGuids = new HashSet<Guid>();
+
+            foreach (var item in source)
+            {
+                Guid? guid = guidSelector(item);
+                if (guid == null || guid == default(Guid)) continue;
+                valueableGuids.Add((Guid)guid);
+            }
+
+            return valueableGuids;
+        }
     }
+
 
     public static class Ext_Guid
     {
@@ -99,6 +129,19 @@ namespace App
             tasks.ForEach(task => task.Start());
             Task.WaitAll(tasks);
             return tasks;
+        }
+    }
+
+    public static class Ext_OneCObject
+    {
+        public static List<T> ShowOneCObjects<T>(this List<T> objects) where T : OneC.OneCObject
+        {
+            foreach (T obj in objects)
+            {
+                obj.Show();
+                Console.WriteLine($"\n\n");
+            }
+            return objects;
         }
     }
 }

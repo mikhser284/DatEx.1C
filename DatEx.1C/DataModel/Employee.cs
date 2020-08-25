@@ -10,23 +10,23 @@ namespace DatEx.OneC.DataModel
     [JsonObject("Catalog_СотрудникиОрганизаций")]
     public class Employee : OneCBaseHierarchicalLookup
     {
-        [OneC("Guid?", "Физлицо_Key", "-", "-", Color = ConsoleColor.DarkBlue)]
+        [OneC("Guid?", "Физлицо_Key", "-", "-", Color = ConsoleColor.Blue)]
         [JsonProperty("Физлицо_Key")]
         public Guid? PersonId { get; set; }
 
-        [OneC("Catalog_ФизическиеЛица", "NavProp(Catalog_ФизическиеЛица)", "Справочник.ФизическиеЛица", "Физлицо", Color = ConsoleColor.Green)]
+        [OneC("Catalog_ФизическиеЛица", "NavProp(Catalog_ФизическиеЛица)", "Справочник.ФизическиеЛица", "Физлицо", Color = ConsoleColor.Yellow)]
         [JsonIgnore]
         public Person NavProp_Person { get; set; }
 
-        [OneC("Boolean?", "Актуальность", "Булево", "Актуальность", Color = ConsoleColor.DarkYellow)]
+        [OneC("Boolean?", "Актуальность", "Булево", "Актуальность")]
         [JsonProperty("Актуальность")]
         public Boolean? IsActual { get; set; }
 
-        [OneC("Guid?", "Организация_Key", "-", "-", Color = ConsoleColor.DarkBlue)]
+        [OneC("Guid?", "Организация_Key", "-", "-", Color = ConsoleColor.Blue)]
         [JsonProperty("Организация_Key")]
         public Guid? OrganizationId { get; set; }
 
-        [OneC("Catalog_Организации", "NavProp(Catalog_Организации)", "Справочник.Организации", "Организация", Color = ConsoleColor.Green)]
+        [OneC("Catalog_Организации", "NavProp(Catalog_Организации)", "Справочник.Организации", "Организация", Color = ConsoleColor.Yellow)]
         [JsonIgnore]
         public Organization NavProp_Organization { get; set; }
 
@@ -42,7 +42,7 @@ namespace DatEx.OneC.DataModel
         [JsonProperty("ВидДоговора")]
         public String ContractType { get; set; }
 
-        [OneC("String", "ВидЗанятости", "Перечисление.ВидыЗанятостиВОрганизации", "ВидЗанятости", Color = ConsoleColor.Green)]
+        [OneC("String", "ВидЗанятости", "Перечисление.ВидыЗанятостиВОрганизации", "ВидЗанятости", Color = ConsoleColor.Yellow)]
         [JsonProperty("ВидЗанятости")]
         public String TypeOfEmployment { get; set; }
 
@@ -62,19 +62,19 @@ namespace DatEx.OneC.DataModel
         [JsonIgnore]
         public Object WorkShedule_ { get; set; }
 
-        [OneC("Guid?", "ПодразделениеОрганизации_Key", "-", "-", Color = ConsoleColor.DarkBlue)]
+        [OneC("Guid?", "ПодразделениеОрганизации_Key", "-", "-", Color = ConsoleColor.Blue)]
         [JsonProperty("ПодразделениеОрганизации_Key")]
         public Guid? OrganizationSubdivisionId { get; set; }
 
-        [OneC("Catalog_ПодразделенияОрганизаций", "NavProp(Catalog_ПодразделенияОрганизаций)", "Справочник.ПодразделенияОрганизаций", "ПодразделениеОрганизации", Color = ConsoleColor.Green)]
+        [OneC("Catalog_ПодразделенияОрганизаций", "NavProp(Catalog_ПодразделенияОрганизаций)", "Справочник.ПодразделенияОрганизаций", "ПодразделениеОрганизации", Color = ConsoleColor.Yellow)]
         [JsonIgnore]
         public OrganizationSubdivision NavProp_OrganizationSubdivision { get; set; }
 
-        [OneC("Guid?", "Должность_Key", "-", "-", Color = ConsoleColor.DarkBlue)]
+        [OneC("Guid?", "Должность_Key", "-", "-", Color = ConsoleColor.Blue)]
         [JsonProperty("Должность_Key")]
         public Guid? PositionId { get; set; }
 
-        [OneC("Catalog_ДолжностиОрганизаций", "NavProp(Должность_Key)", "Справочник.ДолжностиОрганизаций", "Должность", Color = ConsoleColor.Green)] 
+        [OneC("Catalog_ДолжностиОрганизаций", "NavProp(Должность_Key)", "Справочник.ДолжностиОрганизаций", "Должность", Color = ConsoleColor.Yellow)] 
         [JsonIgnore]
         public PositionInOrganization NavProp_Position { get; set; }
 
@@ -82,11 +82,11 @@ namespace DatEx.OneC.DataModel
         [JsonProperty("ЗанимаемыхСтавок")]
         public Double? OccupiedBets { get; set; }
 
-        [OneC("DateTime?", "ДатаНачала", "Дата", "ДатаНачала", Color = ConsoleColor.Green)]
+        [OneC("DateTime?", "ДатаНачала", "Дата", "ДатаНачала", Color = ConsoleColor.Yellow)]
         [JsonProperty("ДатаНачала")]
         public DateTime? StartDate { get; set; }
 
-        [OneC("DateTime?", "ДатаОкончания", "Дата", "ДатаОкончания", Color = ConsoleColor.Green)]
+        [OneC("DateTime?", "ДатаОкончания", "Дата", "ДатаОкончания", Color = ConsoleColor.Yellow)]
         [JsonProperty("ДатаОкончания")]
         public DateTime? DueDate { get; set; }
 
@@ -142,27 +142,27 @@ namespace DatEx.OneC.DataModel
         [JsonIgnore]
         public Object NavProp_ContributionGroup { get; set; }
         
-        [OneC("Guid?", "ТекущееПодразделениеОрганизации_Key", "-", "-", Color = ConsoleColor.DarkBlue)]
+        [OneC("Guid?", "ТекущееПодразделениеОрганизации_Key", "-", "-", Color = ConsoleColor.Blue)]
         [JsonProperty("ТекущееПодразделениеОрганизации_Key")]
         public Guid? CurrentOrganizationSubdivisionId { get; set; }
 
-        [OneC("Catalog_ПодразделенияОрганизаций", "NavProp(ТекущееПодразделениеОрганизации)", "Справочник.ПодразделенияОрганизаций", "ТекущееПодразделениеОрганизации", Color = ConsoleColor.Green)]
+        [OneC("Catalog_ПодразделенияОрганизаций", "NavProp(ТекущееПодразделениеОрганизации)", "Справочник.ПодразделенияОрганизаций", "ТекущееПодразделениеОрганизации", Color = ConsoleColor.Yellow)]
         [JsonIgnore]
         public OrganizationSubdivision NavProp_CurrentOrganizationSubdivision { get; set; }
 
-        [OneC("Guid?", "ТекущаяДолжностьОрганизации_Key", "-", "-", Color = ConsoleColor.DarkBlue)]
+        [OneC("Guid?", "ТекущаяДолжностьОрганизации_Key", "-", "-", Color = ConsoleColor.Blue)]
         [JsonProperty("ТекущаяДолжностьОрганизации_Key")]
         public Guid? CurrentPositionInOrganizationId { get; set; }
 
-        [OneC("Catalog_ДолжностиОрганизаций", "NavProp(ТекущаяДолжностьОрганизации)", "Справочник.ДолжностиОрганизаций", "ТекущаяДолжностьОрганизации", Color = ConsoleColor.Green)]
+        [OneC("Catalog_ДолжностиОрганизаций", "NavProp(ТекущаяДолжностьОрганизации)", "Справочник.ДолжностиОрганизаций", "ТекущаяДолжностьОрганизации", Color = ConsoleColor.Yellow)]
         [JsonIgnore]
         public PositionInOrganization NavProp_CurrentPositionInOrganization { get; set; }
 
-        [OneC("DateTime?", "ДатаПриемаНаРаботу", "Дата", "ДатаПриемаНаРаботу", Color = ConsoleColor.Green)]
+        [OneC("DateTime?", "ДатаПриемаНаРаботу", "Дата", "ДатаПриемаНаРаботу", Color = ConsoleColor.Yellow)]
         [JsonProperty("ДатаПриемаНаРаботу")]
         public DateTime? DateOfEmployment { get; set; }
 
-        [OneC("DateTime?", "ДатаУвольнения", "Дата", "ДатаУвольнения", Color = ConsoleColor.Green)]
+        [OneC("DateTime?", "ДатаУвольнения", "Дата", "ДатаУвольнения", Color = ConsoleColor.Yellow)]
         [JsonProperty("ДатаУвольнения")]
         public DateTime? DateOfDismisal { get; set; }
 
@@ -202,7 +202,7 @@ namespace DatEx.OneC.DataModel
         [JsonProperty("ПоНаправлениюОргановЗанятости")]
         public Boolean? ByDirectionOfEmploymentOrganizations { get; set; }
 
-        [OneC("String", "IdCreatio", "Строка", "IdCreatio", Color = ConsoleColor.Green)]
+        [OneC("String", "IdCreatio", "Строка", "IdCreatio", Color = ConsoleColor.Yellow)]
         [JsonProperty("IdCreatio")]
         public String IdCreatio { get; set; }
 

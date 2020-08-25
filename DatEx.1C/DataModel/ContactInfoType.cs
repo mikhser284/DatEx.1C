@@ -10,7 +10,7 @@ namespace DatEx.OneC.DataModel
     [JsonObject("Catalog_ВидыКонтактнойИнформации")]
     public class ContactInfoType : OneCBaseLookup
     {
-        [OneC("String", "Тип", "Перечисление.ТипыКонтактнойИнформации", "Тип", Color = ConsoleColor.Green)]
+        [OneC("String", "Тип", "Перечисление.ТипыКонтактнойИнформации", "Тип", Color = ConsoleColor.Yellow)]
         [JsonProperty("Тип")]
         public String Type { get; set; }
 

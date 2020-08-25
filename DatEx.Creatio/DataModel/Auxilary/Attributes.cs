@@ -31,6 +31,9 @@ namespace DatEx.Creatio.DataModel.Auxilary
         }
     }
 
+    /// <summary> Данное свойство не существует в модели данных от ITIS но необходимо для синхронизации с 1C </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public class CreatioPropNotExistInDataModelOfITISAttribute : Attribute { }
 
 
     [AttributeUsage(AttributeTargets.Class)]
@@ -51,10 +54,67 @@ namespace DatEx.Creatio.DataModel.Auxilary
         }
     }
 
-    public class MapAttribute : Attribute
+    public class MapFromOneSRemarksAttribute : Attribute
     {
-        public String Link { get; set; }
+        public String Remarks { get; set; }
+        
+        public MapFromOneSRemarksAttribute(String remarks)
+        {
+            Remarks = remarks;
+        }
+    }
 
-        public String Comment { get; set; }
+    [AttributeUsage(AttributeTargets.Property)]
+    public class MapFromOneSPropAttribute : Attribute
+    {
+        /// <summary> Вид типа данных </summary>
+        public OneSDataTypeKind DataTypeKind { get; private set; }
+
+        /// <summary> Название типа данных </summary>
+        public String DataTypeName { get; private set; }
+
+        /// <summary> Тип данных проецируемого свойства </summary>
+        public String MapablePropDataType { get; private set; }
+
+        /// <summary> Название проецируемого свойства </summary>
+        public String MapablePropName { get; private set; }
+
+
+        /// <summary> Проекция свойства из 1С на свойство из Creatio </summary>
+        /// <param name="dataTypeKind"> Вид типа данных </param>
+        /// <param name="dataTypeName"> Название типа данных </param>
+        /// <param name="mapablePropDataType"> Тип данных проэцируемого свойства </param>
+        /// <param name="mapablePropName"> Название проэцируемого свойства </param>
+        public MapFromOneSPropAttribute(OneSDataTypeKind dataTypeKind, String dataTypeName, String mapablePropDataType, String mapablePropName)
+        {
+            DataTypeKind = dataTypeKind;
+            DataTypeName = dataTypeName;
+            MapablePropDataType = mapablePropDataType;
+            MapablePropName = mapablePropName;
+        }
+    }
+
+    /// <summary> Тип данных в 1С </summary>
+    public enum OneSDataTypeKind
+    {
+        /// <summary> Справочник </summary>
+        Lookup,
+        /// <summary> Информационный регистр </summary>
+        InfoReg,
+        /// <summary> Перечисление </summary>
+        Enum,
+        /// <summary> Строка </summary>
+        String,
+        /// <summary> Дата/время </summary>
+        DateTime,
+        /// <summary> Целое число </summary>
+        Int,
+        /// <summary> Дроброе число </summary>
+        Float,
+        /// <summary> Булево </summary>
+        Bool,
+        /// <summary> Guid (идентификатор) </summary>
+        Guid,
+
     }
 }

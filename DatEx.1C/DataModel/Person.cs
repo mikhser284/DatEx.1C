@@ -14,27 +14,27 @@
         [JsonIgnore]
         public List<Employee> RelatedObjs_RelatedEmployeePositions { get; set; } = new List<Employee>();
 
-        [OneC("InformationRegister_ФИОФизЛиц", "-", "РегистрСведений.ФИОФизЛиц", "-", Remarks = "Прямая связь между объектами отсутствует", Color = ConsoleColor.Green)]
+        [OneC("InformationRegister_ФИОФизЛиц", "-", "РегистрСведений.ФИОФизЛиц", "-", Remarks = "Прямая связь между объектами отсутствует", Color = ConsoleColor.Yellow)]
         [JsonIgnore]
         public IRNamesOfPersons RelatedObj_NameInfo { get; set; }
 
-        [OneC("InformationRegister_КонтактнаяИнформация", "-", "РегистрСведений.КонтактнаяИнформация", "-", Remarks = "Прямая связь между объектами отсутствует", Color = ConsoleColor.Green)]
+        [OneC("InformationRegister_КонтактнаяИнформация", "-", "РегистрСведений.КонтактнаяИнформация", "-", Remarks = "Прямая связь между объектами отсутствует", Color = ConsoleColor.Yellow)]
         [JsonIgnore]
         public IRContactInfo RelatedObj_ContactInfoEmail { get; set; }
 
-        [OneC("InformationRegister_КонтактнаяИнформация", "-", "РегистрСведений.КонтактнаяИнформация", "-", Remarks = "Прямая связь между объектами отсутствует", Color = ConsoleColor.Green)]
+        [OneC("InformationRegister_КонтактнаяИнформация", "-", "РегистрСведений.КонтактнаяИнформация", "-", Remarks = "Прямая связь между объектами отсутствует", Color = ConsoleColor.Yellow)]
         [JsonIgnore]
         public IRContactInfo RelatedObj_ContactInfoPhone { get; set; }
 
-        [OneC("InformationRegister_КонтактнаяИнформация", "-", "РегистрСведений.КонтактнаяИнформация", "-", Remarks = "Прямая связь между объектами отсутствует", Color = ConsoleColor.Green)]
+        [OneC("InformationRegister_КонтактнаяИнформация", "-", "РегистрСведений.КонтактнаяИнформация", "-", Remarks = "Прямая связь между объектами отсутствует", Color = ConsoleColor.Yellow)]
         [JsonIgnore]
         public IRContactInfo RelatedObj_ContactInfoWorkPhone { get; set; }
 
-        [OneC("DateTime?", "ДатаРождения", "Дата", "ДатаРождения", Color = ConsoleColor.Green)]
+        [OneC("DateTime?", "ДатаРождения", "Дата", "ДатаРождения", Color = ConsoleColor.Yellow)]
         [JsonProperty("ДатаРождения")]
         public DateTime? BirthDate { get; set; }
 
-        [OneC("String", "ИНН", "Строка", "ИНН", Color = ConsoleColor.Green)]
+        [OneC("String", "ИНН", "Строка", "ИНН", Color = ConsoleColor.Yellow)]
         [JsonProperty("ИНН")]
         public String INN { get; set; }
 
@@ -42,7 +42,7 @@
         [JsonProperty("Комментарий")]
         public String Remarks { get; set; }
 
-        [OneC("String", "Пол", "ПеречислениеСсылка.ПолФизическихЛиц", "Пол", Color = ConsoleColor.Green)]
+        [OneC("String", "Пол", "ПеречислениеСсылка.ПолФизическихЛиц", "Пол", Color = ConsoleColor.Yellow)]
         [JsonProperty("Пол")]
         public String Gender { get; set; }
 
