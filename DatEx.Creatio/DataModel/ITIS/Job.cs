@@ -4,10 +4,10 @@
     using DatEx.Creatio.DataModel.Auxilary;
     using Terrasoft = DatEx.Creatio.DataModel.Terrasoft.Base;
 
-    [CreatioType("Должность сотрудника")]
+    [CreatioType("Должность")]
 
-    /// <summary> Должность сотрудника </summary>
-    public class EmployeeJob : Terrasoft.EmployeeJob
+    /// <summary> Должность </summary>
+    public class Job : Terrasoft.Job
     {
         /// <summary> Id объекта в 1C </summary>
         [CreatioProp("Guid", "Id объекта в 1C")]

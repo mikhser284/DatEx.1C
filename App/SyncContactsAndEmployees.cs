@@ -74,7 +74,7 @@ namespace App
             List<ITIS.Contact> contacts = new List<Contact>();
 
             Console.WriteLine("\n ██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████");
-            Console.WriteLine(" █████ Ранее созданные объекты ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████");
+            Console.WriteLine(" █████ Объекты, импортированные ранее (из Excell) █████████████████████████████████████████████████████████████████████████████████████████████████████");
             Console.WriteLine(" ██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████");
 
             contactIds.Add(new Guid("9ce50422-16d8-4960-8466-f0f3c2c69a77")); // Білоус Ю.О.
@@ -89,16 +89,19 @@ namespace App
             contactIds.Clear();
             contacts.Clear();
 
+            SyncTemporaryObjects temp = new SyncTemporaryObjects();
+            temp.EmploymentTypes = CreatioHttpClient.GetObjsByIds<ITIS.ITISEmploymentType>(settings.MapEmploymentTypeEnumInOneS_EmploymentTypeGuidInCreatio.Values);
+
             foreach (Person p in persons.Values)
             {
-                ITIS.Contact c = Creatio_AddNewContact(p, settings);
+                ITIS.Contact c = Creatio_FirstSyncOfEmployeesInfo(p, settings, temp);
                 contactIds.Add((Guid)c.Id);
             }
             contacts = Creatio_GetCreatedContactsAndRelatedInfo(contactIds).Values.ToList();
             contacts.ForEach(x => Creatio_ShowContact(x));
         }
 
-        private static ITIS.Contact Creatio_AddNewContact(Person p, SyncSettings settings)
+        private static ITIS.Contact Creatio_FirstSyncOfEmployeesInfo(Person p, SyncSettings settings, SyncTemporaryObjects temp)
         {
             ITIS.Contact c = new Contact();
 
@@ -118,8 +121,38 @@ namespace App
             c.ITISCareeStartDate = (DateTime)p.RelatedObjs_RelatedEmployeePositions.Min(x => x.DateOfEmployment);
             Boolean isActualEmployee = p.RelatedObjs_RelatedEmployeePositions.Any(x => x.DateOfDismisal == null || x.DateOfDismisal == default(DateTime));
             c.ITISCareerEndDate = isActualEmployee ? null : (DateTime?)p.RelatedObjs_RelatedEmployeePositions.Max(x => x.DateOfDismisal);
-
             ITIS.Contact contact = CreatioHttpClient.CreateObj(c);
+
+            List<OneC.Employee> orderedPositions = p.RelatedObjs_RelatedEmployeePositions.OrderByDescending(x => x.DateOfEmployment).ToList();
+            OneC.Employee lastActualPrimaryPosition = null;
+            OneC.Employee lastPosition = null;
+
+            foreach(var position in orderedPositions)
+            {
+                if(lastActualPrimaryPosition == null && (position.DueDate == null || position.DueDate == default(DateTime)))
+                {
+                    if (position.TypeOfEmployment == "ОсновноеМестоРаботы") lastActualPrimaryPosition = position;
+                    if(lastPosition == null) lastPosition = position;
+                }
+            }
+
+            // Если возможно то присвоить последнюю актуальную должность с основным местом работы
+            if (lastActualPrimaryPosition != null) lastPosition = lastActualPrimaryPosition;
+            // Если актуальных должностей вообще нет просто задать самую крайнюю
+            if (lastPosition == null) lastPosition = orderedPositions.FirstOrDefault();
+            if (lastPosition != null)
+            {
+                c.ITISEmploymentTypeId = settings.MapEmploymentTypeEnumInOneS_EmploymentTypeGuidInCreatio[lastPosition.TypeOfEmployment];
+                c.JobTitle = lastPosition.NavProp_Position.Description;
+                ITIS.EmployeeJob job = new ITIS.EmployeeJob();
+                job.Name = lastPosition.NavProp_Position.Description;
+                job.ITISOneSId = lastPosition.NavProp_Position.Id;
+                job.
+                c.ITISEmployeePosition = CreatioHttpClient.CreateObj(job);
+                c.ITISEmployeePositionId = c.ITISEmployeePosition.Id;
+            }
+
+            contact = CreatioHttpClient.CreateObj(c);
             ITIS.Employee employee = Creatio_AddNewEmployee(contact, p);
             return contact;
         }

@@ -20,6 +20,8 @@ namespace App
 
         public Dictionary<String, Guid> MapGenderInOneC_GenderGuidInCreatio = new Dictionary<string, Guid>();
 
+        public Dictionary<String, Guid> MapEmploymentTypeEnumInOneS_EmploymentTypeGuidInCreatio = new Dictionary<string, Guid>();
+
         public static SyncSettings GetDefaultSettings()
         {
             SyncSettings settings = new SyncSettings()
@@ -33,6 +35,10 @@ namespace App
 
             settings.MapGenderInOneC_GenderGuidInCreatio.Add("Мужской", new Guid("eeac42ee-65b6-df11-831a-001d60e938c6"));
             settings.MapGenderInOneC_GenderGuidInCreatio.Add("Женский", new Guid("fc2483f8-65b6-df11-831a-001d60e938c6"));
+            //
+            settings.MapEmploymentTypeEnumInOneS_EmploymentTypeGuidInCreatio.Add("ОсновноеМестоРаботы", new Guid("13BF7A1E-89D2-4888-BC9D-A831EC597FAE"));
+            settings.MapEmploymentTypeEnumInOneS_EmploymentTypeGuidInCreatio.Add("ВнутреннееСовместительство", new Guid("5195D27F-F8B3-4872-B992-A2729135EF7E"));
+            settings.MapEmploymentTypeEnumInOneS_EmploymentTypeGuidInCreatio.Add("Совместительство", new Guid("2362FD46-0EBB-4210-9872-086B716648CD"));
 
             return settings;
         }

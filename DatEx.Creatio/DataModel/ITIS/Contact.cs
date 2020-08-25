@@ -31,6 +31,7 @@
         public Guid? ITISEmployeePositionId { get; set; }
 
         /// <summary> Должность сотрудника </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Должность сотрудника", Color = ConsoleColor.Yellow)]
         public ITIS.EmployeeJob ITISEmployeePosition { get; set; }
 
@@ -40,6 +41,7 @@
         public Guid? ITISSubdivisionId { get; set; }
 
         /// <summary> Подразделение </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Подразделение", Color = ConsoleColor.Yellow)]
         public Terrasoft.AccountOrganizationChart ITISSubdivision { get; set; }
 
@@ -60,6 +62,7 @@
         public Guid? ITISEmploymentTypeId { get; set; }
 
         /// <summary> Вид занятости </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Вид занятости", Color = ConsoleColor.Yellow)]
         public ITISEmploymentType ITISEmploymentType { get; set; }
 
@@ -69,6 +72,7 @@
         public Guid? ITISOrganizationSubdivisionId { get; set; }
 
         /// <summary> Подразделение организации </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Подразделение организации", Color = ConsoleColor.Yellow)]
         public Terrasoft.OrgStructureUnit ITISOrganizationSubdivision { get; set; }
     }

@@ -11,8 +11,8 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
     [CreatioType("Контакт")]
     public class Contact : BaseEntity
     {
+        [JsonIgnoreSerialization]
         [CreatioProp("Employee", "Сотрудник", Remarks ="Не существует в oData, создано для удобства")]
-        [JsonIgnore]
         public Employee Employee { get; set; }
 
         /// <summary> ФИО </summary>
@@ -26,6 +26,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? OwnerId { get; set; }
 
         /// <summary> Ответственный </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Ответственный")]
         public Contact Owner { get; set; }
 
@@ -39,6 +40,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? SalutationTypeId { get; set; }
 
         /// <summary> Обращение </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Обращение")]
         public ContactSalutationType SalutationType { get; set; }
 
@@ -50,6 +52,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? GenderId { get; set; }
 
         /// <summary> Пол </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Пол", Color = ConsoleColor.Yellow)]
         public Gender Gender { get; set; }
 
@@ -59,6 +62,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? AccountId { get; set; }
 
         /// <summary> Контрагент </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Контрагент", Color = ConsoleColor.Yellow)]
         public Account Account { get; set; }
 
@@ -68,6 +72,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? DecisionRoleId { get; set; }
 
         /// <summary> Роль </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Роль")]
         public ContactDecisionRole DecisionRole { get; set; }
 
@@ -78,6 +83,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? TypeId { get; set; }
 
         /// <summary> Тип </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Тип", Color = ConsoleColor.Yellow)]
         public ContactType Type { get; set; }
 
@@ -87,6 +93,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? JobId { get; set; }
 
         /// <summary> Должность </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Должность", Color = ConsoleColor.Yellow)]
         public Job Job { get; set; }
 
@@ -100,6 +107,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? DepartmentId { get; set; }
 
         /// <summary> Департамент </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Департамент", Color = ConsoleColor.Yellow)]
         public Department Department { get; set; }
 
@@ -140,6 +148,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? AddressTypeId { get; set; }
 
         /// <summary> Тип адреса </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Тип адреса")]
         public AddressType AddressType { get; set; }
 
@@ -162,6 +171,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? RegionId { get; set; }
 
         /// <summary> Область/штат </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Область/штат")]
         public Region Region { get; set; }
 
@@ -175,6 +185,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? CountryId { get; set; }
 
         /// <summary> Страна </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Guid", "Страна")]
         public Country Country { get; set; }
 
@@ -232,6 +243,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? TwitterAFDAId { get; set; }
 
         /// <summary> Аккаунт Twitter для доступа к данным </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Аккаунт Twitter для доступа к данным")]
         public SocialAccount TwitterAFDA { get; set; }
 
@@ -241,6 +253,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? FacebookAFDAId { get; set; }
 
         /// <summary> Аккаунт Facebook для доступа к данным </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Аккаунт Facebook для доступа к данным")]
         public SocialAccount FacebookAFDA { get; set; }
 
@@ -250,6 +263,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? LinkedInAFDAId { get; set; }
 
         /// <summary> Аккаунт LinkedIn для доступа к данным </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Аккаунт LinkedIn для доступа к данным")]
         public SocialAccount LinkedInAFDA { get; set; }
 
@@ -259,6 +273,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? PhotoId { get; set; }
 
         /// <summary> Фото </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Фото")]
         public Image Photo { get; set; }
 
@@ -299,6 +314,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? LanguageId { get; set; }
 
         /// <summary> Язык общения </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Язык общения")]
         public SysLanguage Language { get; set; }
 
@@ -308,6 +324,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? CalendarId { get; set; }
 
         /// <summary> Календарь </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Календарь")]
         public Calendar Calendar { get; set; }
 

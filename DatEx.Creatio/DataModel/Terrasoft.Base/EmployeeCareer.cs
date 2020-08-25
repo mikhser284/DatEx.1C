@@ -3,40 +3,49 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
     using System;
     using DatEx.Creatio.DataModel.Auxilary;
+    using Newtonsoft.Json;
 
     /// <summary> Карьера сотрудника в нашей компании </summary>
     [CreatioType("Карьера сотрудника в нашей компании")]
     public class EmployeeCareer : BaseEntity
     {
         /// <summary> Сотрудник (Id) </summary>
+        [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Сотрудник (Id)", Color = ConsoleColor.Blue)]
-        public Guid EmployeeId { get; set; }
+        public Guid? EmployeeId { get; set; }
 
         /// <summary> Сотрудник </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Сотрудник", Color = ConsoleColor.Yellow)]
         public Employee Employee { get; set; }
 
         /// <summary> Контрагент (Id) </summary>
+        [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Контрагент (Id)", Color = ConsoleColor.Blue)]
-        public Guid AccountId { get; set; }
+        public Guid? AccountId { get; set; }
 
         /// <summary> Контрагент </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Контрагент", Color = ConsoleColor.Yellow)]
         public Account Account { get; set; }
 
         /// <summary> Подразделение (Id) </summary>
+        [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Подразделение (Id)", Color = ConsoleColor.Blue)]
-        public Guid OrgStructureUnitId { get; set; }
+        public Guid? OrgStructureUnitId { get; set; }
 
         /// <summary> Подразделение </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Подразделение", Color = ConsoleColor.Yellow)]
         public OrgStructureUnit OrgStructureUnit { get; set; }
 
         /// <summary> Должность (Id) </summary>
+        [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Должность (Id)", Color = ConsoleColor.Blue)]
-        public Guid EmployeeJobId { get; set; }
+        public Guid? EmployeeJobId { get; set; }
 
         /// <summary> Должность </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Должность", Color = ConsoleColor.Yellow)]
         public ITIS.EmployeeJob EmployeeJob { get; set; }
 
@@ -61,10 +70,12 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public DateTime ProbationDueDate { get; set; }
 
         /// <summary> Причина увольнения (Id) </summary>
+        [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Причина увольнения (Id)", Color = ConsoleColor.Blue)]
-        public Guid ReasonForDismissalId { get; set; }
+        public Guid? ReasonForDismissalId { get; set; }
 
         /// <summary> Причина увольнения </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Причина увольнения", Color = ConsoleColor.Yellow)]
         public ReasonForLeaving ReasonForDismissal { get; set; }
     }
