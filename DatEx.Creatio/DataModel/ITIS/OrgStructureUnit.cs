@@ -1,13 +1,12 @@
 ﻿namespace DatEx.Creatio.DataModel.ITIS
 {
-    using System;
     using DatEx.Creatio.DataModel.Auxilary;
+    using System;
     using Terrasoft = DatEx.Creatio.DataModel.Terrasoft.Base;
 
-
-    /// <summary> Должность </summary>
-    [CreatioType("Должность")]
-    public class Job : Terrasoft.Job
+    /// <summary> Элемент организационной структуры </summary>
+    [CreatioType("Элемент организационной структуры")]
+    public class OrgStructureUnit : Terrasoft.OrgStructureUnit
     {
         /// <summary> Id объекта в 1C </summary>
         [CreatioPropNotExistInDataModelOfITIS]

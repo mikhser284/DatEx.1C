@@ -10,7 +10,9 @@
     public class EmployeeJob : Terrasoft.EmployeeJob
     {
         /// <summary> Id объекта в 1C </summary>
-        [CreatioProp("Guid", "Id объекта в 1C")]
+        [Map]
+        [CreatioPropNotExistInDataModelOfITIS]
+        [CreatioProp("Guid", "Id объекта в 1C", Color = ConsoleColor.Red)]
         public Guid ITISOneSId { get; set; }
     }
 }

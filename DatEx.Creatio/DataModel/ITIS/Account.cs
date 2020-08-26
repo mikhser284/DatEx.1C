@@ -11,19 +11,22 @@
         [CreatioProp("Email")]
         public String ITISEmail { get; set; }
 
-        [CreatioProp("Юридический статус контрагента (Id)")]
+        [CreatioProp("Юридический статус контрагента (Id)", Color = ConsoleColor.Blue)]
         public Guid ITISCOunterpartyLegalStatusId { get; set; }
 
-        [CreatioProp("Юридический статус контрагента")]
+        [Map]
+        [CreatioProp("Юридический статус контрагента", Color = ConsoleColor.Yellow)]
         public ITISCounterpartyLegalStatus ITISCOunterpartyLegalStatus { get; set; }
 
         [CreatioProp("Деактивирована")]
         public Boolean RecordInactive { get; set; }
 
-        [CreatioProp("Внутренний код")]
+        [Map]
+        [CreatioProp("Внутренний код", Color = ConsoleColor.Yellow)]
         public String ITISInternalCode { get; set; }
 
-        [CreatioProp("Id Контрагента в системе 1С")]
+        [Map]
+        [CreatioProp("Id Контрагента в системе 1С", Color = ConsoleColor.Red)]
         public Guid ITISOneSId { get; set; }
     }
 }

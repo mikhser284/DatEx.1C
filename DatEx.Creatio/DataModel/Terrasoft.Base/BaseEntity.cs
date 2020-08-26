@@ -58,7 +58,7 @@
 
 
 
-        public void Show(Int32 indentLevel = 0)
+        public void Show(Int32 indentLevel = 0, Boolean showMapingsOrRemarks = false)
         {
             IEnumerable<PropertyInfo> properties = this.GetType().GetProperties();
 
@@ -75,13 +75,16 @@
             Console.WriteLine($"{indent}   {(typeAtribure?.Title ?? "---")} * {(this.GetType().Name)}");
             Console.WriteLine($"{indent}{new String('─', totalLen)}");
 
-            ShowPropertiesBlock(this, properties, maxTypeTitleLen, maxPropTitleLen, maxPropTypeLen, maxPropNameLen, indent);
+            ShowPropertiesBlock(this, properties, maxTypeTitleLen, maxPropTitleLen, maxPropTypeLen, maxPropNameLen, indent, showMapingsOrRemarks);
             
-            static void ShowPropertiesBlock<T>(T obj, IEnumerable<PropertyInfo> propsInfo, Int32 maxTypeTitleLen, Int32 maxPropTitleLen, Int32 maxPropTypeLen, Int32 maxPropNameLen, String indent)
+            static void ShowPropertiesBlock<T>(T obj, IEnumerable<PropertyInfo> propsInfo, Int32 maxTypeTitleLen, Int32 maxPropTitleLen, Int32 maxPropTypeLen, Int32 maxPropNameLen, String indent, Boolean showMapingsOrRemarks)
             {
                 foreach (var p in propsInfo)
                 {
-                    var attribute = (CreatioPropAttribute)p.GetCustomAttributes(typeof(CreatioPropAttribute), false).FirstOrDefault();
+                    CreatioPropAttribute creatioPropAttr = (CreatioPropAttribute)p.GetCustomAttribute(typeof(CreatioPropAttribute), false);
+                    MapAttribute mapPropAttr = (MapAttribute)p.GetCustomAttribute(typeof(MapAttribute));
+                    MapRemarksAttribute mapRem = (MapRemarksAttribute)p.GetCustomAttribute(typeof(MapRemarksAttribute));
+
                     String propValue = p.GetValue(obj)?.ToString();
                     if (p.GetValue(obj) == null) propValue = "---";
                     else if (p.PropertyType != typeof(String) && typeof(ICollection).IsAssignableFrom(p.PropertyType))
@@ -100,11 +103,21 @@
                         propValue = default(DateTime) == (DateTime)p.GetValue(obj) ? "---" : val.ToString();
                     }
 
-                    Console.ForegroundColor = attribute?.Color ?? ConsoleColor.DarkGray;
+                    if (showMapingsOrRemarks && (mapPropAttr != null || mapRem != null))
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGreen;
+                        Console.Write($"{indent}│   │");
+                        if (mapPropAttr != null) Console.Write($"   ~ {mapPropAttr}");
+                        if (mapRem != null) Console.Write($"   // {mapRem}");
+                        Console.WriteLine();
+                    }
+                    
+                    String mapIsImplemented = $"│ {(mapPropAttr is null ? " " : mapPropAttr.Implemented ? "V" : "X")} │";
 
+                    Console.ForegroundColor = creatioPropAttr?.Color ?? ConsoleColor.DarkGray;
                     var propType = GetCreatioTypeName(p);
 
-                    Console.WriteLine($"{indent} {(String.IsNullOrEmpty(propType) ? "---" : propType).PadRight(maxTypeTitleLen)} │ {(attribute?.CreatioTitle ?? "---").PadRight(maxPropTitleLen)} " +
+                    Console.WriteLine($"{indent}{mapIsImplemented} {(String.IsNullOrEmpty(propType) ? "---" : propType).PadRight(maxTypeTitleLen)} │ {(creatioPropAttr?.CreatioTitle ?? "---").PadRight(maxPropTitleLen)} " +
                         $"│ {GetTypeName(p).PadRight(maxPropTypeLen)} │ {p.Name.PadRight(maxPropNameLen)} │ {propValue}");
                 }
                 Console.ResetColor();

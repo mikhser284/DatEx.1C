@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace DatEx.Creatio.DataModel.Auxilary
@@ -54,48 +55,117 @@ namespace DatEx.Creatio.DataModel.Auxilary
         }
     }
 
-    public class MapFromOneSRemarksAttribute : Attribute
+    public class MapRemarksAttribute : Attribute
     {
         public String Remarks { get; set; }
         
-        public MapFromOneSRemarksAttribute(String remarks)
+        public MapRemarksAttribute(String remarks)
         {
             Remarks = remarks;
         }
+
+        public override string ToString() => Remarks;
     }
 
     [AttributeUsage(AttributeTargets.Property)]
-    public class MapFromOneSPropAttribute : Attribute
+    public class MapAttribute : Attribute
     {
         /// <summary> Вид типа данных </summary>
-        public OneSDataTypeKind DataTypeKind { get; private set; }
+        public DataType? ObjDataType { get; private set; }
 
         /// <summary> Название типа данных </summary>
-        public String DataTypeName { get; private set; }
+        public String ObjName { get; private set; }
 
         /// <summary> Тип данных проецируемого свойства </summary>
-        public String MapablePropDataType { get; private set; }
+        public DataType? PropDataType { get; private set; }
 
         /// <summary> Название проецируемого свойства </summary>
-        public String MapablePropName { get; private set; }
+        public String PropName { get; private set; }
 
+        /// <summary> Название проецируемого свойства </summary>
+        public Boolean Implemented { get; private set; }
+
+        public List<Property> PropertiesChain { get; private set; } = new List<Property>();
 
         /// <summary> Проекция свойства из 1С на свойство из Creatio </summary>
-        /// <param name="dataTypeKind"> Вид типа данных </param>
-        /// <param name="dataTypeName"> Название типа данных </param>
-        /// <param name="mapablePropDataType"> Тип данных проэцируемого свойства </param>
-        /// <param name="mapablePropName"> Название проэцируемого свойства </param>
-        public MapFromOneSPropAttribute(OneSDataTypeKind dataTypeKind, String dataTypeName, String mapablePropDataType, String mapablePropName)
+        /// <param name="objDataType"> Вид типа данных </param>
+        /// <param name="objName"> Название типа данных </param>
+        /// <param name="propDataType"> Тип данных проэцируемого свойства </param>
+        /// <param name="propName"> Название проэцируемого свойства </param>
+        public MapAttribute(DataType objDataType, String objName, DataType propDataType, String propName)
         {
-            DataTypeKind = dataTypeKind;
-            DataTypeName = dataTypeName;
-            MapablePropDataType = mapablePropDataType;
-            MapablePropName = mapablePropName;
+            ObjDataType = objDataType;
+            ObjName = objName;
+            PropDataType = propDataType;
+            PropName = propName;
+            Implemented = false;
+        }
+
+        public MapAttribute(DataType objDataType, String objName, DataType propDataType, String propName, Property[] propertiesChain)
+        {
+            ObjDataType = objDataType;
+            ObjName = objName;
+            PropDataType = propDataType;
+            PropName = propName;
+            PropertiesChain = propertiesChain.ToList();
+            Implemented = false;
+        }
+
+        public MapAttribute(Boolean implemented, DataType objDataType, String objName, DataType propDataType, String propName)
+        {
+            ObjDataType = objDataType;
+            ObjName = objName;
+            PropDataType = propDataType;
+            PropName = propName;
+            Implemented = implemented;
+        }
+
+        public MapAttribute(Boolean implemented, DataType objDataType, String objName, DataType propDataType, String propName, Property[] propertiesChain)
+        {
+            ObjDataType = objDataType;
+            ObjName = objName;
+            PropDataType = propDataType;
+            PropName = propName;
+            PropertiesChain = propertiesChain.ToList();
+            Implemented = implemented;
+        }
+
+        public MapAttribute(Boolean implemented = false)
+        {
+            Implemented = implemented;
+        }
+
+        public override string ToString()
+        {
+            if (ObjDataType == null) return String.Empty;
+            String propsChain = PropertiesChain.Count == 0 ? "" : $" -> {String.Join(" -> ", PropertiesChain)}";
+            return $"[{((DataType)ObjDataType).AsString()}] {ObjName} -> [{((DataType)PropDataType).AsString()}] {PropName}{propsChain}";
         }
     }
 
+    public class Property
+    {
+        /// <summary> Тип данных проецируемого свойства </summary>
+        public DataType PropDataType { get; private set; }
+
+        /// <summary> Название проецируемого свойства </summary>
+        public String PropName { get; private set; }
+
+        public Property(DataType propDataType, String propName)
+        {
+            PropDataType = propDataType;
+            PropName = propName;
+        }
+
+        public override string ToString()
+        {
+            return $"[{((DataType)PropDataType).AsString()}] {PropName}";
+        }
+    }
+
+
     /// <summary> Тип данных в 1С </summary>
-    public enum OneSDataTypeKind
+    public enum DataType
     {
         /// <summary> Справочник </summary>
         Lookup,
@@ -107,6 +177,10 @@ namespace DatEx.Creatio.DataModel.Auxilary
         String,
         /// <summary> Дата/время </summary>
         DateTime,
+        /// <summary> Дата </summary>
+        Date,
+        /// <summary> Время </summary>
+        Time,
         /// <summary> Целое число </summary>
         Int,
         /// <summary> Дроброе число </summary>
@@ -116,5 +190,26 @@ namespace DatEx.Creatio.DataModel.Auxilary
         /// <summary> Guid (идентификатор) </summary>
         Guid,
 
+    }
+
+
+    public static class Ext_EnumOneSDataTypeKind
+    {
+        private static readonly Dictionary<DataType, String> MapToString = new Dictionary<DataType, string>
+        {
+            { DataType.Lookup , "Справочник" },
+            { DataType.InfoReg , "Информационный регистр" },
+            { DataType.Enum , "Перечисление" },
+            { DataType.String , "Строка" },
+            { DataType.DateTime , "Дата/Время" },
+            { DataType.Date , "Дата" },
+            { DataType.Time , "Время" },
+            { DataType.Int , "Целое число" },
+            { DataType.Float , "Дробное число" },
+            { DataType.Bool , "Булево" },
+            { DataType.Guid , "Guid" },
+        };
+
+        public static String AsString(this DataType e) => MapToString[e];
     }
 }

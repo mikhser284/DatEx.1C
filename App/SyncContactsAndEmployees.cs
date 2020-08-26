@@ -13,6 +13,7 @@ using DatEx.Creatio.DataModel.ITIS;
 using DatEx.Creatio;
 using System.Threading;
 using System.Security.Cryptography.X509Certificates;
+using System.Net.WebSockets;
 
 namespace App
 {
@@ -21,7 +22,8 @@ namespace App
     {
         public static void SyncEmployees(SyncSettings settings)
         {
-            Task<Dictionary<Guid, OneC.Person>> oneS_getPersonsInfo = new Task<Dictionary<Guid, Person>>(() => OneC_GetPersonsAndRelatedInfoForSycn(settings));
+            SyncObjs syncObjs = new SyncObjs();
+            Task<Dictionary<Guid, OneC.Person>> oneS_getPersonsInfo = new Task<Dictionary<Guid, Person>>(() => OneC_GetPersonsAndRelatedInfoForSync(syncObjs, settings));
             
             Task[] tasks = new Task[]
             {
@@ -44,16 +46,16 @@ namespace App
 
 
         /// <summary> Получить из 1С физ. лица и всю связанную с ними информацию необходимою для синхронизации </summary>
-        public static Dictionary<Guid, OneC.Person> OneC_GetPersonsAndRelatedInfoForSycn(SyncSettings settings = null)
+        public static Dictionary<Guid, OneC.Person> OneC_GetPersonsAndRelatedInfoForSync(SyncObjs syncObjs, SyncSettings settings)
         {
             settings ??= SyncSettings.GetDefaultSettings();
-            Dictionary<Guid, OneC.Person> personsWithEmailsOrderedById = OneC_GetPersonsWithSufficientEmail(settings);
+            Dictionary<Guid, OneC.Person> personsWithEmailsOrderedById = OneC_GetPersonsWithSufficientEmail(settings, syncObjs);
 
             Task[] tasks = new Task[]
             {
-                new Task(() => OneC_GetContactInfoAndBindWithPersons(personsWithEmailsOrderedById, settings)),
-                new Task(() => OneC_GetNamesAndBindWithPersons(personsWithEmailsOrderedById)),
-                new Task(() => OneC_GetEmployeesAndBindWithPersons(personsWithEmailsOrderedById)),
+                new Task(() => OneC_GetContactInfoAndBindWithPersons(syncObjs, settings)),
+                new Task(() => OneC_GetNamesAndBindWithPersons(syncObjs)),
+                new Task(() => OneC_GetEmployeesAndBindWithPersons(syncObjs)),
             }.StartAndWaitForAll();
             //
             return personsWithEmailsOrderedById;
@@ -63,9 +65,15 @@ namespace App
         public static void Creatio_ClearSyncObjects()
         {
             String defaultGuid = default(Guid).ToString();
+
+            var contacts = CreatioHttpClient.GetObjs<ITIS.Contact>($"filter=ITISOneSId ne null and ITISOneSId ne {defaultGuid}");
+            contacts.ForEach(x => CreatioHttpClient.DeleteObj(x));
             
-            var res = CreatioHttpClient.GetObjs<ITIS.Contact>($"filter=ITISOneSId ne null and ITISOneSId ne {defaultGuid}");
-            res.ForEach(x => CreatioHttpClient.DeleteObj(x));
+            var jobs = CreatioHttpClient.GetObjs<ITIS.Job>($"filter=ITISOneSId ne null and ITISOneSId ne {defaultGuid}");
+            jobs.ForEach(x => CreatioHttpClient.DeleteObj(x));
+
+            var employeeJobs = CreatioHttpClient.GetObjs<ITIS.EmployeeJob>($"filter=ITISOneSId ne null and ITISOneSId ne {defaultGuid}");
+            employeeJobs.ForEach(x => CreatioHttpClient.DeleteObj(x));
         }
 
         public static void Creatio_EmployeesFirstSyncWithOneS(Dictionary<Guid, OneC.Person> persons, SyncSettings settings)
@@ -89,8 +97,7 @@ namespace App
             contactIds.Clear();
             contacts.Clear();
 
-            SyncTemporaryObjects temp = new SyncTemporaryObjects();
-            temp.EmploymentTypes = CreatioHttpClient.GetObjsByIds<ITIS.ITISEmploymentType>(settings.MapEmploymentTypeEnumInOneS_EmploymentTypeGuidInCreatio.Values);
+            SyncObjs temp = Creatio_PrepareSync(persons, settings);
 
             foreach (Person p in persons.Values)
             {
@@ -101,7 +108,16 @@ namespace App
             contacts.ForEach(x => Creatio_ShowContact(x));
         }
 
-        private static ITIS.Contact Creatio_FirstSyncOfEmployeesInfo(Person p, SyncSettings settings, SyncTemporaryObjects temp)
+        private static SyncObjs Creatio_PrepareSync(Dictionary<Guid, OneC.Person> persons, SyncSettings settings)
+        {
+            SyncObjs t = new SyncObjs();
+
+            
+
+            return t;
+        }
+
+        private static ITIS.Contact Creatio_FirstSyncOfEmployeesInfo(Person p, SyncSettings settings, SyncObjs temp)
         {
             ITIS.Contact c = new Contact();
 
@@ -121,18 +137,27 @@ namespace App
             c.ITISCareeStartDate = (DateTime)p.RelatedObjs_RelatedEmployeePositions.Min(x => x.DateOfEmployment);
             Boolean isActualEmployee = p.RelatedObjs_RelatedEmployeePositions.Any(x => x.DateOfDismisal == null || x.DateOfDismisal == default(DateTime));
             c.ITISCareerEndDate = isActualEmployee ? null : (DateTime?)p.RelatedObjs_RelatedEmployeePositions.Max(x => x.DateOfDismisal);
-            ITIS.Contact contact = CreatioHttpClient.CreateObj(c);
+            c = CreatioHttpClient.CreateObj(c);
 
+            BindCareerJobs(settings, temp, p, c);
+
+            CreatioHttpClient.UpdateObj(c);
+            ITIS.Employee employee = Creatio_AddNewEmployee(c, p);
+            return c;
+        }
+
+        private static void BindCareerJobs(SyncSettings settings, SyncObjs temp, Person p, ITIS.Contact c)
+        {
             List<OneC.Employee> orderedPositions = p.RelatedObjs_RelatedEmployeePositions.OrderByDescending(x => x.DateOfEmployment).ToList();
             OneC.Employee lastActualPrimaryPosition = null;
             OneC.Employee lastPosition = null;
 
-            foreach(var position in orderedPositions)
+            foreach (var position in orderedPositions)
             {
-                if(lastActualPrimaryPosition == null && (position.DueDate == null || position.DueDate == default(DateTime)))
+                if (lastActualPrimaryPosition == null && (position.DueDate == null || position.DueDate == default(DateTime)))
                 {
                     if (position.TypeOfEmployment == "ОсновноеМестоРаботы") lastActualPrimaryPosition = position;
-                    if(lastPosition == null) lastPosition = position;
+                    if (lastPosition == null) lastPosition = position;
                 }
             }
 
@@ -147,14 +172,10 @@ namespace App
                 ITIS.EmployeeJob job = new ITIS.EmployeeJob();
                 job.Name = lastPosition.NavProp_Position.Description;
                 job.ITISOneSId = lastPosition.NavProp_Position.Id;
-                job.
+
                 c.ITISEmployeePosition = CreatioHttpClient.CreateObj(job);
                 c.ITISEmployeePositionId = c.ITISEmployeePosition.Id;
             }
-
-            contact = CreatioHttpClient.CreateObj(c);
-            ITIS.Employee employee = Creatio_AddNewEmployee(contact, p);
-            return contact;
         }
 
         private static ITIS.Employee Creatio_AddNewEmployee(ITIS.Contact c, Person p)
@@ -224,7 +245,7 @@ namespace App
         }
 
         /// <summary> Получить из 1С физ. лица с подходящим email </summary>
-        public static Dictionary<Guid, OneC.Person> OneC_GetPersonsWithSufficientEmail(SyncSettings settings)
+        public static Dictionary<Guid, OneC.Person> OneC_GetPersonsWithSufficientEmail(SyncSettings settings, SyncObjs syncObjs)
         {
             // Получаем идентификаторы физ. лиц с почтовыми адресами, которые оканчиваются на указанный домен
             List<Guid> idsPersonsWithEmails = OneCHttpClient.GetIdsOfObjs<OneC.IRContactInfo>(
@@ -233,20 +254,20 @@ namespace App
                 + $" and endswith(Представление, '{settings.EmailDomain}') eq true", "Объект");
 
             // Получаем объекты физ. лиц
-            Dictionary<Guid, OneC.Person> personsWithEmails = OneCHttpClient.GetObjsByIds<OneC.Person>(idsPersonsWithEmails).ToDictionary(k => k.Id);
-            return personsWithEmails;
+            syncObjs.OneS_PersonsOrderedById = OneCHttpClient.GetObjsByIds<OneC.Person>(idsPersonsWithEmails).ToDictionary(k => k.Id);
+            return syncObjs.OneS_PersonsOrderedById;
         }
 
         /// <summary> Получить из 1С контактную информацию и связать ее с физ. лицам </summary>
-        public static void OneC_GetContactInfoAndBindWithPersons(Dictionary<Guid, OneC.Person> personsWithEmailsOrderedById, SyncSettings settings)
+        public static void OneC_GetContactInfoAndBindWithPersons(SyncObjs syncObjs, SyncSettings settings)
         {
-            Dictionary<Guid, List<OneC.IRContactInfo>> contactInfosGroupedByPersonId = OneCHttpClient
-                .GetObjsByIds<OneC.IRContactInfo>(personsWithEmailsOrderedById.Keys, "cast(Объект, 'Catalog_ФизическиеЛица')")
+            syncObjs.OneS_ContactInfosGroupedByPersonId = OneCHttpClient
+                .GetObjsByIds<OneC.IRContactInfo>(syncObjs.OneS_PersonsOrderedById.Keys, "cast(Объект, 'Catalog_ФизическиеЛица')")
                 .GroupToDictionaryBy(x => new Guid(x.KeyObject));
-            OneC_GetAndBindContactInfoTypes(contactInfosGroupedByPersonId);
-            foreach(OneC.Person person in personsWithEmailsOrderedById.Values)
+            OneC_GetAndBindContactInfoTypes(syncObjs.OneS_ContactInfosGroupedByPersonId);
+            foreach(OneC.Person person in syncObjs.OneS_PersonsOrderedById.Values)
             {
-                List<OneC.IRContactInfo> contactInfoOfPerson = contactInfosGroupedByPersonId[person.Id];
+                List<OneC.IRContactInfo> contactInfoOfPerson = syncObjs.OneS_ContactInfosGroupedByPersonId[person.Id];
                 foreach (var contactInfo in contactInfoOfPerson)
                 {
                     Guid kindOfInfo = new Guid(contactInfo.KeyKind);
@@ -274,23 +295,23 @@ namespace App
         }
 
         /// <summary> Получить из 1С данные из инфо. регистра InformationRegister_ФИОФизЛиц и связываем з физлицами </summary>
-        public static void OneC_GetNamesAndBindWithPersons(Dictionary<Guid, OneC.Person> personsWithEmailsOrderedById)
+        public static void OneC_GetNamesAndBindWithPersons(SyncObjs syncObjs)
         {
             List<OneC.IRNamesOfPersons> namesOfPersons = OneCHttpClient
-                .GetObjsByIds<OneC.IRNamesOfPersons>(personsWithEmailsOrderedById.Keys, "cast(ФизЛицо, 'Catalog_ФизическиеЛица')");
+                .GetObjsByIds<OneC.IRNamesOfPersons>(syncObjs.OneS_PersonsOrderedById.Keys, "cast(ФизЛицо, 'Catalog_ФизическиеЛица')");
             foreach (var personName in namesOfPersons)
-                personsWithEmailsOrderedById[personName.KeyPerson].RelatedObj_NameInfo = personName;
+                syncObjs.OneS_PersonsOrderedById[personName.KeyPerson].RelatedObj_NameInfo = personName;
         }
 
         /// <summary> Получить из 1С сотрудников и связать с физ. лицами </summary>
-        public static void OneC_GetEmployeesAndBindWithPersons(Dictionary<Guid, OneC.Person> personsWithEmailsOrderedById)
+        public static void OneC_GetEmployeesAndBindWithPersons(SyncObjs syncObjs)
         {
             // Связать сотрудников с физ. лицами
-            List<OneC.Employee> employeesWithEmails = OneCHttpClient.GetObjsByIds<OneC.Employee>(personsWithEmailsOrderedById.Keys, "Физлицо_Key");
-            employeesWithEmails.ForEach(employee => employee.NavProp_Person = personsWithEmailsOrderedById[(Guid)employee.PersonId]);
+            List<OneC.Employee> employeesWithEmails = OneCHttpClient.GetObjsByIds<OneC.Employee>(syncObjs.OneS_PersonsOrderedById.Keys, "Физлицо_Key");
+            employeesWithEmails.ForEach(employee => employee.NavProp_Person = syncObjs.OneS_PersonsOrderedById[(Guid)employee.PersonId]);
 
             // Связать физ. лиц с сотрудниками
-            employeesWithEmails.ForEach(employee => personsWithEmailsOrderedById[(Guid)employee.PersonId].RelatedObjs_RelatedEmployeePositions.Add(employee));
+            employeesWithEmails.ForEach(employee => syncObjs.OneS_PersonsOrderedById[(Guid)employee.PersonId].RelatedObjs_RelatedEmployeePositions.Add(employee));
 
             Task[] tasks = new Task[]
             {
@@ -357,14 +378,13 @@ namespace App
         /// <summary> Получить из Creatio контакты по email физ.лиц из 1C </summary>
         public static Dictionary<Guid, ITIS.Contact> Creatio_GetCreatedContactsAndRelatedInfo(HashSet<Guid> contactsIds)
         {
-            //List<String> emails = personsWithEmailsOrderedById.Values.Select(x => x.RelatedObj_ContactInfoEmail.View).Distinct().ToList();
-            //List<ITIS.Contact> creatio_Contacts = CreatioHttpClient.GetObjsWherePropIn<ITIS.Contact, String>("Email", emails);
             Dictionary<Guid, ITIS.Contact> creatio_ContactsOrderedById = CreatioHttpClient.GetObjsByIds<ITIS.Contact>(contactsIds);
             List<ITIS.Contact> creatio_Contacts = creatio_ContactsOrderedById.Values.ToList();
 
             Task[] tasks = new Task[]
             {
                 new Task(() => Creatio_GetEmployeeJobAndBindWithContact(creatio_Contacts)),
+                new Task(() => Cratio_GetContactCareerAndBindWithContact(creatio_ContactsOrderedById)),
                 new Task(() => Creatio_GetEmployeeAndBindWithContact(creatio_ContactsOrderedById)),
                 new Task(() => Creatio_GetContactGenderAndBindWithContact(creatio_Contacts)),
                 new Task(() => Creatio_GetSubdivisionsAndBindWithEmployees(creatio_Contacts)),
@@ -378,6 +398,44 @@ namespace App
 
             return creatio_ContactsOrderedById;
         }
+
+
+
+
+        public static void Creatio_ShowContact(ITIS.Contact contact, Boolean showMapingsOrRemarks = true)
+        {
+            contact?.Show(0, showMapingsOrRemarks);
+            foreach(var career in contact?.Career)
+            {
+                career.Show(1, showMapingsOrRemarks);
+                career.Account?.Show(2, showMapingsOrRemarks);
+                career.OrgStructureUnit?.Show(2, showMapingsOrRemarks);
+                career.ITISSubdivision?.Show(2, showMapingsOrRemarks);
+                career.Job?.Show(2, showMapingsOrRemarks);
+            }
+
+            ITIS.Employee employee = (ITIS.Employee)contact?.Employee;
+            employee?.Show(1, showMapingsOrRemarks);
+            foreach(var career in employee?.Career)
+            {
+                career.Show(2, showMapingsOrRemarks);
+                career.Account?.Show(3, showMapingsOrRemarks);
+                career.OrgStructureUnit?.Show(3, showMapingsOrRemarks);
+                career.EmployeeJob?.Show(3, showMapingsOrRemarks);
+            }
+            employee?.Career.ForEach(x => x.Show(2, showMapingsOrRemarks));
+
+            contact?.ITISSubdivision?.Show(1, showMapingsOrRemarks);
+            contact?.ITISEmploymentType?.Show(1, showMapingsOrRemarks);
+            contact?.ITISOrganizationSubdivision?.Show(1, showMapingsOrRemarks);
+            contact?.Account?.Show(1, showMapingsOrRemarks);
+            contact?.Type?.Show(1, showMapingsOrRemarks);
+            contact?.Job?.Show(1, showMapingsOrRemarks);
+            contact?.Department?.Show(1, showMapingsOrRemarks);
+        }
+
+
+
 
         /// <summary> Получить из Creatio сотрудников и связать с контактами </summary>
         public static void Creatio_GetEmployeeAndBindWithContact(Dictionary<Guid, ITIS.Contact> creatio_ContactsOrderedById)
@@ -398,6 +456,8 @@ namespace App
             Creatio_GetEmployeeCareerAndBindWithEmploee(employeesOrderedById);
         }
 
+
+
         public static void Creatio_GetContactGenderAndBindWithContact(List<ITIS.Contact> creatio_Contacts)
         {
             Dictionary<Guid, Terrasoft.Gender> genders = CreatioHttpClient.GetObjsByIds<Terrasoft.Gender>(creatio_Contacts.Select(x => (Guid)x.GenderId));
@@ -408,7 +468,9 @@ namespace App
             }
         }
 
-        /// <summary> Получить из Creatio должности и связать с контактами </summary>
+        
+        
+        /// <summary> Получить из Creatio должности сотрудников и связать с контактами </summary>
         public static void Creatio_GetEmployeeJobAndBindWithContact(List<ITIS.Contact> creatio_Contacts)
         {
             Dictionary<Guid, ITIS.EmployeeJob> jobs = CreatioHttpClient.GetObjsByIds<ITIS.EmployeeJob>(creatio_Contacts.SelectValuableGuids(x => x.ITISEmployeePositionId));
@@ -420,6 +482,8 @@ namespace App
             }
         }
 
+        
+        
         /// <summary> Получить из Creatio подразделения и связать с сотрудниками </summary>
         public static void Creatio_GetSubdivisionsAndBindWithEmployees(List<ITIS.Contact> creatio_Contacts)
         {
@@ -432,6 +496,8 @@ namespace App
             }
         }
 
+        
+        
         /// <summary> Получить из Creatio тип зайнятости и связать с контактами </summary>
         public static void Creatio_GetEmploymentTypesAndBindWitEmployees(List<ITIS.Contact> creatio_Contacts)
         {
@@ -443,6 +509,8 @@ namespace App
             }
         }
 
+        
+        
         /// <summary> Получить из Creatio подразделения организаций зайнятости и связать с контактами </summary>
         public static void Creatio_GetSubdivisionAndBindWithContact(List<ITIS.Contact> creatio_Contacts)
         {
@@ -454,6 +522,8 @@ namespace App
             }
         }
 
+        
+        
         /// <summary> Получить из Creatio контрагентов и связать с контактами </summary>
         public static void Creaio_GetAccountsAndBindWithContacts(List<ITIS.Contact> creatio_Contacts)
         {
@@ -465,6 +535,8 @@ namespace App
             }
         }
 
+        
+        
         /// <summary> Получить из Creatio типы контактов и связать с контактами </summary>
         public static void Creatio_GetContactTypesAndBindWithContacts(List<ITIS.Contact> creatio_Contacts)
         {
@@ -476,6 +548,8 @@ namespace App
             }
         }
 
+        
+        
         /// <summary> Получить из Creatio должности и связать с контактами </summary>
         public static void Creatio_GetJobsAndBindWithContacts(List<ITIS.Contact> creatio_Contacts)
         {
@@ -487,6 +561,8 @@ namespace App
             }
         }
 
+        
+        
         /// <summary> Получить из Creatio подразделения и связать с контактами </summary>
         public static void Creatio_GetDepartmentsAndBindWithContacts(List<ITIS.Contact> creatio_Contacts)
         {
@@ -498,6 +574,8 @@ namespace App
             }
         }
 
+        
+        
         /// <summary> Получить из Creatio подразделения и связать с контактами </summary>
         public static void Creatio_SyncEmployeesWithContact(List<ITIS.Employee> creatio_Employees)
         {
@@ -523,6 +601,8 @@ namespace App
             }
         }
 
+        
+        
         /// <summary> Получить из Creatio карьеру сотрудников и связать с сотрудниками </summary>
         public static void Creatio_GetEmployeeCareerAndBindWithEmploee(Dictionary<Guid, ITIS.Employee> employeesOrderedById)
         {          
@@ -541,80 +621,154 @@ namespace App
             Task[] bindRelatedObjs = new Task[]
             {
                 new Task(() => Creatio_GetEmployementTypeAndBindWithEmploymentCareer(careers)),
-                new Task(() => Creatio_GetAccountsAndBindWithCareers(careers)),
-                new Task(() => Creatio_GetOrgStructureUnitsAndBindWithCareers(careers)),
-                new Task(() => Creatio_GetJobAndBindWithCareers(careers)),
+                new Task(() => Creatio_GetAccountsAndBindWithEmployeeCareers(careers)),
+                new Task(() => Creatio_GetOrgStructureUnitsAndBindWithEmployeeCareers(careers)),
+                new Task(() => Creatio_GetJobAndBindWithEmployeeCareers(careers)),
             }.StartAndWaitForAll();
         }
 
+        
+        
         /// <summary> Получить из Creatio типы видов зайнятости и связать с карьерой сотрудника </summary>
         public static void Creatio_GetEmployementTypeAndBindWithEmploymentCareer(List<ITIS.EmployeeCareer> careers)
         {
-            HashSet<Guid> employmentTypesIds = new HashSet<Guid>(careers.Select(x => x.ITISTypeOfEmploymentId));
+            HashSet<Guid> employmentTypesIds = new HashSet<Guid>(careers.SelectValuableGuids(x => x.ITISTypeOfEmploymentId));
             Dictionary<Guid, ITIS.ITISEmploymentType> employmentTypes = CreatioHttpClient.GetObjsByIds<ITIS.ITISEmploymentType>(employmentTypesIds);
 
             foreach(var career in careers)
             {
-                if (career.ITISTypeOfEmploymentId.IsNotDefault())
-                    career.ITISTypeOfEmployment = employmentTypes[career.ITISTypeOfEmploymentId];
+                if (career.ITISTypeOfEmploymentId.IsNotNullOrDefault())
+                    career.ITISTypeOfEmployment = employmentTypes[(Guid)career.ITISTypeOfEmploymentId];
             }
         }
 
+        
+        
         /// <summary> Получить из Creatio контрагентов и связать с карьерой сотрудника </summary>
-        public static void Creatio_GetAccountsAndBindWithCareers(List<ITIS.EmployeeCareer> careers)
+        public static void Creatio_GetAccountsAndBindWithEmployeeCareers(List<ITIS.EmployeeCareer> careers)
         {
-            HashSet<Guid> accountIds = new HashSet<Guid>(careers.Select(x => x.AccountId));
-            Dictionary<Guid, Terrasoft.Account> accounts = CreatioHttpClient.GetObjsByIds<Terrasoft.Account>(accountIds);
+            HashSet<Guid> accountIds = new HashSet<Guid>(careers.SelectValuableGuids(x => x.AccountId));
+            Dictionary<Guid, ITIS.Account> accounts = CreatioHttpClient.GetObjsByIds<ITIS.Account>(accountIds);
 
             foreach(var career in careers)
             {
-                if (career.AccountId.IsNotDefault())
-                    career.Account = accounts[career.AccountId];
+                if (career.AccountId.IsNotNullOrDefault())
+                    career.Account = accounts[(Guid)career.AccountId];
             }
         }
 
+        
+        
         /// <summary> Получить из Creatio елементы орг. структуры и привязать к карьере сотрудника </summary>
-        public static void Creatio_GetOrgStructureUnitsAndBindWithCareers(List<ITIS.EmployeeCareer> careers)
+        public static void Creatio_GetOrgStructureUnitsAndBindWithEmployeeCareers(List<ITIS.EmployeeCareer> careers)
         {
-            HashSet<Guid> orgStructUnitsIds = new HashSet<Guid>(careers.Select(x => x.OrgStructureUnitId));
-            Dictionary<Guid, Terrasoft.OrgStructureUnit> orgStructUnits = CreatioHttpClient.GetObjsByIds<Terrasoft.OrgStructureUnit>(orgStructUnitsIds);
+            HashSet<Guid> orgStructUnitsIds = new HashSet<Guid>(careers.SelectValuableGuids(x => x.OrgStructureUnitId));
+            Dictionary<Guid, ITIS.OrgStructureUnit> orgStructUnits = CreatioHttpClient.GetObjsByIds<ITIS.OrgStructureUnit>(orgStructUnitsIds);
 
             foreach(var career in careers)
             {
-                if (career.OrgStructureUnitId.IsNotDefault())
-                    career.OrgStructureUnit = orgStructUnits[career.OrgStructureUnitId];
+                if (career.OrgStructureUnitId.IsNotNullOrDefault())
+                    career.OrgStructureUnit = orgStructUnits[(Guid)career.OrgStructureUnitId];
             }
         }
 
+        
+        
         /// <summary> Получить из Creatio должности и привязать к карьере сотрудника </summary>
-        public static void Creatio_GetJobAndBindWithCareers(List<ITIS.EmployeeCareer> careers)
+        public static void Creatio_GetJobAndBindWithEmployeeCareers(List<ITIS.EmployeeCareer> careers)
         {
-            HashSet<Guid> jobIds = new HashSet<Guid>(careers.Select(x => x.EmployeeJobId));
+            HashSet<Guid> jobIds = new HashSet<Guid>(careers.SelectValuableGuids(x => x.EmployeeJobId));
             Dictionary<Guid, ITIS.EmployeeJob> jobs = CreatioHttpClient.GetObjsByIds<ITIS.EmployeeJob>(jobIds);
 
             foreach(var career in careers)
             {
-                if (career.EmployeeJobId.IsNotDefault())
-                    career.EmployeeJob = jobs[career.EmployeeJobId];
+                if (career.EmployeeJobId.IsNotNullOrDefault())
+                    career.EmployeeJob = jobs[(Guid)career.EmployeeJobId];
             }
         }
 
-        public static void Creatio_ShowContact(ITIS.Contact contact)
-        {
-            contact?.Show();
-            
-            ITIS.Employee employee = (ITIS.Employee)contact?.Employee;
-            employee?.Show(1);
-            employee?.Career.ForEach(x => x.Show(2));
-            
-            contact?.ITISSubdivision?.Show(1);
-            contact?.ITISEmploymentType?.Show(1);
-            contact?.ITISOrganizationSubdivision?.Show(1);
-            contact?.Account?.Show(1);
-            contact?.Type?.Show(1);
-            contact?.Job?.Show(1);
-            contact?.Department?.Show(1);
 
+        public static void Cratio_GetContactCareerAndBindWithContact(Dictionary<Guid, ITIS.Contact> creatio_ContactsOrderedById)
+        {
+            Dictionary<Guid, List<ITIS.ContactCareer>> careersGroupedByContactId = CreatioHttpClient.GetBindedObjsByParentIds<ITIS.ContactCareer>(creatio_ContactsOrderedById.Keys, "Contact", x => x.ContactId);
+            foreach(var item in careersGroupedByContactId)
+            {
+                ITIS.Contact contact;
+                if (!creatio_ContactsOrderedById.TryGetValue(item.Key, out contact)) continue;
+                contact.Career.AddRange(item.Value);
+                item.Value.ForEach(x => x.Contact = contact);
+            }
+
+
+            List<ITIS.ContactCareer> careers = new List<ContactCareer>();
+            careersGroupedByContactId.ForEach(x => careers.AddRange(x.Value));
+
+            Task[] bindRelatedObjs = new Task[]
+            {
+                new Task(() => Creatio_GetEmployementTypeAndBindWithContactCareer(careers)),
+                new Task(() => Creatio_GetAccountsAndBindWithContactCareers(careers)),
+                new Task(() => Creatio_GetOrgStructureUnitsAndBindWithContactCareers(careers)),
+                new Task(() => Creatio_GetJobAndBindWithContactCareers(careers)),
+            }.StartAndWaitForAll();
+        }
+
+
+
+        /// <summary> Получить из Creatio типы видов зайнятости и связать с карьерой контакта </summary>
+        public static void Creatio_GetEmployementTypeAndBindWithContactCareer(List<ITIS.ContactCareer> careers)
+        {
+            HashSet<Guid> employmentTypesIds = new HashSet<Guid>(careers.SelectValuableGuids(x => x.ITISEmploymentTypeId));
+            Dictionary<Guid, ITIS.ITISEmploymentType> employmentTypes = CreatioHttpClient.GetObjsByIds<ITIS.ITISEmploymentType>(employmentTypesIds);
+
+            foreach (var career in careers)
+            {
+                if (career.ITISEmploymentTypeId.IsNotNullOrDefault())
+                    career.ITISEmploymentType = employmentTypes[(Guid)career.ITISEmploymentTypeId];
+            }
+        }
+
+
+        /// <summary> Получить из Creatio контрагентов и связать с карьерой контакта </summary>
+        public static void Creatio_GetAccountsAndBindWithContactCareers(List<ITIS.ContactCareer> careers)
+        {
+            HashSet<Guid> accountIds = new HashSet<Guid>(careers.SelectValuableGuids(x => x.AccountId));
+            Dictionary<Guid, ITIS.Account> accounts = CreatioHttpClient.GetObjsByIds<ITIS.Account>(accountIds);
+
+            foreach (var career in careers)
+            {
+                if (career.AccountId.IsNotNullOrDefault())
+                    career.Account = accounts[(Guid)career.AccountId];
+            }
+        }
+
+
+
+        /// <summary> Получить из Creatio елементы орг. структуры и привязать к карьере контакта </summary>
+        public static void Creatio_GetOrgStructureUnitsAndBindWithContactCareers(List<ITIS.ContactCareer> careers)
+        {
+            HashSet<Guid> orgStructUnitsIds = new HashSet<Guid>(careers.SelectValuableGuids(x => x.ITISSubdivisionId));
+            Dictionary<Guid, ITIS.OrgStructureUnit> orgStructUnits = CreatioHttpClient.GetObjsByIds<ITIS.OrgStructureUnit>(orgStructUnitsIds);
+
+            foreach (var career in careers)
+            {
+                if (career.ITISSubdivisionId.IsNotNullOrDefault())
+                    career.ITISSubdivision = orgStructUnits[(Guid)career.ITISSubdivisionId];
+            }
+        }
+
+
+
+        /// <summary> Получить из Creatio должности и привязать к карьере сотрудника </summary>
+        public static void Creatio_GetJobAndBindWithContactCareers(List<ITIS.ContactCareer> careers)
+        {
+            HashSet<Guid> jobIds = new HashSet<Guid>(careers.SelectValuableGuids(x => x.JobId));
+            Dictionary<Guid, ITIS.Job> jobs = CreatioHttpClient.GetObjsByIds<ITIS.Job>(jobIds);
+
+            foreach (var career in careers)
+            {
+                if (career.JobId.IsNotNullOrDefault())
+                    career.Job = jobs[(Guid)career.JobId];
+            }
         }
     }
 }

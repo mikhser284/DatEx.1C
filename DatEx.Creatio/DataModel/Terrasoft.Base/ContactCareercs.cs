@@ -3,6 +3,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
 {
     using System;
     using DatEx.Creatio.DataModel.Auxilary;
+    using Newtonsoft.Json;
 
     /// <summary> Карьера сотрудника в нашей компании </summary>
     [CreatioType("Карьера сотрудника в нашей компании")]
@@ -15,7 +16,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         /// <summary> Сотрудник </summary>
         [JsonIgnoreSerialization]
         [CreatioProp("Контакт", Color = ConsoleColor.Yellow)]
-        public Employee Contact { get; set; }
+        public Contact Contact { get; set; }
 
         /// <summary> Контрагент (Id) </summary>
         [CreatioProp("Контрагент (Id)", Color = ConsoleColor.Blue)]
@@ -23,6 +24,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
 
         /// <summary> Контрагент </summary>
         [JsonIgnoreSerialization]
+        [Map]
         [CreatioProp("Контрагент", Color = ConsoleColor.Yellow)]
         public Account Account { get; set; }
 
@@ -32,35 +34,43 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
 
         /// <summary> Подразделение </summary>
         [JsonIgnoreSerialization]
+        [Map]
         [CreatioProp("Департамент", Color = ConsoleColor.Yellow)]
         public OrgStructureUnit OrgStructureUnit { get; set; }
 
         /// <summary> Должность (Id) </summary>
+        [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Должность (Id)", Color = ConsoleColor.Blue)]
-        public Guid JobId { get; set; }
+        public Guid? JobId { get; set; }
 
         /// <summary> Должность </summary>
         [JsonIgnoreSerialization]
+        [Map]
         [CreatioProp("Должность", Color = ConsoleColor.Yellow)]
         public ITIS.Job Job { get; set; }
 
         /// <summary> Полное название должности </summary>
+        [Map]
         [CreatioProp("Полное название должности", Color = ConsoleColor.Yellow)]
         public String JobTitle { get; set; }
 
         /// <summary> Основное </summary>
-        [CreatioProp("Полное название должности", Color = ConsoleColor.Yellow)]
+        [Map]
+        [CreatioProp("Основное", Color = ConsoleColor.Yellow)]
         public Boolean Primary { get; set; }
 
         /// <summary> Текущее </summary>
+        [Map]
         [CreatioProp("Текущее", Color = ConsoleColor.Yellow)]
         public Boolean Current { get; set; }
 
         /// <summary> Начало </summary>
+        [Map]
         [CreatioProp("Начало", Color = ConsoleColor.Yellow)]
         public DateTime StartDate { get; set; }
 
         /// <summary> Завершение </summary>
+        [Map]
         [CreatioProp("Завершение", Color = ConsoleColor.Yellow)]
         public DateTime? DueDate { get; set; }
 

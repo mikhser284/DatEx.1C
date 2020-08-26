@@ -16,7 +16,8 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Employee Employee { get; set; }
 
         /// <summary> ФИО </summary>
-        [MapFromOneSRemarks("Отключить авто заполнение фамилии имени и отчества из свойства Name; Наоборот брать Name из них: this.Name = $\"{this.Surname} {c.GivenName} {c.MiddleName}\"")]
+        [MapRemarks("Отключить авто заполнение фамилии имени и отчества из свойства Name; Наоборот брать Name из них: this.Name = $\"{this.Surname} {c.GivenName} {c.MiddleName}\"")]
+        [Map(true)]
         [CreatioProp("ФИО", Color = ConsoleColor.Yellow)]
         public String Name { get; set; }
 
@@ -46,8 +47,8 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
 
         /// <summary> Пол (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
-        [MapFromOneSProp(OneSDataTypeKind.Enum, "Catalog_ФизическиеЛица", "Перечисление.ПолФизическихЛиц", "Пол")]
-        [MapFromOneSRemarks("Используя объект настроек синхронизации проецировать значение перечисления ПолФизическихЛиц из 1С на Guid Справочника<Пол>")]
+        [MapRemarks("Используя объект настроек синхронизации проецировать значение перечисления ПолФизическихЛиц из 1С на Guid Справочника<Пол>")]
+        [Map(true, DataType.Lookup, "Catalog_ФизическиеЛица", DataType.Enum, "Пол(ПолФизическихЛиц)")]
         [CreatioProp("Guid", "Пол (Id)", Color = ConsoleColor.Blue)]
         public Guid? GenderId { get; set; }
 
@@ -78,7 +79,8 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
 
         /// <summary> Тип (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
-        [MapFromOneSRemarks("Брать значение Guid из объекта настроек синхронизации (Guid записи Справочника Тип контакта со значением \"Сотрудник\")")]
+        [MapRemarks("Брать значение Guid из объекта настроек синхронизации (Guid записи Справочника Тип контакта со значением \"Сотрудник\")")]
+        [Map(true)]
         [CreatioProp("Guid", "Тип (Id)", Color = ConsoleColor.Blue)]
         public Guid? TypeId { get; set; }
 
@@ -94,10 +96,13 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
 
         /// <summary> Должность </summary>
         [JsonIgnoreSerialization]
+        [Map]
         [CreatioProp("Должность", Color = ConsoleColor.Yellow)]
         public Job Job { get; set; }
 
         /// <summary> Полное название должности </summary>
+        [MapRemarks("т.е. из связанного с Catalog_СотрудникиОрганизаций объекта Catalog_ДолжностиОрганизаций")]
+        [Map(true, DataType.Lookup, "Catalog_ДолжностиОрганизаций", DataType.String, "Наименование")]
         [CreatioProp("Полное название должности", Color = ConsoleColor.Yellow)]
         public String JobTitle { get; set; }
 
@@ -113,18 +118,19 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
 
         /// <summary> Дата рождения </summary>
         [JsonConverter(typeof(JsonConverter_Date))]
+        [Map(true, DataType.Lookup, "Catalog_ФизическиеЛица", DataType.Date, "ДатаРождения")]
         [CreatioProp("Дата рождения", Color = ConsoleColor.Yellow)]
         public DateTime? BirthDate { get; set; }
 
         /// <summary> Рабочий телефон </summary>
-        [MapFromOneSRemarks("Для того чтобы получить нужную запись инфо. регистра с Рабочим телефоном используется объект настроек синхронизации")]
-        [MapFromOneSProp(OneSDataTypeKind.InfoReg, "InformationRegister_КонтактнаяИнформация", "Строка", "Представление")]
+        [MapRemarks("Для того чтобы получить нужную запись инфо. регистра с Рабочим телефоном используется объект настроек синхронизации")]
+        [Map(true, DataType.InfoReg, "InformationRegister_КонтактнаяИнформация", DataType.String, "Представление")]
         [CreatioProp("Рабочий телефон", Color = ConsoleColor.Yellow)]
         public String Phone { get; set; }
 
         /// <summary> Мобильный телефон </summary>
-        [MapFromOneSRemarks("Для того чтобы получить нужную запись инфо. регистра с Телефоном используется объект настроек синхронизации")]
-        [MapFromOneSProp(OneSDataTypeKind.InfoReg, "InformationRegister_КонтактнаяИнформация", "Строка", "Представление")]
+        [MapRemarks("Для того чтобы получить нужную запись инфо. регистра с Телефоном используется объект настроек синхронизации")]
+        [Map(true, DataType.InfoReg, "InformationRegister_КонтактнаяИнформация", DataType.String, "Представление")]
         [CreatioProp("Мобильный телефон", Color = ConsoleColor.Yellow)]
         public String MobilePhone { get; set; }
 
@@ -137,8 +143,8 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public String Skype { get; set; }
 
         /// <summary> Email </summary>
-        [MapFromOneSRemarks("Для того чтобы получить нужную запись инфо. регистра с Email используется объект настроек синхронизации")]
-        [MapFromOneSProp(OneSDataTypeKind.InfoReg, "InformationRegister_КонтактнаяИнформация", "Строка", "Представление")]
+        [MapRemarks("Для того чтобы получить нужную запись инфо. регистра с Email используется объект настроек синхронизации")]
+        [Map(true, DataType.InfoReg, "InformationRegister_КонтактнаяИнформация", DataType.String, "Представление")]
         [CreatioProp("Email", Color = ConsoleColor.Yellow)]
         public String Email { get; set; }
 
@@ -286,17 +292,17 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public String GPSE { get; set; }
 
         /// <summary> Фамилия </summary>
-        [MapFromOneSProp(OneSDataTypeKind.InfoReg, "InformationRegister_ФИОФизЛиц", "Строка", "Фамилия")]
+        [Map(true, DataType.InfoReg, "InformationRegister_ФИОФизЛиц", DataType.String, "Фамилия")]
         [CreatioProp("Фамилия", Color = ConsoleColor.Yellow)]
         public String Surname { get; set; }
 
         /// <summary> Имя </summary>
-        [MapFromOneSProp(OneSDataTypeKind.InfoReg, "InformationRegister_ФИОФизЛиц", "Строка", "Имя")]
+        [Map(true, DataType.InfoReg, "InformationRegister_ФИОФизЛиц", DataType.String, "Имя")]
         [CreatioProp("Имя", Color = ConsoleColor.Yellow)]
         public String GivenName { get; set; }
 
         /// <summary> Отчество </summary>
-        [MapFromOneSProp(OneSDataTypeKind.InfoReg, "InformationRegister_ФИОФизЛиц", "Строка", "Отчество")]
+        [Map(true, DataType.InfoReg, "InformationRegister_ФИОФизЛиц", DataType.String, "Отчество")]
         [CreatioProp("Отчество", Color = ConsoleColor.Yellow)]
         public String MiddleName { get; set; }
 
@@ -305,6 +311,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Boolean? Confirmend { get; set; }
 
         /// <summary> Полнота заполнения данных </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Полнота заполнения данных")]
         public Double? Completeness { get; set; }
 
@@ -329,6 +336,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Calendar Calendar { get; set; }
 
         /// <summary> Возраст </summary>
+        [JsonIgnoreSerialization]
         [CreatioProp("Возраст")]
         public Int32? Age { get; set; }        
     }

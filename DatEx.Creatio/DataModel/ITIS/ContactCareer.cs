@@ -12,26 +12,30 @@
     {
         /// <summary> Подразделение (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
-        [CreatioProp("Guid", "Подразделение (Id)")]
+        [CreatioProp("Guid", "Подразделение (Id)", Color = ConsoleColor.Blue)]
         public Guid? ITISSubdivisionId { get; set; }
 
         /// <summary> Подразделение </summary>
         [JsonIgnoreSerialization]
-        [CreatioProp("Guid", "Подразделение")]
+        [Map]
+        [CreatioProp("Guid", "Подразделение", Color = ConsoleColor.Yellow)]
         public OrgStructureUnit ITISSubdivision { get; set; }
 
         /// <summary> Вид занятости (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
-        [CreatioProp("Guid", "Вид занятости (Id)")]
+        [CreatioProp("Guid", "Вид занятости (Id)", Color = ConsoleColor.Yellow)]
         public Guid? ITISEmploymentTypeId { get; set; }
 
         /// <summary> Вид занятости (Id) </summary>
         [JsonIgnoreSerialization]
-        [CreatioProp("Guid", "Вид занятости (Id)")]
+        [Map]
+        [CreatioProp("Guid", "Вид занятости", Color = ConsoleColor.Blue)]
         public ITIS.ITISEmploymentType ITISEmploymentType { get; set; }
 
         [JsonConverter(typeof(JsonConverter_Guid))]
-        [CreatioProp("Идентификатор объекта в 1С", Remarks = "Поле отсутствует в оригинальном пакете 'ItisWorkFlowBase'", Color = ConsoleColor.Red)]
+        [Map]
+        [CreatioPropNotExistInDataModelOfITIS]
+        [CreatioProp("Идентификатор объекта в 1С", Color = ConsoleColor.Red)]
         public Guid? ITISOneSId { get; set; }
     }
 }

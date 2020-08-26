@@ -26,6 +26,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
 
         /// <summary> Контрагент </summary>
         [JsonIgnoreSerialization]
+        [Map]
         [CreatioProp("Контрагент", Color = ConsoleColor.Yellow)]
         public Account Account { get; set; }
 
@@ -36,6 +37,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
 
         /// <summary> Подразделение </summary>
         [JsonIgnoreSerialization]
+        [Map]
         [CreatioProp("Подразделение", Color = ConsoleColor.Yellow)]
         public OrgStructureUnit OrgStructureUnit { get; set; }
 
@@ -45,23 +47,28 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public Guid? EmployeeJobId { get; set; }
 
         /// <summary> Должность </summary>
+        [Map]
         [JsonIgnoreSerialization]
         [CreatioProp("Должность", Color = ConsoleColor.Yellow)]
         public ITIS.EmployeeJob EmployeeJob { get; set; }
 
         /// <summary> Полное название должности </summary>
+        [Map]
         [CreatioProp("Полное название должности", Color = ConsoleColor.Yellow)]
         public String FullJobTitle { get; set; }
 
         /// <summary> Начало </summary>
+        [Map]
         [CreatioProp("Начало", Color = ConsoleColor.Yellow)]
         public DateTime StartDate { get; set; }
 
         /// <summary> Завершение </summary>
+        [Map]
         [CreatioProp("Завершение", Color = ConsoleColor.Yellow)]
         public DateTime DueDate { get; set; }
 
         /// <summary> Текущее </summary>
+        [Map]
         [CreatioProp("Текущее", Color = ConsoleColor.Yellow)]
         public Boolean IsCurrent { get; set; }
 

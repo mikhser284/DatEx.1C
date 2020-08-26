@@ -47,22 +47,25 @@ namespace DatEx.Creatio
         }
 
         /// <summary> Получить связанные объекты по идентификаторам дочерних </summary>
-        public Dictionary<Guid, List<T>> GetBindedObjsByParentIds<T>(IEnumerable<Guid> identifiers, String nameOfParentObj, Func<T, Guid> parentKeySelector) where T : BaseEntity
+        public Dictionary<Guid, List<T>> GetBindedObjsByParentIds<T>(IEnumerable<Guid> identifiers, String nameOfParentObj, Func<T, Guid?> parentKeySelector) where T : BaseEntity
         {
+            Guid defaultGuid = default(Guid);
             Dictionary<Guid, List<T>> bindedObjsGroupedByParentId = new Dictionary<Guid, List<T>>();
             if (identifiers.Count() == 0) return bindedObjsGroupedByParentId;
             String linkedObj = $"{nameOfParentObj}{(String.IsNullOrEmpty(nameOfParentObj) ? "" : "/")}Id";
             String filter = String.Join(" or ", identifiers.Select(id => $"{linkedObj} eq {id} "));
             String query = $"filter={filter}";
             List<T> queryResult = GetObjs<T>(query);
-            foreach(T item in queryResult)
+            foreach (T item in queryResult)
             {
-                Guid parentKey = parentKeySelector(item);
+                if (parentKeySelector(item) is null) continue;
+                Guid parentKey = (Guid)parentKeySelector(item);
+                if (parentKey == defaultGuid) continue;
                 if (bindedObjsGroupedByParentId.ContainsKey(parentKey)) bindedObjsGroupedByParentId[parentKey].Add(item);
                 else bindedObjsGroupedByParentId.Add(parentKey, new List<T> { item });
             }
             return bindedObjsGroupedByParentId;
-        }
+        }        
 
         /// <summary> Получить объекты указанного типа </summary>
         public List<T> GetObjs<T>(String query = default(String)) where T : BaseEntity
