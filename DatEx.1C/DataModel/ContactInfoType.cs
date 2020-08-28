@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace DatEx.OneC.DataModel
 {
-    [OneC("Catalog_ВидыКонтактнойИнформации", "Catalog_ВидыКонтактнойИнформации", "", "")]
+    [OneC("Catalog_ВидыКонтактнойИнформации", "Catalog_ВидыКонтактнойИнформации", "ВидыКонтактнойИнформации", "ВидыКонтактнойИнформации")]
     [JsonObject("Catalog_ВидыКонтактнойИнформации")]
     public class ContactInfoType : OneCBaseLookup
     {

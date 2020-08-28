@@ -22,44 +22,21 @@ namespace App
     {
         public static void SyncEmployees(SyncSettings settings)
         {
-            SyncObjs syncObjs = new SyncObjs();
-            Task<Dictionary<Guid, OneC.Person>> oneS_getPersonsInfo = new Task<Dictionary<Guid, Person>>(() => OneC_GetPersonsAndRelatedInfoForSync(syncObjs, settings));
+            Task<SyncObjs> oneS_getSyncObjects = new Task<SyncObjs>(() => OneC_GetPersonsAndRelatedInfoForSync(settings));
             
             Task[] tasks = new Task[]
             {
                 new Task(() => Creatio_ClearSyncObjects()),
-                oneS_getPersonsInfo
+                oneS_getSyncObjects
             }.StartAndWaitForAll();
 
+            SyncObjs syncObjs = oneS_getSyncObjects.Result;
+            OneC_ShowPersonFullInfo(syncObjs.OneS_PersonsOrderedById.Values.Take(2));
+            syncObjs.OneS_PersonsOrderedById.Values.ForEach(person => Console.WriteLine(person.GetShortNameAndActualPositions()));
 
-            Dictionary<Guid, OneC.Person> personsWithEmailsOrderedById = oneS_getPersonsInfo.Result;
-            OneC_ShowPersonFullInfo(personsWithEmailsOrderedById.Values.Take(2));
-            personsWithEmailsOrderedById.Values.ForEach(person => Console.WriteLine(person.GetShortNameAndActualPositions()));
-
-            Creatio_EmployeesFirstSyncWithOneS(personsWithEmailsOrderedById, settings);
-
-
-            //Dictionary<Guid, ITIS.Contact> creatio_Contacts = Creatio_GetContactsAcordingToPersonEmail(personsWithEmailsOrderedById);
-            //var creatioContact = creatio_Contacts.Skip(1).FirstOrDefault().Value;
-            //Creatio_ShowContact(creatioContact);
+            Creatio_EmployeesFirstSyncWithOneS(syncObjs.OneS_PersonsOrderedById, settings);
         }
 
-
-        /// <summary> Получить из 1С физ. лица и всю связанную с ними информацию необходимою для синхронизации </summary>
-        public static Dictionary<Guid, OneC.Person> OneC_GetPersonsAndRelatedInfoForSync(SyncObjs syncObjs, SyncSettings settings)
-        {
-            settings ??= SyncSettings.GetDefaultSettings();
-            Dictionary<Guid, OneC.Person> personsWithEmailsOrderedById = OneC_GetPersonsWithSufficientEmail(settings, syncObjs);
-
-            Task[] tasks = new Task[]
-            {
-                new Task(() => OneC_GetContactInfoAndBindWithPersons(syncObjs, settings)),
-                new Task(() => OneC_GetNamesAndBindWithPersons(syncObjs)),
-                new Task(() => OneC_GetEmployeesAndBindWithPersons(syncObjs)),
-            }.StartAndWaitForAll();
-            //
-            return personsWithEmailsOrderedById;
-        }
 
         /// <summary> Удалить из Creatio все синхронизированные ранее объекты </summary>
         public static void Creatio_ClearSyncObjects()
@@ -211,6 +188,20 @@ namespace App
     /// <summary> Получение из 1C структур данных связанных с физлицами, сотрудниками и контактной информацией </summary>
     public partial class Program
     {
+        /// <summary> Получить из 1С физ. лица и всю связанную с ними информацию необходимою для синхронизации </summary>
+        public static SyncObjs OneC_GetPersonsAndRelatedInfoForSync(SyncSettings settings)
+        {
+            SyncObjs syncObjs = new SyncObjs();
+            OneC_GetPersonsWithSufficientEmail(settings, syncObjs);
+            Task[] tasks = new Task[]
+            {
+                new Task(() => OneC_GetContactInfoAndBindWithPersons(syncObjs, settings)),
+                new Task(() => OneC_GetNamesAndBindWithPersons(syncObjs)),
+                new Task(() => OneC_GetEmployeesAndBindWithPersons(syncObjs)),
+            }.StartAndWaitForAll();
+            return syncObjs;
+        }
+
         /// <summary> Показать всю информацию по физ.лицу </summary>
         public static void OneC_ShowPersonFullInfo(IEnumerable<OneC.Person> persons)
         {
@@ -264,7 +255,7 @@ namespace App
             syncObjs.OneS_ContactInfosGroupedByPersonId = OneCHttpClient
                 .GetObjsByIds<OneC.IRContactInfo>(syncObjs.OneS_PersonsOrderedById.Keys, "cast(Объект, 'Catalog_ФизическиеЛица')")
                 .GroupToDictionaryBy(x => new Guid(x.KeyObject));
-            OneC_GetAndBindContactInfoTypes(syncObjs.OneS_ContactInfosGroupedByPersonId);
+            OneC_GetAndBindContactInfoTypes(syncObjs);
             foreach(OneC.Person person in syncObjs.OneS_PersonsOrderedById.Values)
             {
                 List<OneC.IRContactInfo> contactInfoOfPerson = syncObjs.OneS_ContactInfosGroupedByPersonId[person.Id];
@@ -283,23 +274,21 @@ namespace App
         }
 
         /// <summary> Получить из 1С типы контактной информации и связать с контактной информацией </summary>
-        static void OneC_GetAndBindContactInfoTypes(Dictionary<Guid, List<OneC.IRContactInfo>> personIdAndContactInfos)
+        static void OneC_GetAndBindContactInfoTypes(SyncObjs syncObjs)
         {
-            Dictionary<Guid, OneC.ContactInfoType> contactInfoTypes;
-            {
-                HashSet<Guid> idsOfcontactInfoTypes = new HashSet<Guid>();
-                personIdAndContactInfos.ForEach(key => key.Value.ForEach(value => idsOfcontactInfoTypes.Add(new Guid(value.KeyKind))));
-                contactInfoTypes = OneCHttpClient.GetObjsByIds<OneC.ContactInfoType>(idsOfcontactInfoTypes).ToDictionary(k => k.Id);
-            }
-            personIdAndContactInfos.ForEach(key => key.Value.ForEach(value => value.RelatedObj_TypeOfContactInfo = contactInfoTypes[new Guid(value.KeyKind)]));
+            HashSet<Guid> idsOfcontactInfoTypes = new HashSet<Guid>();
+            syncObjs.OneS_ContactInfosGroupedByPersonId.ForEach(key => key.Value.ForEach(value => idsOfcontactInfoTypes.Add(new Guid(value.KeyKind))));
+            syncObjs.OneS_ContactInfoTypes = OneCHttpClient.GetObjsByIds<OneC.ContactInfoType>(idsOfcontactInfoTypes).ToDictionary(k => k.Id);
+            //
+            syncObjs.OneS_ContactInfosGroupedByPersonId.ForEach(key => key.Value.ForEach(value => value.RelatedObj_TypeOfContactInfo = syncObjs.OneS_ContactInfoTypes[new Guid(value.KeyKind)]));
         }
 
         /// <summary> Получить из 1С данные из инфо. регистра InformationRegister_ФИОФизЛиц и связываем з физлицами </summary>
         public static void OneC_GetNamesAndBindWithPersons(SyncObjs syncObjs)
         {
-            List<OneC.IRNamesOfPersons> namesOfPersons = OneCHttpClient
+            syncObjs.OneS_NamesOfPersons = OneCHttpClient
                 .GetObjsByIds<OneC.IRNamesOfPersons>(syncObjs.OneS_PersonsOrderedById.Keys, "cast(ФизЛицо, 'Catalog_ФизическиеЛица')");
-            foreach (var personName in namesOfPersons)
+            foreach (var personName in syncObjs.OneS_NamesOfPersons)
                 syncObjs.OneS_PersonsOrderedById[personName.KeyPerson].RelatedObj_NameInfo = personName;
         }
 
@@ -307,67 +296,65 @@ namespace App
         public static void OneC_GetEmployeesAndBindWithPersons(SyncObjs syncObjs)
         {
             // Связать сотрудников с физ. лицами
-            List<OneC.Employee> employeesWithEmails = OneCHttpClient.GetObjsByIds<OneC.Employee>(syncObjs.OneS_PersonsOrderedById.Keys, "Физлицо_Key");
-            employeesWithEmails.ForEach(employee => employee.NavProp_Person = syncObjs.OneS_PersonsOrderedById[(Guid)employee.PersonId]);
+            syncObjs.OneS_Employees = OneCHttpClient.GetObjsByIds<OneC.Employee>(syncObjs.OneS_PersonsOrderedById.Keys, "Физлицо_Key");
+            syncObjs.OneS_Employees.ForEach(employee => employee.NavProp_Person = syncObjs.OneS_PersonsOrderedById[(Guid)employee.PersonId]);
 
             // Связать физ. лиц с сотрудниками
-            employeesWithEmails.ForEach(employee => syncObjs.OneS_PersonsOrderedById[(Guid)employee.PersonId].RelatedObjs_RelatedEmployeePositions.Add(employee));
+            syncObjs.OneS_Employees.ForEach(employee => syncObjs.OneS_PersonsOrderedById[(Guid)employee.PersonId].RelatedObjs_RelatedEmployeePositions.Add(employee));
 
             Task[] tasks = new Task[]
             {
-                new Task(() => OneC_GetPositionsAndBindWithEmployees(employeesWithEmails)),
-                new Task(() => OneC_GetOrganizationsAndBindWithEmployees(employeesWithEmails)),
-                new Task(() => OneC_GetSubdivisionsAndBindWithEmployees(employeesWithEmails))
+                new Task(() => OneC_GetPositionsAndBindWithEmployees(syncObjs)),
+                new Task(() => OneC_GetOrganizationsAndBindWithEmployees(syncObjs)),
+                new Task(() => OneC_GetSubdivisionsAndBindWithEmployees(syncObjs))
             }.StartAndWaitForAll();
         }
 
         /// <summary> Получить из 1С должности и связать их с сотрудниками </summary>
-        static void OneC_GetPositionsAndBindWithEmployees(List<OneC.Employee> employeesWithEmails)
+        static void OneC_GetPositionsAndBindWithEmployees(SyncObjs syncObjs)
         {
-            Dictionary<Guid, OneC.PositionInOrganization> positions = null;
+            syncObjs.OneS_Positions = null;
             {
-                List<Guid> listOfpositions = employeesWithEmails.DistinctValuesExcluding(default(Guid), x => x.PositionId).Cast<Guid>().ToList();
-                listOfpositions.AddRange(employeesWithEmails.DistinctValuesExcluding(default(Guid), x => x.CurrentCompanyPositionId).Cast<Guid>());
-                listOfpositions.AddRange(employeesWithEmails.DistinctValuesExcluding(default(Guid), x => x.CurrentPositionInOrganizationId).Cast<Guid>());
-                positions = OneCHttpClient.GetObjsByIds<OneC.PositionInOrganization>(listOfpositions.DistinctValuesExcluding(default(Guid), x => x).Cast<Guid>())
+                List<Guid> listOfpositions = syncObjs.OneS_Employees.DistinctValuesExcluding(default(Guid), x => x.PositionId).Cast<Guid>().ToList();
+                listOfpositions.AddRange(syncObjs.OneS_Employees.DistinctValuesExcluding(default(Guid), x => x.CurrentCompanyPositionId).Cast<Guid>());
+                listOfpositions.AddRange(syncObjs.OneS_Employees.DistinctValuesExcluding(default(Guid), x => x.CurrentPositionInOrganizationId).Cast<Guid>());
+                syncObjs.OneS_Positions = OneCHttpClient.GetObjsByIds<OneC.PositionInOrganization>(listOfpositions.DistinctValuesExcluding(default(Guid), x => x).Cast<Guid>())
                     .ToDictionary(k => k.Id);
             }
-            foreach (var employee in employeesWithEmails)
+            foreach (var employee in syncObjs.OneS_Employees)
             {
 
                 if (employee.PositionId.IsNotNullOrDefault())
-                    employee.NavProp_Position = positions[(Guid)employee.PositionId];
+                    employee.NavProp_Position = syncObjs.OneS_Positions[(Guid)employee.PositionId];
                 if (employee.CurrentCompanyPositionId.IsNotNullOrDefault())
-                    employee.NavProp_CurrentCompanyPosition = positions[(Guid)employee.CurrentCompanyPositionId];
+                    employee.NavProp_CurrentCompanyPosition = syncObjs.OneS_Positions[(Guid)employee.CurrentCompanyPositionId];
                 if (employee.CurrentPositionInOrganizationId.IsNotNullOrDefault())
-                    employee.NavProp_CurrentPositionInOrganization = positions[(Guid)employee.CurrentPositionInOrganizationId];
+                    employee.NavProp_CurrentPositionInOrganization = syncObjs.OneS_Positions[(Guid)employee.CurrentPositionInOrganizationId];
             }
         }
 
         /// <summary> Получить из 1С организации и связать их с сотрудниками </summary>
-        static void OneC_GetOrganizationsAndBindWithEmployees(List<OneC.Employee> employeesWithEmails)
+        static void OneC_GetOrganizationsAndBindWithEmployees(SyncObjs syncObjs)
         {
-            Dictionary<Guid, OneC.Organization> organizations = OneCHttpClient.GetObjs<OneC.Organization>().ToDictionary(k => k.Id);
-            foreach (var employee in employeesWithEmails)
-            {
+            syncObjs.OneS_Organizations = OneCHttpClient.GetObjs<OneC.Organization>().ToDictionary(k => k.Id);
+            foreach (var employee in syncObjs.OneS_Employees)
                 if (employee.OrganizationId.IsNotNullOrDefault())
-                    employee.NavProp_Organization = organizations[(Guid)employee.OrganizationId];
-            }
+                    employee.NavProp_Organization = syncObjs.OneS_Organizations[(Guid)employee.OrganizationId];
         }
 
         /// <summary> Получить из 1С подразделения и связать их с сотрудниками </summary>
-        static void OneC_GetSubdivisionsAndBindWithEmployees(List<OneC.Employee> employeesWithEmails)
+        static void OneC_GetSubdivisionsAndBindWithEmployees(SyncObjs syncObjs)
         {
 
-            List<Guid> subdivisionIds = employeesWithEmails.DistinctValuesExcluding(default(Guid), x => x.OrganizationSubdivisionId).Cast<Guid>().ToList();
-            subdivisionIds.AddRange(employeesWithEmails.DistinctValuesExcluding(default(Guid), x => x.CurrentOrganizationSubdivisionId).Cast<Guid>());
-            Dictionary<Guid, OneC.OrganizationSubdivision> subdivisions = OneCHttpClient.GetObjsByIds<OneC.OrganizationSubdivision>(subdivisionIds).ToDictionary(k => k.Id);
-            foreach (var employee in employeesWithEmails)
+            List<Guid> subdivisionIds = syncObjs.OneS_Employees.DistinctValuesExcluding(default(Guid), x => x.OrganizationSubdivisionId).Cast<Guid>().ToList();
+            subdivisionIds.AddRange(syncObjs.OneS_Employees.DistinctValuesExcluding(default(Guid), x => x.CurrentOrganizationSubdivisionId).Cast<Guid>());
+            syncObjs.OneS_Subdivisions = OneCHttpClient.GetObjsByIds<OneC.OrganizationSubdivision>(subdivisionIds).ToDictionary(k => k.Id);
+            foreach (var employee in syncObjs.OneS_Employees)
             {
                 if (employee.OrganizationSubdivisionId.IsNotNullOrDefault())
-                    employee.NavProp_OrganizationSubdivision = subdivisions[(Guid)employee.OrganizationSubdivisionId];
+                    employee.NavProp_OrganizationSubdivision = syncObjs.OneS_Subdivisions[(Guid)employee.OrganizationSubdivisionId];
                 if (employee.CurrentOrganizationSubdivisionId.IsNotNullOrDefault())
-                    employee.NavProp_CurrentOrganizationSubdivision = subdivisions[(Guid)employee.CurrentOrganizationSubdivisionId];
+                    employee.NavProp_CurrentOrganizationSubdivision = syncObjs.OneS_Subdivisions[(Guid)employee.CurrentOrganizationSubdivisionId];
             }
         }
     }

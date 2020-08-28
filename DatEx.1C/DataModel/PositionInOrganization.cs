@@ -8,7 +8,7 @@ namespace DatEx.OneC.DataModel
     using System.Text;
 
     [OneC("Catalog_ДолжностиОрганизаций", "Catalog_ДолжностиОрганизаций", "Справочник.ДолжностиОрганизаций", "Справочник.ДолжностиОрганизаций")]
-    [JsonObject()]
+    [JsonObject("ДолжностиОрганизаций")]
     public class PositionInOrganization : OneCBaseLookup
     {
         [OneC("Boolean?", "АУП", "Булево", "АУП")]
