@@ -10,6 +10,8 @@ namespace App
     /// <summary> Временные объекты, используемые на протяжении синхронизации </summary>
     public class SyncObjs
     {
+        #region ■■■■■ Объекты из 1C ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
         /// <summary> 1C Физ. лица упорядоченные по Id </summary>
         public Dictionary<Guid, OneC.Person> OneS_PersonsOrderedById { get; set; } = new Dictionary<Guid, OneC.Person>();
 
@@ -33,5 +35,21 @@ namespace App
 
         /// <summary> 1С даные из справочника ДолжностиОрганизаций </summary>
         public Dictionary<Guid, OneC.PositionInOrganization> OneS_Positions = new Dictionary<Guid, OneC.PositionInOrganization>();
+
+        #endregion ■■■■■ Объекты из 1C
+
+        #region ■■■■■ Объекты из Creatio ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+        public Dictionary<Guid, ITIS.Job> Creatio_Jobs_ByOneSId = new Dictionary<Guid, ITIS.Job>();
+        public Dictionary<Guid, ITIS.Job> Creatio_Jobs_ByCreatioId = new Dictionary<Guid, ITIS.Job>();
+
+        public Dictionary<Guid, ITIS.ContactCareer> Creatio_ContactCareers = new Dictionary<Guid, ITIS.ContactCareer>();
+
+        public Dictionary<Guid, ITIS.EmployeeJob> Creatio_EmployeeJobs_ByOneSId = new Dictionary<Guid, ITIS.EmployeeJob>();
+        public Dictionary<Guid, ITIS.EmployeeJob> Creatio_EmployeeJobs_ByCreatioId = new Dictionary<Guid, ITIS.EmployeeJob>();
+
+        public Dictionary<Guid, ITIS.EmployeeCareer> Creatio_EmployeeCareers = new Dictionary<Guid, ITIS.EmployeeCareer>();
+
+        #endregion ■■■■■ Объекты из 1C
     }
 }

@@ -34,7 +34,7 @@ namespace App
             OneC_ShowPersonFullInfo(syncObjs.OneS_PersonsOrderedById.Values.Take(2));
             syncObjs.OneS_PersonsOrderedById.Values.ForEach(person => Console.WriteLine(person.GetShortNameAndActualPositions()));
 
-            Creatio_EmployeesFirstSyncWithOneS(syncObjs.OneS_PersonsOrderedById, settings);
+            Creatio_EmployeesFirstSyncWithOneS(syncObjs, settings);
         }
 
 
@@ -53,7 +53,9 @@ namespace App
             employeeJobs.ForEach(x => CreatioHttpClient.DeleteObj(x));
         }
 
-        public static void Creatio_EmployeesFirstSyncWithOneS(Dictionary<Guid, OneC.Person> persons, SyncSettings settings)
+
+
+        public static void Creatio_EmployeesFirstSyncWithOneS(SyncObjs syncObjs, SyncSettings settings)
         {
             HashSet<Guid> contactIds = new HashSet<Guid>();
             List<ITIS.Contact> contacts = new List<Contact>();
@@ -74,24 +76,69 @@ namespace App
             contactIds.Clear();
             contacts.Clear();
 
-            SyncObjs temp = Creatio_PrepareSync(persons, settings);
+            Creatio_FirstSyncOfEmployeesInfo(syncObjs, settings);
 
-            foreach (Person p in persons.Values)
+            foreach (Person p in syncObjs.OneS_PersonsOrderedById.Values)
             {
-                ITIS.Contact c = Creatio_FirstSyncOfEmployeesInfo(p, settings, temp);
+                ITIS.Contact c = Creatio_FirstSyncOfEmployeesInfo(p, settings, syncObjs);
                 contactIds.Add((Guid)c.Id);
             }
             contacts = Creatio_GetCreatedContactsAndRelatedInfo(contactIds).Values.ToList();
             contacts.ForEach(x => Creatio_ShowContact(x));
         }
 
-        private static SyncObjs Creatio_PrepareSync(Dictionary<Guid, OneC.Person> persons, SyncSettings settings)
+        private static void Creatio_FirstSyncOfEmployeesInfo(SyncObjs syncObjs, SyncSettings settings)
         {
-            SyncObjs t = new SyncObjs();
+            Creatio_EmployeesInfo_MapObjectsFromOneSToObjectsFromCreatio(syncObjs, settings);
+        }
 
-            
+        private static void Creatio_EmployeesInfo_MapObjectsFromOneSToObjectsFromCreatio(SyncObjs syncObjs, SyncSettings settings)
+        {
+            Cratio_MapObj_Job(syncObjs, settings);
+            Creatio_MapObj_EmployeeJob(syncObjs, settings);
+            Creatio_MapObj_OrgStructureUnit(syncObjs, settings);
+        }
 
-            return t;
+        private static void Cratio_MapObj_Job(SyncObjs syncObjs, SyncSettings settings)
+        {
+            foreach(var x in syncObjs.OneS_Positions.Values)
+            {
+                if(syncObjs.Creatio_Jobs_ByOneSId.ContainsKey(x.Id)) continue;
+                ITIS.Job c = new Job();
+                //
+                c.ITISOneSId = x.Id;
+                c.Name = x.Description;
+                //
+                c = CreatioHttpClient.CreateObj(c);
+                syncObjs.Creatio_Jobs_ByOneSId.Add(c.ITISOneSId, c);
+                syncObjs.Creatio_Jobs_ByCreatioId.Add((Guid)c.Id, c);
+            }
+        }
+
+        private static void Creatio_MapObj_EmployeeJob(SyncObjs syncObjs, SyncSettings settings)
+        {
+            foreach(var x in syncObjs.OneS_Positions.Values)
+            {
+                if(syncObjs.Creatio_EmployeeJobs_ByOneSId.ContainsKey(x.Id)) continue;
+                ITIS.EmployeeJob c = new EmployeeJob();
+                //
+                c.ITISOneSId = x.Id;
+                c.Name = x.Description;
+                //
+                c = CreatioHttpClient.CreateObj(c);
+                syncObjs.Creatio_EmployeeJobs_ByOneSId.Add(c.ITISOneSId, c);
+                syncObjs.Creatio_EmployeeJobs_ByCreatioId.Add((Guid)c.Id, c);
+            }
+        }
+
+        private static void Creatio_MapObj_OrgStructureUnit(SyncObjs syncObjs, SyncSettings settings)
+        {
+            foreach(var x in syncObjs.OneS_Organizations)
+            {
+                ITIS.OrgStructureUnit c = new OrgStructureUnit();
+                //
+                c.ITISOneSId = (Guid)x.Id;
+            }
         }
 
         private static ITIS.Contact Creatio_FirstSyncOfEmployeesInfo(Person p, SyncSettings settings, SyncObjs temp)
@@ -417,7 +464,7 @@ namespace App
             contact?.ITISOrganizationSubdivision?.Show(1, showMapingsOrRemarks);
             contact?.Account?.Show(1, showMapingsOrRemarks);
             contact?.Type?.Show(1, showMapingsOrRemarks);
-            contact?.Job?.Show(1, showMapingsOrRemarks);
+            (contact?.Job as ITIS.Job)?.Show(1, showMapingsOrRemarks);
             contact?.Department?.Show(1, showMapingsOrRemarks);
         }
 

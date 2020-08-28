@@ -4,8 +4,6 @@ namespace DatEx.OneC.DataModel
     using DatEx.OneC.DataModel.Auxilary;
     using Newtonsoft.Json;
     using System;
-    using System.Collections.Generic;
-    using System.Text;
 
     [OneC("Catalog_Организации", "Catalog_Организации", "Организации", "Организации")]
     [JsonObject("Catalog_Организации")]
