@@ -6,15 +6,15 @@ using Newtonsoft.Json;
 
 namespace DatEx.OneC.DataModel
 {
-    [OneC("Catalog_ВидыКонтактнойИнформации", "Catalog_ВидыКонтактнойИнформации", "ВидыКонтактнойИнформации", "ВидыКонтактнойИнформации")]
+    [OneS("Catalog_ВидыКонтактнойИнформации", "Catalog_ВидыКонтактнойИнформации", "ВидыКонтактнойИнформации", "ВидыКонтактнойИнформации")]
     [JsonObject("Catalog_ВидыКонтактнойИнформации")]
     public class ContactInfoType : OneCBaseLookup
     {
-        [OneC("String", "Тип", "Перечисление.ТипыКонтактнойИнформации", "Тип", Color = ConsoleColor.Yellow)]
+        [OneS("String", "Тип", "Перечисление.ТипыКонтактнойИнформации", "Тип", Color = ConsoleColor.Yellow)]
         [JsonProperty("Тип")]
         public String Type { get; set; }
 
-        [OneC("String", "ВидОбъектаКонтактнойИнформации", "Перечисление.ВидыОбъектовКонтактнойИнформации", "ВидОбъектаКонтактнойИнформации")]
+        [OneS("String", "ВидОбъектаКонтактнойИнформации", "Перечисление.ВидыОбъектовКонтактнойИнформации", "ВидОбъектаКонтактнойИнформации")]
         [JsonProperty("ВидОбъектаКонтактнойИнформации")]
         public String KindOfContactInfoObject { get; set; }
 

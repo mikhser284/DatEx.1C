@@ -4,48 +4,48 @@
     using Newtonsoft.Json;
     using System;
 
-    [OneC("Catalog_ПодразделенияОрганизаций", "Catalog_ПодразделенияОрганизаций", "", "")]
+    [OneS("Catalog_ПодразделенияОрганизаций", "Catalog_ПодразделенияОрганизаций", "Справочник.ПодразделенияОрганизаций", "Справочник.ПодразделенияОрганизаций")]
     [JsonObject("Catalog_ПодразделенияОрганизаций")]
     public class OrganizationSubdivision : OneCBaseLookup
     {
         /// <summary> Родитель </summary>
-        [OneC("Guid?", "Parent_Key", "-", "-")]
+        [OneS("Guid?", "Parent_Key", "-", "-")]
         [JsonProperty("Parent_Key")]
         public Guid? ParentId { get; set; }
 
-        [OneC("Guid?", "Owner_Key", "-", "-")]
+        [OneS("Guid?", "Owner_Key", "-", "-")]
         [JsonProperty("Owner_Key")]
         public Guid? OwnerId { get; set; }
 
-        [OneC("String", "ВидПодразделения", "Перечисление.ВидыПодразделений", "ВидПодразделения")]
+        [OneS("String", "ВидПодразделения", "Перечисление.ВидыПодразделений", "ВидПодразделения")]
         [JsonProperty("ВидПодразделения")]
         public String SubdivisionType { get; set; }
 
-        [OneC("Guid?", "НалоговоеНазначение_Key", "-", "-")]
+        [OneS("Guid?", "НалоговоеНазначение_Key", "-", "-")]
         [JsonProperty("НалоговоеНазначение_Key")]
         public Guid? TaxPurposeId { get; set; }
 
-        [OneC("?", "NavProp(НалоговоеНазначение)", "Справочник.НалоговыеНазначенияАктивовИЗатрат", "НалоговоеНазначение")]
+        [OneS("?", "NavProp(НалоговоеНазначение)", "Справочник.НалоговыеНазначенияАктивовИЗатрат", "НалоговоеНазначение")]
         [JsonIgnore]
         public Object NavProp_TaxPurpos { get; set; }
 
-        [OneC("Int64?", "Порядок", "Число", "Порядок")]
+        [OneS("Int64?", "Порядок", "Число", "Порядок")]
         [JsonProperty("Порядок")]
         public Int64? Order { get; set; }
 
-        [OneC("Guid?", "ИНАГРО_ВидДеятельности_Key", "-", "-")]
+        [OneS("Guid?", "ИНАГРО_ВидДеятельности_Key", "-", "-")]
         [JsonProperty("ИНАГРО_ВидДеятельности_Key")]
         public Guid? InagroActivityId { get; set; }
 
-        [OneC("?", "NavProp(ИНАГРО_ВидДеятельности)", "Справочник.ИНАГРО_ВидыДеятельности", "ИНАГРО_ВидДеятельности")]
+        [OneS("?", "NavProp(ИНАГРО_ВидДеятельности)", "Справочник.ИНАГРО_ВидыДеятельности", "ИНАГРО_ВидДеятельности")]
         [JsonIgnore]
         public Object NavProp_InagroActivity { get; set; }
 
-        [OneC("Guid?", "ИНАГРО_Подразделение_Key", "-", "-")]
+        [OneS("Guid?", "ИНАГРО_Подразделение_Key", "-", "-")]
         [JsonProperty("ИНАГРО_Подразделение_Key")]
         public Guid? InagroSubdivisionId { get; set; }
 
-        [OneC("?", "NavProp(ИНАГРО_Подразделение)", "Справочник.Подразделения", "ИНАГРО_Подразделение")]
+        [OneS("?", "NavProp(ИНАГРО_Подразделение)", "Справочник.Подразделения", "ИНАГРО_Подразделение")]
         [JsonIgnore]
         public Object NavProp_InagroSubdivision { get; set; }
         

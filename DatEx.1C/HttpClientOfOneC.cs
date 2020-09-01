@@ -35,9 +35,9 @@ namespace DatEx.OneC
         public List<Guid> GetIdsOfObjs<T>(String query = null, String nameOfGuidFieldToSelect = "Ref_Key") where T : OneCObject
         {
             String typeName = TypesMap[typeof(T)];
-            String separator = !String.IsNullOrEmpty(query) ? "&" : "";
-            String fullQuery = $"{typeName}/?{query}{separator}$select={nameOfGuidFieldToSelect}&{AsJson}";
-            HttpResponseMessage response = HttpClient.GetAsync(fullQuery).Result;
+            String separator = !String.IsNullOrEmpty(query) ? " &" : "";
+            String queryString = $"{typeName}/?{query}{separator}$select={nameOfGuidFieldToSelect} &{AsJson}";
+            HttpResponseMessage response = HttpClient.GetAsync(queryString).Result;
             response.EnsureSuccessStatusCode();
             String result = response.Content.ReadAsStringAsync().Result;
 #if DEBUG
@@ -106,11 +106,13 @@ namespace DatEx.OneC
 
         private static readonly Dictionary<Type, String> TypesMap = new Dictionary<Type, String>
         {
+            { typeof(IRNamesOfPersons), "InformationRegister_ФИОФизЛиц" },
+            { typeof(IRContactInfo), "InformationRegister_КонтактнаяИнформация" },
+            { typeof(IROwnContracror), "InformationRegister_СобственныеКонтрагенты" },
+            //
             { typeof(Contractor), "Catalog_Контрагенты" },
             { typeof(Employee), "Catalog_СотрудникиОрганизаций" },
             { typeof(Person), "Catalog_ФизическиеЛица" },
-            { typeof(IRNamesOfPersons), "InformationRegister_ФИОФизЛиц" },
-            { typeof(IRContactInfo), "InformationRegister_КонтактнаяИнформация" },
             { typeof(ContactInfoType), "Catalog_ВидыКонтактнойИнформации" },
             { typeof(Organization), "Catalog_Организации" },
             { typeof(OrganizationSubdivision), "Catalog_ПодразделенияОрганизаций" },

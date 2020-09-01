@@ -12,22 +12,26 @@ using System.Collections.Concurrent;
 
 namespace App
 {
+    [System.Runtime.InteropServices.Guid("D4741F7B-5AA3-470B-A935-B26494017ED3")]
     partial class Program
     {
-        private static HttpClientOfCreatio CreatioHttpClient = 
+        private static HttpClientOfCreatio HttpClientOfCreatio = 
             HttpClientOfCreatio.LogIn("http://185.59.101.152:51080/", "Supervisor", "Supervisor"); // Creatio-Dev1
             //HttpClientOfCreatio.LogIn("http://185.59.101.152:50080/", "Supervisor", "Supervisor"); // Creatio-Dev3
-        public static HttpClientOfOneC OneCHttpClient =
+        public static HttpClientOfOneC HttpClientOfOneS =
             new HttpClientOfOneC(new HttpClientOfOneCSettings("http://185.59.101.152:51081/Dev01_1C/odata/standard.odata/", "Администратор", "")); // Creatio-Dev1
-                                                                                                                                                   //new HttpClientOfOneC(new HttpClientOfOneCSettings("http://185.59.101.152:50081/Dev03_1C/odata/standard.odata/", "Администратор", "")); // Creatio-Dev3
+            //new HttpClientOfOneC(new HttpClientOfOneCSettings("http://185.59.101.152:50081/Dev03_1C/odata/standard.odata/", "Администратор", "")); // Creatio-Dev3
 
 
         static void Main(string[] args)
         {
             SyncSettings settings = SyncSettings.GetDefaultSettings();
+
+            
+
             SyncEmployees(settings);
-
-
         }
+
+        
     }
 }

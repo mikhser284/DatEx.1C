@@ -9,11 +9,13 @@
     public class Account : BaseEntity
     {
         /// <summary> Название </summary>
+        [JsonProperty("Name", Order = 2)]
         [CreatioProp("Название", Color = ConsoleColor.Yellow)]
         public String Name { get; set; }
 
         /// <summary> Ответственный (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
+        [JsonProperty("OwnerId", Order = 3)]
         [CreatioProp("Ответственный (Id)")]
         public Guid? OwnerId { get; set; }
 
@@ -24,8 +26,9 @@
 
         /// <summary> Форма собственности (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
+        [JsonProperty("OwnershipId", Order = 9)]
         [CreatioProp("Форма собственности (Id)", Color = ConsoleColor.Blue)]
-        public Guid OwnershipId { get; set; }
+        public Guid? OwnershipId { get; set; }
 
         /// <summary> Форма собственности </summary>
         [Map]
@@ -35,8 +38,9 @@
 
         /// <summary> Основной контакт (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
+        [JsonProperty("PrimaryContactId", Order = 10)]
         [CreatioProp("Основной контакт (Id)")]
-        public Guid PrimaryContactId { get; set; }
+        public Guid? PrimaryContactId { get; set; }
 
         /// <summary> Основной контакт </summary>
         [JsonIgnoreSerialization]
@@ -46,7 +50,7 @@
         /// <summary> Родительский контрагент (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Родительский контрагент (Id)", Color = ConsoleColor.Blue)]
-        public Guid ParentId { get; set; }
+        public Guid? ParentId { get; set; }
 
         /// <summary> Родительский контрагент </summary>
         [JsonIgnoreSerialization]
@@ -56,7 +60,7 @@
         /// <summary> Отрасль (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Отрасль (Id)")]
-        public Guid IndustryId { get; set; }
+        public Guid? IndustryId { get; set; }
 
         /// <summary> Отрасль </summary>
         [JsonIgnoreSerialization]
@@ -69,8 +73,10 @@
 
         /// <summary> Тип (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
+        [MapRemarks("Значение может браться из объекта настроек, когда это наша компания")]
+        [Map(true)]
         [CreatioProp("Тип (Id)", Color = ConsoleColor.Blue)]
-        public Guid TypeId { get; set; }
+        public Guid? TypeId { get; set; }
 
         /// <summary> Тип </summary>
         [Map]
@@ -84,7 +90,7 @@
 
         /// <summary> Дополнительный телефон </summary>
         [CreatioProp("Дополнительный телефон")]
-        public String AdditionalProne { get; set; }
+        public String AdditionalPhone { get; set; }
 
         /// <summary> Факс </summary>
         [CreatioProp("Факс")]
@@ -97,7 +103,7 @@
         /// <summary> Тип адреса (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Тип адреса (Id)")]
-        public Guid AddressTypeId { get; set; }
+        public Guid? AddressTypeId { get; set; }
 
         /// <summary> Тип адреса </summary>
         [JsonIgnoreSerialization]
@@ -111,7 +117,7 @@
         /// <summary> Город (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Город (Id)")]
-        public Guid CityId { get; set; }
+        public Guid? CityId { get; set; }
 
         /// <summary> Город </summary>
         [JsonIgnoreSerialization]
@@ -121,7 +127,7 @@
         /// <summary> Область/штат (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Область/штат (Id)")]
-        public Guid RegionId { get; set; }
+        public Guid? RegionId { get; set; }
 
         /// <summary> Область/штат </summary>
         [JsonIgnoreSerialization]
@@ -135,7 +141,7 @@
         /// <summary> Страна (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Страна (Id)")]
-        public Guid CountryId { get; set; }
+        public Guid? CountryId { get; set; }
 
         /// <summary> Страна </summary>
         [JsonIgnoreSerialization]
@@ -145,7 +151,7 @@
         /// <summary> Категория (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Категория (Id)")]
-        public Guid AccountCategoryId { get; set; }
+        public Guid? AccountCategoryId { get; set; }
 
         /// <summary> Категория </summary>
         [JsonIgnoreSerialization]
@@ -155,7 +161,7 @@
         /// <summary> Количество сотрудников (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Количество сотрудников (Id)")]
-        public Guid EmployeesNumberId { get; set; }
+        public Guid? EmployeesNumberId { get; set; }
 
         /// <summary> Количество сотрудников </summary>
         [CreatioProp("Количество сотрудников")]
@@ -165,7 +171,7 @@
         /// <summary> Годовой оборот (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Годовой оборот (Id)")]
-        public Guid AnnualRevenueId { get; set; }
+        public Guid? AnnualRevenueId { get; set; }
 
         /// <summary> Годовой оборот </summary>
         [JsonIgnoreSerialization]
@@ -177,7 +183,7 @@
         public String Notes { get; set; }
 
         /// <summary> Альтернативное название </summary>
-        [Map]
+        [Map(true, DataType.Lookup, "Catalog_Организации", DataType.String, "Наименование")]
         [CreatioProp("Альтернативное название", Color = ConsoleColor.Yellow)]
         public String AlternativeName { get; set; }
 
@@ -197,7 +203,7 @@
         /// <summary> Логотип контрагента (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Логотип контрагента (Id)")]
-        public Guid AccountLogoId { get; set; }
+        public Guid? AccountLogoId { get; set; }
 
         /// <summary> Логотип контрагента </summary>
         [JsonIgnoreSerialization]
@@ -209,7 +215,7 @@
         [CreatioProp("ИНН", Color = ConsoleColor.Yellow)]
         public String INN { get; set; }
 
-        /// <summary> КПП </summary>
+        /// <summary> ЕДРПОУ </summary>
         [Map]
         [CreatioProp("ЕДРПОУ", Color = ConsoleColor.Yellow)]
         public String KPP { get; set; }

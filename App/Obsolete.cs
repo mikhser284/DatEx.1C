@@ -16,36 +16,36 @@ namespace App
     {
         public static void CreatioGetEmployees()
         {
-            List<ITIS.Employee> contacts = CreatioHttpClient.GetObjs<ITIS.Employee>();
+            List<ITIS.Employee> contacts = HttpClientOfCreatio.GetObjs<ITIS.Employee>();
             ITIS.Employee mZorin = contacts.FirstOrDefault(x => x.ITISSurName.Contains("Зорін"));
         }
 
         public static void ShowIRContactInfo()
         {
             Console.WriteLine("————— #1 ————————————————————");
-            OneCHttpClient.GetObjs<OneC.IRContactInfo>("$filter=cast(Объект, 'Catalog_ФизическиеЛица') eq guid'23d75280-5b29-11e7-80cb-00155d65b717'")
+            HttpClientOfOneS.GetObjs<OneC.IRContactInfo>("$filter=cast(Объект, 'Catalog_ФизическиеЛица') eq guid'23d75280-5b29-11e7-80cb-00155d65b717'")
                 .ShowOneCObjects();
 
             Console.WriteLine("————— #1a ————————————————————");
-            OneCHttpClient.GetObjs<OneC.IRContactInfo>("$filter=Объект_Type eq 'StandardODATA.Catalog_ФизическиеЛица' and cast(Вид, 'Catalog_ВидыКонтактнойИнформации') eq guid'6b1ae98e-bb91-11ea-80c7-00155d65b747'")
+            HttpClientOfOneS.GetObjs<OneC.IRContactInfo>("$filter=Объект_Type eq 'StandardODATA.Catalog_ФизическиеЛица' and cast(Вид, 'Catalog_ВидыКонтактнойИнформации') eq guid'6b1ae98e-bb91-11ea-80c7-00155d65b747'")
                 .ShowOneCObjects();
 
             Console.WriteLine("————— #2 ————————————————————");
-            OneCHttpClient.GetObjs<OneC.ContactInfoType>("$filter=Ref_Key eq guid'08188400-bb94-11ea-80c7-00155d65b747'").ShowOneCObjects();
-            OneCHttpClient.GetObjs<OneC.ContactInfoType>("$filter=Ref_Key eq guid'f1862c22-bb94-11ea-80c7-00155d65b747'").ShowOneCObjects();
-            OneCHttpClient.GetObjs<OneC.ContactInfoType>("$filter=Ref_Key eq guid'6b1ae98e-bb91-11ea-80c7-00155d65b747'").ShowOneCObjects();
+            HttpClientOfOneS.GetObjs<OneC.ContactInfoType>("$filter=Ref_Key eq guid'08188400-bb94-11ea-80c7-00155d65b747'").ShowOneCObjects();
+            HttpClientOfOneS.GetObjs<OneC.ContactInfoType>("$filter=Ref_Key eq guid'f1862c22-bb94-11ea-80c7-00155d65b747'").ShowOneCObjects();
+            HttpClientOfOneS.GetObjs<OneC.ContactInfoType>("$filter=Ref_Key eq guid'6b1ae98e-bb91-11ea-80c7-00155d65b747'").ShowOneCObjects();
 
             Console.WriteLine("————— #3 ————————————————————");
-            OneCHttpClient.GetObjs<OneC.Person>("$top=20&$filter=Ref_Key eq guid'23d75280-5b29-11e7-80cb-00155d65b717'")
+            HttpClientOfOneS.GetObjs<OneC.Person>("$top=20&$filter=Ref_Key eq guid'23d75280-5b29-11e7-80cb-00155d65b717'")
                 .ShowOneCObjects();
 
             Console.WriteLine("————— #4 ————————————————————");
             //OneCHttpClient.GetObjs<OneC.IRNamesOfPersons>("$top=20&$filter=ФизЛицо_Type eq 'StandardODATA.Catalog_ФизическиеЛица' and ФизЛицо like '23d75280-5b29-11e7-80cb-00155d65b717'")
-            OneCHttpClient.GetObjs<OneC.IRNamesOfPersons>("$top=20&$filter=cast(ФизЛицо, 'Catalog_ФизическиеЛица') eq guid'23d75280-5b29-11e7-80cb-00155d65b717'")
+            HttpClientOfOneS.GetObjs<OneC.IRNamesOfPersons>("$top=20&$filter=cast(ФизЛицо, 'Catalog_ФизическиеЛица') eq guid'23d75280-5b29-11e7-80cb-00155d65b717'")
                 .ShowOneCObjects();
 
             Console.WriteLine("————— #5 ————————————————————");
-            OneCHttpClient.GetObjs<OneC.Employee>("$top=20&$filter=Физлицо_Key eq guid'23d75280-5b29-11e7-80cb-00155d65b717'")
+            HttpClientOfOneS.GetObjs<OneC.Employee>("$top=20&$filter=Физлицо_Key eq guid'23d75280-5b29-11e7-80cb-00155d65b717'")
                 .ShowOneCObjects();
 
 
@@ -57,7 +57,7 @@ namespace App
 
         public static void ShowEmployees()
         {
-            List<Guid> ids = OneCHttpClient.GetIdsOfObjs<OneC.Employee>();
+            List<Guid> ids = HttpClientOfOneS.GetIdsOfObjs<OneC.Employee>();
 
             ConsoleKeyInfo input;
             Int32 index = 0;
@@ -68,7 +68,7 @@ namespace App
                 Console.WriteLine($"Index: {index,4}; Count: {count,4}\n\n");
                 List<Guid> idsPage = ids.GetRange(index, count);
                 //ClientOf1C.GetEmployeesByIds(idsPage).ShowOneCObjects();
-                OneCHttpClient.GetObjsByIds<OneC.Employee>(new Guid("f9e7b11f-609a-11e7-80cb-00155d65b717")).ShowOneCObjects();
+                HttpClientOfOneS.GetObjsByIds<OneC.Employee>(new Guid("f9e7b11f-609a-11e7-80cb-00155d65b717")).ShowOneCObjects();
                 //ClientOf1C.GetEmployeesLike("Зорін").ShowOneCObjects();
                 input = Console.ReadKey();
                 index += count;
@@ -77,7 +77,7 @@ namespace App
 
         public static void ShowContractors()
         {
-            List<Guid> ids = OneCHttpClient.GetIdsOfObjs<OneC.Contractor>();
+            List<Guid> ids = HttpClientOfOneS.GetIdsOfObjs<OneC.Contractor>();
 
             ConsoleKeyInfo input;
             Int32 index = 0;
@@ -87,7 +87,7 @@ namespace App
                 Console.Clear();
                 Console.WriteLine($"Index: {index,4}; Count: {count,4}\n\n");
                 List<Guid> idsPage = ids.GetRange(index, count);
-                OneCHttpClient.GetObjsByIds<OneC.Contractor>(idsPage).ShowOneCObjects();
+                HttpClientOfOneS.GetObjsByIds<OneC.Contractor>(idsPage).ShowOneCObjects();
                 input = Console.ReadKey();
                 index += count;
             } while (input.Key != ConsoleKey.Escape);
@@ -95,7 +95,7 @@ namespace App
 
         public static void GetContractorByCodesOfEdrpo()
         {
-            OneCHttpClient.GetContractorsByCodeOfEdrpo("40623794").ShowOneCObjects();
+            HttpClientOfOneS.GetContractorsByCodeOfEdrpo("40623794").ShowOneCObjects();
         }
 
         public static void GetContractorsByCodesOfEdrpo()
@@ -108,12 +108,12 @@ namespace App
                 "37630010",
                 "40792278"
             };
-            OneCHttpClient.GetContractorsByCodeOfEdrpo(codesOfEdrpo).ShowOneCObjects();
+            HttpClientOfOneS.GetContractorsByCodeOfEdrpo(codesOfEdrpo).ShowOneCObjects();
         }
 
         public static void GetContractorsByIdentifier()
         {
-            OneCHttpClient.GetObjsByIds<OneC.Contractor>(new Guid("848b5acf-83ed-11e6-80ba-00155d65b717")).ShowOneCObjects();
+            HttpClientOfOneS.GetObjsByIds<OneC.Contractor>(new Guid("848b5acf-83ed-11e6-80ba-00155d65b717")).ShowOneCObjects();
         }
 
         public static void GetContractorsByIdentifiers()
@@ -126,7 +126,7 @@ namespace App
                 new Guid("3c2d8c7f-7670-11e6-80ba-00155d65b717"),
                 new Guid("86569aec-7f0d-11e6-80ba-00155d65b717"),
             };
-            OneCHttpClient.GetObjsByIds<OneC.Contractor>(identifiers).ShowOneCObjects();
+            HttpClientOfOneS.GetObjsByIds<OneC.Contractor>(identifiers).ShowOneCObjects();
         }
 
         // ————————————————————————————————————————————————————————————————————————————————————————————————————

@@ -7,59 +7,59 @@ namespace DatEx.OneC.DataModel
     using System.Collections.Generic;
     using System.Text;
 
-    [OneC("Catalog_ДолжностиОрганизаций", "Catalog_ДолжностиОрганизаций", "Справочник.ДолжностиОрганизаций", "Справочник.ДолжностиОрганизаций")]
+    [OneS("Catalog_ДолжностиОрганизаций", "Catalog_ДолжностиОрганизаций", "Справочник.ДолжностиОрганизаций", "Справочник.ДолжностиОрганизаций")]
     [JsonObject("ДолжностиОрганизаций")]
     public class PositionInOrganization : OneCBaseLookup
     {
-        [OneC("Boolean?", "АУП", "Булево", "АУП")]
+        [OneS("Boolean?", "АУП", "Булево", "АУП")]
         [JsonProperty("АУП")]
         public Boolean? IsAdministrativeOrManagementPersonnel { get; set; }
 
-        [OneC("Guid?", "Категория_Key", "-", "-")]
+        [OneS("Guid?", "Категория_Key", "-", "-")]
         [JsonProperty("Категория_Key")]
         public Guid? CategoryId { get; set; }
 
-        [OneC("?", "NavProp(Категория)", "Справочник.КатегорииДолжностей", "Категория")]
+        [OneS("?", "NavProp(Категория)", "Справочник.КатегорииДолжностей", "Категория")]
         [JsonIgnore]
         public Object NavProp_Category { get; set; }
 
-        [OneC("Guid?", "Должность_Key", "-", "-")]
+        [OneS("Guid?", "Должность_Key", "-", "-")]
         [JsonProperty("Должность_Key")]
         public Guid? PositionId { get; set; }
 
-        [OneC("?", "NavProp(Должность)", "Справочник.Должности", "Должность")]
+        [OneS("?", "NavProp(Должность)", "Справочник.Должности", "Должность")]
         [JsonIgnore]
         public Object NavProp_Position { get; set; }
 
-        [OneC("String", "КодКП", "Строка", "КодКП")]
+        [OneS("String", "КодКП", "Строка", "КодКП")]
         [JsonProperty("КодКП")]
         public String Prop { get; set; }
 
-        [OneC("Boolean", "Шахтеры", "Булево", "Шахтеры")]
+        [OneS("Boolean", "Шахтеры", "Булево", "Шахтеры")]
         [JsonProperty("")]
         public Boolean Miners { get; set; }
 
-        [OneC("String", "НаименованиеПоКП", "Строка", "НаименованиеПоКП")]
+        [OneS("String", "НаименованиеПоКП", "Строка", "НаименованиеПоКП")]
         [JsonProperty("НаименованиеПоКП")]
         public String NameByProffessionsClasifier { get; set; }
 
-        [OneC("String", "КодЗКППТР", "Строка", "КодЗКППТР")]
+        [OneS("String", "КодЗКППТР", "Строка", "КодЗКППТР")]
         [JsonProperty("КодЗКППТР")]
         public String CodeByZKPPTR { get; set; }
 
-        [OneC("Boolean", "Кусто_Водители", "Булево", "Кусто_Водители")]
+        [OneS("Boolean", "Кусто_Водители", "Булево", "Кусто_Водители")]
         [JsonProperty("Кусто_Водители")]
         public Boolean? KustoDrivers { get; set; }
 
-        [OneC("Boolean", "Кусто_Агрономы", "Булево", "Кусто_Агрономы")]
+        [OneS("Boolean", "Кусто_Агрономы", "Булево", "Кусто_Агрономы")]
         [JsonProperty("Кусто_Агрономы")]
         public Boolean? KustoAgronomists { get; set; }
 
-        [OneC("Boolean", "Кусто_МенеджерыПоля", "Булево", "Кусто_МенеджерыПоля")]
+        [OneS("Boolean", "Кусто_МенеджерыПоля", "Булево", "Кусто_МенеджерыПоля")]
         [JsonProperty("Кусто_МенеджерыПоля")]
         public Boolean? KustoFieldManagers { get; set; }
 
-        [OneC("Boolean", "Кусто_Заправщики", "Булево", "Кусто_Заправщики")]
+        [OneS("Boolean", "Кусто_Заправщики", "Булево", "Кусто_Заправщики")]
         [JsonProperty("Кусто_Заправщики")]
         public Boolean? KustoRefuellers { get; set; }
 

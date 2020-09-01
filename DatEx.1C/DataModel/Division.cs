@@ -4,7 +4,7 @@
     using Newtonsoft.Json;
     using System;
 
-    [OneC("Catalog_Подразделения", "Catalog_Подразделения", "Справочник.Подразделения", "Справочник.Подразделения")]
+    [OneS("Catalog_Подразделения", "Catalog_Подразделения", "Справочник.Подразделения", "Справочник.Подразделения")]
     [JsonObject("")]
     public class Division
     {

@@ -7,7 +7,7 @@ namespace DatEx.OneC.DataModel.Auxilary
 
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
-    public class OneCAttribute : Attribute
+    public class OneSAttribute : Attribute
     {
         public String OneCType { get; private set; }
 
@@ -27,7 +27,7 @@ namespace DatEx.OneC.DataModel.Auxilary
         public String Remarks { get; set; }
 
 
-        public OneCAttribute(String oDataType, String oDataName, String oneCType, String oneCName)
+        public OneSAttribute(String oDataType, String oDataName, String oneCType, String oneCName)
         {
             OneCType = oneCType;
             OneCName = oneCName;

@@ -10,6 +10,7 @@
     {
         /// <summary> Название </summary>
         [CreatioProp("Название", Color = ConsoleColor.Yellow)]
+        [Map(true, DataType.Lookup, "Catalog_ПодразделенияОрганизаций", DataType.String, "Description")]
         public String Name { get; set; }
 
         /// <summary> Руководитель(Id) </summary>
@@ -33,6 +34,7 @@
         public OrgStructureUnit Parent { get; set; }
 
         /// <summary> Полное название </summary>
+        [Map(true, DataType.Lookup, "Catalog_ПодразделенияОрганизаций", DataType.String, "Description")]
         [CreatioProp("Полное название", Color = ConsoleColor.Yellow)]
         public String FullName { get; set; }
 

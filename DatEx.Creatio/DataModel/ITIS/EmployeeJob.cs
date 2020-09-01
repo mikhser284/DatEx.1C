@@ -10,7 +10,7 @@
     public class EmployeeJob : Terrasoft.EmployeeJob
     {
         /// <summary> Id объекта в 1C </summary>
-        [Map]
+        [Map(true, DataType.Lookup, "Catalog_ДолжностиОрганизаций", DataType.Guid, "Ref_Key")]
         [CreatioPropNotExistInDataModelOfITIS]
         [CreatioProp("Guid", "Id объекта в 1C", Color = ConsoleColor.Red)]
         public Guid ITISOneSId { get; set; }

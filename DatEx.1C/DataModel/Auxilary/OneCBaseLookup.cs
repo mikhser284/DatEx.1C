@@ -11,35 +11,35 @@ namespace DatEx.OneC.DataModel
     public class OneCBaseLookup : OneCObject
     {
         /// <summary> Id </summary>
-        [OneC("Guid", "Ref_Key", "-", "-", Color = ConsoleColor.Magenta)]
+        [OneS("Guid", "Ref_Key", "-", "-", Color = ConsoleColor.Magenta)]
         [JsonProperty("Ref_Key")]
         public Guid Id { get; set; }
 
-        [OneC("Boolean?", "Predefined", "Булево", "?")]
+        [OneS("Boolean?", "Predefined", "Булево", "?")]
         [JsonProperty("Predefined")]
         public Boolean? Predefined { get; set; }
 
-        [OneC("String", "PredefinedDataName", "Строка", "?")]
+        [OneS("String", "PredefinedDataName", "Строка", "?")]
         [JsonProperty("PredefinedDataName")]
         public String PredefinedDataName { get; set; }
 
 
-        [OneC("String", "DataVersion", "Строка", "?")]
+        [OneS("String", "DataVersion", "Строка", "?")]
         [JsonProperty("DataVersion")]
         public String DataVersion { get; set; }
 
         /// <summary> Наименование </summary>
-        [OneC("String", "Description", "Строка", "Наименование", Color = ConsoleColor.Yellow)]
+        [OneS("String", "Description", "Строка", "Наименование", Color = ConsoleColor.Yellow)]
         [JsonProperty("Description")]
         public String Description { get; set; }
 
         /// <summary> Код </summary>
-        [OneC("String", "Code", "Строка", "Код", Color = ConsoleColor.Blue)]
+        [OneS("String", "Code", "Строка", "Код", Color = ConsoleColor.Blue)]
         [JsonProperty("Code")]
         public String Code { get; set; }
 
         /// <summary> Пометка удаления </summary>
-        [OneC("Boolean?", "DeletionMark", "Булево", "Пометка удаления", Color = ConsoleColor.Blue)]
+        [OneS("Boolean?", "DeletionMark", "Булево", "Пометка удаления", Color = ConsoleColor.Blue)]
         [JsonProperty("DeletionMark")]
         public Boolean? DeletionMark { get; set; }
 
@@ -49,12 +49,12 @@ namespace DatEx.OneC.DataModel
     public class OneCBaseHierarchicalLookup : OneCBaseLookup
     {
         /// <summary> Родитель </summary>
-        [OneC("Guid?", "Parent_Key", "?", "Родитель", Color = ConsoleColor.Blue)]
+        [OneS("Guid?", "Parent_Key", "?", "Родитель", Color = ConsoleColor.Blue)]
         [JsonProperty("Parent_Key")]
         public Guid? ParentId { get; set; }
 
         /// <summary> Является папкой </summary>
-        [OneC("Boolean?", "IsFolder", "Булево", "Является папкой", Color = ConsoleColor.Blue)]
+        [OneS("Boolean?", "IsFolder", "Булево", "Является папкой", Color = ConsoleColor.Blue)]
         [JsonProperty("IsFolder")]
         public Boolean? IsFolder { get; set; }
     }
@@ -66,21 +66,21 @@ namespace DatEx.OneC.DataModel
             IEnumerable<PropertyInfo> properties = this.GetType().GetProperties();
 
             Int32 maxOneCODataTypeLen = properties
-                .Select(p => ((OneCAttribute)p.GetCustomAttributes(typeof(OneCAttribute), false)
+                .Select(p => ((OneSAttribute)p.GetCustomAttributes(typeof(OneSAttribute), false)
                 .FirstOrDefault())?.ODataType.Length).Max(x => x) ?? 0;
             Int32 maxOneCODataName = properties
-                .Select(p => ((OneCAttribute)p.GetCustomAttributes(typeof(OneCAttribute), false)
+                .Select(p => ((OneSAttribute)p.GetCustomAttributes(typeof(OneSAttribute), false)
                 .FirstOrDefault())?.ODataName.Length).Max(x => x) ?? 0;
             Int32 maxOneCTypeLen = properties
-                .Select(p => ((OneCAttribute)p.GetCustomAttributes(typeof(OneCAttribute), false)
+                .Select(p => ((OneSAttribute)p.GetCustomAttributes(typeof(OneSAttribute), false)
                 .FirstOrDefault())?.OneCType.Length).Max(x => x) ?? 0;
             Int32 maxOneCNameLen = properties
-                .Select(p => ((OneCAttribute)p.GetCustomAttributes(typeof(OneCAttribute), false)
+                .Select(p => ((OneSAttribute)p.GetCustomAttributes(typeof(OneSAttribute), false)
                 .FirstOrDefault())?.OneCName.Length).Max(x => x) ?? 0;            
             Int32 maxPropNameLen = properties.Max(x => x.Name.Length);
             Int32 totalWidth = 16 + maxOneCODataTypeLen + maxOneCODataName + maxOneCTypeLen + maxOneCNameLen + maxPropNameLen;
 
-            var typeAtribure = (OneCAttribute)this.GetType().GetCustomAttributes(typeof(OneCAttribute), false).FirstOrDefault();
+            var typeAtribure = (OneSAttribute)this.GetType().GetCustomAttributes(typeof(OneSAttribute), false).FirstOrDefault();
             String indent = new String(' ', indentLevel * 4);
             Console.WriteLine($"\n{indent}{new String('─', totalWidth)}");
             Console.WriteLine($"{indent}   {(typeAtribure?.ODataType ?? "---")} * {(typeAtribure?.OneCType ?? "---")}");
@@ -93,7 +93,7 @@ namespace DatEx.OneC.DataModel
             {
                 foreach(var p in propsInfo)
                 {
-                    var attribute = (OneCAttribute)p.GetCustomAttributes(typeof(OneCAttribute), false).FirstOrDefault();
+                    var attribute = (OneSAttribute)p.GetCustomAttributes(typeof(OneSAttribute), false).FirstOrDefault();
                     String propValue = p.GetValue(obj)?.ToString();
                     if (p.GetValue(obj) == null) propValue = "---";
                     else if (p.PropertyType != typeof(String) && typeof(ICollection).IsAssignableFrom(p.PropertyType))
