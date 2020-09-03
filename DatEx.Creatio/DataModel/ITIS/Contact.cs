@@ -31,23 +31,25 @@
 
         /// <summary> Должность сотрудника (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
+        [MapRemarks("Объект Должность сотрудника должен быть уже синхронизирован с 1С, здесь же необходимо найти ранее созданный объект по его ITISOneSId и присвоить его Id в Creatio")]
+        [Map(true)]
         [CreatioProp("Guid", "Должность сотрудника (Id)", Color = ConsoleColor.Blue)]
         public Guid? ITISEmployeePositionId { get; set; }
 
         /// <summary> Должность сотрудника </summary>
         [JsonIgnoreSerialization]
-        [Map]
         [CreatioProp("Должность сотрудника", Color = ConsoleColor.Yellow)]
         public ITIS.EmployeeJob ITISEmployeePosition { get; set; }
 
         /// <summary> Подразделение (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
+        [MapRemarks("Объект Структура организации контрагента должен быть уже синхронизирован с 1С, здесь же необходимо найти ранее созданный объект по его ITISOneSId и присвоить его Id в Creatio")]
+        [Map(true)]
         [CreatioProp("Guid", "Подразделение (Id)", Color = ConsoleColor.Blue)]
         public Guid? ITISSubdivisionId { get; set; }
 
         /// <summary> Подразделение </summary>
         [JsonIgnoreSerialization]
-        [Map]
         [CreatioProp("Подразделение", Color = ConsoleColor.Yellow)]
         public Terrasoft.AccountOrganizationChart ITISSubdivision { get; set; }
 
@@ -78,6 +80,8 @@
         public ITISEmploymentType ITISEmploymentType { get; set; }
 
         /// <summary> Подразделение организации (Id) </summary>
+        [MapRemarks("Объект Элемент организационной структуры должен быть уже синхронизирован с 1С, здесь же необходимо найти ранее созданный объект по его ITISOneSId и присвоить его Id в Creatio")]
+        [Map(true)]
         [CreatioProp("Guid", "Подразделение организации (Id)", Color = ConsoleColor.Blue)]
         [JsonConverter(typeof(JsonConverter_Guid))]
         public Guid? ITISOrganizationSubdivisionId { get; set; }

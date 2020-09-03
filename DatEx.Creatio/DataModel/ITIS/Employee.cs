@@ -43,5 +43,7 @@
         [CreatioProp("Вид занятости", Color = ConsoleColor.Yellow)]
         [JsonIgnoreSerialization]
         public ITISEmploymentType ITISEmploymentsType { get; set; }
+
+        public override string ToString() => $"{ITISSurName} {ITISGivenName} {ITISMiddleName} ({FullJobTitle})";
     }
 }

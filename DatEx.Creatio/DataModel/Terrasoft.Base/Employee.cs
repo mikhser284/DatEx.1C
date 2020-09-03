@@ -9,7 +9,7 @@
     public class Employee : BaseEntity
     {
         /// <summary> Контакт (Id) </summary>
-        [JsonIgnoreSerialization]
+        [JsonConverter(typeof(JsonConverter_Guid))]
         [CreatioProp("Контакт (Id)", Color = ConsoleColor.Blue)]
         public Guid? ContactId { get; set; }
 
@@ -47,7 +47,6 @@
         public Job Job { get; set; }
 
         /// <summary> Полное название должности </summary>
-        [JsonIgnoreSerialization]
         [CreatioProp("Полное название должности", Color = ConsoleColor.Yellow)]
         public String FullJobTitle { get; set; }
 
@@ -63,13 +62,11 @@
         public Contact Owner { get; set; }
 
         /// <summary> Начало карьеры </summary>
-        [JsonIgnoreSerialization]
         [JsonConverter(typeof(JsonConverter_Date))]
         [CreatioProp("Начало карьеры", Color = ConsoleColor.Yellow)]
         public DateTime? CareerStartDate { get; set; }
 
         /// <summary> Завершение карьеры </summary>
-        [JsonIgnoreSerialization]
         [JsonConverter(typeof(JsonConverter_Date))]
         [CreatioProp("Завершение карьеры", Color = ConsoleColor.Yellow)]
         public DateTime? CareerDueDate { get; set; }
@@ -108,5 +105,7 @@
         [CreatioProp("Руководитель")]
         [JsonIgnoreSerialization]
         public Employee Manager { get; set; }
+
+        
     }
 }

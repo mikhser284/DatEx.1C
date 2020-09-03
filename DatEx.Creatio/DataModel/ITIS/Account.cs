@@ -17,7 +17,6 @@
         [CreatioProp("Юридический статус контрагента (Id)", Color = ConsoleColor.Blue)]
         public Guid? ITISCounterpartyLegalStatusId { get; set; }
 
-        [Map]
         [CreatioProp("Юридический статус контрагента", Color = ConsoleColor.Yellow)]
         public ITISCounterpartyLegalStatus ITISCOunterpartyLegalStatus { get; set; }
 

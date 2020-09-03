@@ -59,6 +59,8 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
 
         /// <summary> Контрагент (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
+        [MapRemarks("Объект Контрагентдолжен быть уже синхронизирован с 1С, здесь же необходимо найти ранее созданный объект по его ITISOneSId и присвоить его Id в Creatio")]
+        [Map(true)]
         [CreatioProp("Guid", "Контрагент (Id)", Color = ConsoleColor.Blue)]
         public Guid? AccountId { get; set; }
 
@@ -91,12 +93,13 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
 
         /// <summary> Должность (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
+        [MapRemarks("Объект Должность контакта должен быть уже синхронизирован с 1С, здесь же необходимо найти ранее созданный объект по его ITISOneSId и присвоить его Id в Creatio")]
+        [Map(true)]
         [CreatioProp("Guid", "Должность (Id)", Color = ConsoleColor.Blue)]
         public Guid? JobId { get; set; }
 
         /// <summary> Должность </summary>
         [JsonIgnoreSerialization]
-        [Map]
         [CreatioProp("Должность", Color = ConsoleColor.Yellow)]
         public Job Job { get; set; }
 

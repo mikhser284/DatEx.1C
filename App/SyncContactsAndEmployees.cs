@@ -14,6 +14,7 @@ using DatEx.Creatio;
 using System.Threading;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.WebSockets;
+using System.IO;
 
 namespace App
 {
@@ -52,8 +53,25 @@ namespace App
             var employeeJobs = HttpClientOfCreatio.GetObjs<ITIS.EmployeeJob>(removableObjsQuery);
             employeeJobs.ForEach(x => HttpClientOfCreatio.DeleteObj(x));
 
+
             var contractors = HttpClientOfCreatio.GetObjs<ITIS.Account>(removableObjsQuery);
             contractors.ForEach(x => HttpClientOfCreatio.DeleteObj(x));
+
+            var departments = HttpClientOfCreatio.GetObjs<ITIS.Department>(removableObjsQuery);
+            var accountOrgChartsGroup = HttpClientOfCreatio.GetBindedObjsByParentIds<Terrasoft.AccountOrganizationChart>(departments.Select(x => (Guid)x.Id), "Department", x => x.DepartmentId);
+            Dictionary<Guid, Terrasoft.AccountOrganizationChart> removableAccountOrgCharts = new Dictionary<Guid, Terrasoft.AccountOrganizationChart>();
+            foreach(var items in accountOrgChartsGroup.Values)
+                foreach (var item in items) 
+                    if (!removableAccountOrgCharts.ContainsKey((Guid)item.Id)) removableAccountOrgCharts.Add((Guid)item.Id, item);
+            
+            removableAccountOrgCharts.Values.ForEach(x => HttpClientOfCreatio.DeleteObj(x));
+            departments.ForEach(x => HttpClientOfCreatio.DeleteObj(x));
+
+            var employeeCareers = HttpClientOfCreatio.GetObjs<ITIS.EmployeeCareer>(removableObjsQuery);
+            employeeCareers.ForEach(x => HttpClientOfCreatio.DeleteObj(x));
+
+            var contactCareers = HttpClientOfCreatio.GetObjs<ITIS.ContactCareer>(removableObjsQuery);
+            contactCareers.ForEach(x => HttpClientOfCreatio.DeleteObj(x));
         }
 
 
@@ -76,91 +94,219 @@ namespace App
             Console.WriteLine(" █████ Синхронизированные объекты █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████");
             Console.WriteLine(" ██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████");
             
-            contactIds.Clear();
-            contacts.Clear();
 
-            Creatio_FirstSyncOfEmployeesInfo(syncObjs, settings);
+            Creatio_EmployeesInfo_MapObjectsFromOneSToObjectsFromCreatio(syncObjs, settings);
 
-            foreach (Person p in syncObjs.OneS_PersonsOrderedById.Values)
-            {
-                ITIS.Contact c = Creatio_FirstSyncOfEmployeesInfo(p, settings, syncObjs);
-                contactIds.Add((Guid)c.Id);
-            }
+            contactIds = new HashSet<Guid>(syncObjs.Creatio_ContractsOrderedByOneSId.Values.Select(x => (Guid)x.Id));
             contacts = Creatio_GetCreatedContactsAndRelatedInfo(contactIds).Values.ToList();
             contacts.ForEach(x => Creatio_ShowContact(x));
         }
 
-        private static void Creatio_FirstSyncOfEmployeesInfo(SyncObjs syncObjs, SyncSettings settings)
-        {
-            Creatio_EmployeesInfo_MapObjectsFromOneSToObjectsFromCreatio(syncObjs, settings);
-        }
-
+        
         private static void Creatio_EmployeesInfo_MapObjectsFromOneSToObjectsFromCreatio(SyncObjs syncObjs, SyncSettings settings)
         {
-            Cratio_MapObj_Job(syncObjs, settings);
-            Creatio_MapObj_EmployeeJob(syncObjs, settings);
+            Creatio_MapObj_Account(syncObjs, settings);
             Creatio_MapObj_OrgStructureUnit(syncObjs, settings);
-            Creatio_MapObj_Organizations(syncObjs, settings);
+            Creatio_MapObj_AccountOrganizationChart(syncObjs, settings);
+            Creatio_MapObj_Job(syncObjs, settings);
+            Creatio_MapObj_EmployeeJob(syncObjs, settings);
+            Creatio_MapObj_Contacts(syncObjs, settings);
+            Creataio_MapObj_Employee(syncObjs, settings);
+
+            Creatio_MapObj_ContactCareer(syncObjs, settings);
+            Creatio_MapObj_EmployeeCareer(syncObjs, settings);
         }
-        private static void Creatio_MapObj_Organizations(SyncObjs syncObjs, SyncSettings settings)
+
+
+
+        private static void Creatio_MapObj_ContactCareer(SyncObjs syncObjs, SyncSettings settings)
         {
-            foreach(var org in syncObjs.OneS_Organizations.Values)
+            //TODO Удалить автоматически созданные записи о карьере контакта (так как у них не заполнено поле ITISOneSId)
+            //TODO Синхронизация карьеры контакта
+        }
+
+        private static void Creatio_MapObj_EmployeeCareer(SyncObjs syncObjs, SyncSettings settings)
+        {
+            ITIS.EmployeeCareer c;
+            var deletableCareers = HttpClientOfCreatio.GetDistinctObjsWithPropValueIn<ITIS.EmployeeCareer, Guid>($"{nameof(c.Employee)}/Id", syncObjs.Creatio_EmployeesOrderedByContactId.Values.Select(e => (Guid)e.Id));
+
+            foreach(var del in deletableCareers.Values)
             {
-                if(syncObjs.Creatio_Accounts_ByOneSId.ContainsKey(org.Id) || org.RelatedObj_Contractor == null) continue;
-                ITIS.Account c = new ITIS.Account();
-                //
-                c.ITISOneSId = org.Id;
-                c.Name = org.FullName;
-                c.AlternativeName = org.Description;
-                c.TypeId = settings.CreatioGuidOfOurCompany;
-                c.OwnershipId = settings.CreatioGuidOfLLCOwnershipType;
-                c.KPP = org.RelatedObj_Contractor?.CodeOfEdrpo;
-                c.INN = org.RelatedObj_Contractor?.INN;
-                c.ITISInternalCode = org.Prefix;
-                c.ITISCounterpartyLegalStatusId = settings.Map_OneSEnum_LegalStatus_CreatioGuidOf_ITISCounterpartyLegalStatus[true];
-                //
-                c = HttpClientOfCreatio.CreateObj(c);
-                syncObjs.Creatio_Accounts_ByOneSId.Add((Guid)c.ITISOneSId, c);
-                syncObjs.Creatio_Accounts_ById.Add((Guid)c.Id, c);
+                try
+                {
+                    HttpClientOfCreatio.DeleteObj(del);
+                }
+                catch(Exception ex)
+                {
+                    //? Почему система не позволяет нормально удалить автоматически созданные объекты
+                    Console.WriteLine("!!! При попытке удалить объек карьера сотрудника возникло исключение");
+                }
+            }
+
+            const string valueOfPrimaryEmploymentTypeEnum = "ОсновноеМестоРаботы";
+            
+            foreach(Person person in syncObjs.OneS_PersonsOrderedById.Values)
+            {
+                ITIS.Contact contact = syncObjs.Creatio_ContractsOrderedByOneSId[person.Id];
+                
+                ITIS.Employee employee = syncObjs.Creatio_EmployeesOrderedByContactId[(Guid)contact.Id];
+
+                
+                foreach(OneS.Employee pos in person.RelatedObjs_RelatedEmployeePositions)
+                {
+                    ITIS.EmployeeCareer career = new EmployeeCareer();
+                    //
+                    career.EmployeeId = employee.Id;
+                    career.ITISOneSId = pos.Id;
+                    career.AccountId = syncObjs.Creatio_Accounts_ByOneSId[pos.NavProp_Organization.Id].Id;
+                    career.StartDate = pos.DateOfEmployment;
+                    career.DueDate = pos.DateOfDismisal.GetNotDefaultValue();
+                    //? Используеться ли испытательный срок в 1С, если да то в каких ед. измерения дни или месяцы
+                    //career.ProbationDueDate = pos.ProbationDueDate;
+                    //? При попытке установить значение true - Internal server error (такое впе
+                    career.IsCurrent = true; // pos.DateOfDismisal.IsNotNullOrDefault() ? false : true;
+                    career.FullJobTitle = pos.NavProp_CurrentPositionInOrganization?.Description;
+                    career.ITISPrimary = pos.TypeOfEmployment == valueOfPrimaryEmploymentTypeEnum;
+                    career.ITISTypeOfEmploymentId = settings.Map_OneSEnum_EmploymentType_CreatioGuidOf_EmploymentType[pos.TypeOfEmployment];
+                    career.OrgStructureUnitId = syncObjs.Creatio_OrgStructureUnits_ByOneSId[pos.NavProp_CurrentOrganizationSubdivision.Id].Id;
+                    career.EmployeeJobId = syncObjs.Creatio_EmployeeJobs_ByOneSId[pos.NavProp_CurrentPositionInOrganization.Id].Id;
+                    //
+                    career = HttpClientOfCreatio.CreateObj<ITIS.EmployeeCareer>(career);
+                    List<ITIS.EmployeeCareer> employeeCareers = new List<EmployeeCareer>();
+                    if (!syncObjs.Creatio_EmployeeCareersGrouppedByEmployeeId.TryGetValue((Guid)employee.Id, out employeeCareers))
+                        syncObjs.Creatio_EmployeeCareersGrouppedByEmployeeId.Add((Guid)employee.Id, new List<EmployeeCareer> { career });
+                    else employeeCareers.Add(career);
+                }
             }
         }
 
-        private static void Test_CreateAccount(SyncSettings settings)
+        private static void Creataio_MapObj_Employee(SyncObjs syncObjs, SyncSettings settings)
         {
-            ITIS.Account c = new ITIS.Account();
-            c.ITISOneSId = new Guid("D4741F7B-5AA3-470B-A935-B26494017ED3");
-            c.Name = "Test contractor";
-            c.TypeId = settings.CreatioGuidOfOurCompany;
-            c.KPP = "123456789";
-            c.OwnershipId = settings.CreatioGuidOfLLCOwnershipType;
-            //c.ITISInternalCode = "TST";
-            //c.ITISEmail = "Test@mail.com";
-            //c.ITISCounterpartyLegalStatusId = settings.Map_OneSEnum_LegalStatus_CreatioGuidOf_ITISCounterpartyLegalStatus[true];
-            ////
-            //c.INN = "123456789012";
+            // Создаеться ли объект Сотрудник автоматически при создании соответствующего типа конракта
+            Boolean autoCreationOfEmployeesActivated = true;
+            if(autoCreationOfEmployeesActivated)
+            {
+                // только получаем уже созданные объекты из Creatio
+                ITIS.Employee e;
+                var employees = HttpClientOfCreatio.GetDistinctObjsWithPropValueIn<ITIS.Employee, Guid>($"{nameof(e.Contact)}/Id", syncObjs.Creatio_ContractsOrderedByOneSId.Values.Select(x => (Guid)x.Id)).Values.ToList();
+                syncObjs.Creatio_EmployeesOrderedByContactId = employees.ToDictionary(k => (Guid)k.ContactId);
+                return;
+            }
 
-            //c.AlternativeName = "Test contractor";
-
-            //c.Code = "Code";
-            //c.Phone = "+38 (097) 621 9438";
-            //c.AdditionalPhone = "+38 (097) 621 9438";
-            //c.Fax = "9876543210";
-            //c.Web = "https://Test-contractor.com";
-            //c.Address = "Аддресс";
-            //c.Zip = "987654";
-            //c.Notes = "Примечания";
-            //c.GPSE = "150";
-            //c.GPSN = "324";
-            //
-            c = HttpClientOfCreatio.CreateObj(c);
+            //Создаем соттудников в Creatio
+            foreach(ITIS.Contact c in syncObjs.Creatio_ContractsOrderedByOneSId.Values)
+            {
+                ITIS.Employee e = new ITIS.Employee();
+                //
+                e.ContactId = c.Id;
+                //e.Name = $"{c.Surname} {c.GivenName} {c.MiddleName}";
+                e.OrgStructureUnitId = c.ITISOrganizationSubdivisionId;
+                e.Notes = c.Notes;
+                e.JobId = c.JobId;
+                e.FullJobTitle = c.JobTitle;
+                e.CareerStartDate = c.ITISCareeStartDate;
+                e.CareerDueDate = c.ITISCareerEndDate;
+                e.AccountId = c.AccountId;
+                e.ITISSurName = c.Surname;
+                e.ITISGivenName = c.GivenName;
+                e.ITISMiddleName = c.MiddleName;
+                e.ITISEmploymentsTypeId = c.ITISEmploymentTypeId;
+                //
+                e = HttpClientOfCreatio.CreateObj(e);
+                syncObjs.Creatio_EmployeesOrderedByContactId.Add((Guid)e.ContactId, e);
+            }
         }
+
+        private static void Creatio_MapObj_Contacts(SyncObjs syncObjs, SyncSettings settings)
+        {
+            foreach(var p in syncObjs.OneS_PersonsOrderedById.Values)
+            {
+                ITIS.Contact c = new Contact();
+                //
+                //
+                c.ITISOneSId = p.Id;
+                c.TypeId = settings.CreatioGuidOfContactsWithTypeOurEmployees;
+                c.Surname = p.RelatedObj_NameInfo.Surname;
+                c.GivenName = p.RelatedObj_NameInfo.GivenName;
+                c.MiddleName = p.RelatedObj_NameInfo.MiddleName;
+                //Отключить авто заполнение фамилии имени и отчества из свойства Name; Наоборот брать Name из них:
+                //c.Name = $"# {c.Surname} {c.GivenName} {c.MiddleName}";
+                c.BirthDate = p.BirthDate;
+                c.GenderId = settings.Map_OneSEnum_Gender_CreatioGuidOf_Gender[p.Gender];
+                c.Email = p.RelatedObj_ContactInfoEmail.View;
+                c.Phone = p.RelatedObj_ContactInfoWorkPhone.View;
+                c.MobilePhone = p.RelatedObj_ContactInfoPhone.View;
+
+                c.ITISCareeStartDate = (DateTime)p.RelatedObjs_RelatedEmployeePositions.Min(e => e.DateOfEmployment);
+                Boolean isActualEmployee = p.RelatedObjs_RelatedEmployeePositions.Any(e => e.DateOfDismisal == null || e.DateOfDismisal == default(DateTime));
+                c.ITISCareerEndDate = isActualEmployee ? null : (DateTime?)p.RelatedObjs_RelatedEmployeePositions.Max(e => e.DateOfDismisal);
+                
+                OneS.Employee primaryPosition = OneS_GetPrimaryPosition(p, syncObjs, settings);
+                if (primaryPosition != null)
+                {
+                    PositionInOrganization pos = primaryPosition.NavProp_CurrentPositionInOrganization;
+                    c.ITISEmploymentTypeId = settings.Map_OneSEnum_EmploymentType_CreatioGuidOf_EmploymentType[primaryPosition.TypeOfEmployment];
+                    c.JobTitle = pos.Description;
+                    c.JobId = syncObjs.Creatio_Jobs_ByOneSId[pos.Id].Id;
+                    c.ITISEmployeePositionId = syncObjs.Creatio_EmployeeJobs_ByOneSId[pos.Id].Id;
+                    //
+                    Organization org = primaryPosition.NavProp_Organization;
+                    Account account = syncObjs.Creatio_Accounts_ByOneSId[org.Id];
+                    c.AccountId = account.Id;
+                    //
+                    OrganizationSubdivision subDiv = primaryPosition.NavProp_CurrentOrganizationSubdivision;
+                    c.ITISOrganizationSubdivisionId = syncObjs.Creatio_OrgStructureUnits_ByOneSId[subDiv.Id].Id;
+                    c.ITISSubdivisionId = syncObjs.Creatio_AccountOrganizationCharts_ByOneSId[subDiv.Id].Id;
+
+                }
+
+                c = HttpClientOfCreatio.CreateObj(c);
+                //
+                BindCareerJobs(settings, syncObjs, p, c);
+                HttpClientOfCreatio.UpdateObj(c);
+                //ITIS.Employee employee = Creatio_AddNewEmployee(c, p);
+                syncObjs.Creatio_ContractsOrderedByOneSId.Add((Guid)c.ITISOneSId, c);
+                //syncObjs.Creatio_ContractsOrderedById.Add((Guid)c.Id, c);
+            }
+        }
+
+        private static void Creatio_MapObjs_Career(SyncObjs syncObjs, SyncSettings settings)
+        {
+            //TODO Заполнение карьеры сотрудника
+        }
+
+        private static void Creatio_MapObj_Account(SyncObjs syncObjs, SyncSettings settings)
+        {
+            foreach(var x in syncObjs.OneS_Organizations.Values)
+            {
+                if(syncObjs.Creatio_Accounts_ByOneSId.ContainsKey(x.Id) || x.RelatedObj_Contractor == null) continue;
+                ITIS.Account c = new ITIS.Account();
+                //
+                //
+                c.ITISOneSId = x.Id;
+                c.Name = x.FullName;
+                c.AlternativeName = x.Description;
+                c.TypeId = settings.CreatioGuidOfOurCompany;
+                c.OwnershipId = settings.CreatioGuidOfLLCOwnershipType;
+                c.KPP = x.RelatedObj_Contractor?.CodeOfEdrpo;
+                c.INN = x.RelatedObj_Contractor?.INN;
+                c.ITISInternalCode = x.Prefix;
+                c.ITISCounterpartyLegalStatusId = settings.Map_OneSEnum_LegalStatus_CreatioGuidOf_ITISCounterpartyLegalStatus[true];
+                //
+                //
+                c = HttpClientOfCreatio.CreateObj(c);
+                syncObjs.Creatio_Accounts_ByOneSId.Add((Guid)c.ITISOneSId, c);
+                //syncObjs.Creatio_Accounts_ById.Add((Guid)c.Id, c);
+            }
+        }
+
 
         private static void Creatio_MapObj_OrgStructureUnit(SyncObjs syncObjs, SyncSettings settings)
         {
             foreach(var x in syncObjs.OneS_Subdivisions.Values)
             {
                 if (syncObjs.Creatio_OrgStructureUnits_ByOneSId.ContainsKey(x.Id)) continue;
-                ITIS.OrgStructureUnit c = new OrgStructureUnit();
+                ITIS.OrgStructureUnit c = new ITIS.OrgStructureUnit();
                 //
                 c.ITISOneSId = (Guid)x.Id;
                 c.FullName = x.Description;
@@ -168,12 +314,46 @@ namespace App
                 //
                 c = HttpClientOfCreatio.CreateObj(c);
                 syncObjs.Creatio_OrgStructureUnits_ByOneSId.Add(c.ITISOneSId, c);
-                syncObjs.Creatio_OrgStructureUnits_ById.Add((Guid)c.Id, c);
+                //syncObjs.Creatio_OrgStructureUnits_ById.Add((Guid)c.Id, c);
             }
         }
+
         
-        
-        
+        private static void Creatio_MapObj_AccountOrganizationChart(SyncObjs syncObjs, SyncSettings settings)
+        {
+            foreach(var x in syncObjs.OneS_PersonsOrderedById.Values)
+            {
+                foreach(var pos in x.RelatedObjs_RelatedEmployeePositions)
+                {
+                    var org = pos.NavProp_Organization;
+                    var subDiv = pos.NavProp_CurrentOrganizationSubdivision;
+
+                    if (syncObjs.Creatio_AccountOrganizationCharts_ByOneSId.ContainsKey(x.Id)) continue;
+                    Terrasoft.AccountOrganizationChart c = new Terrasoft.AccountOrganizationChart();
+                    //
+                    c.AccountId = (Guid)syncObjs.Creatio_Accounts_ByOneSId[org.Id].Id;
+                    ITIS.Department dep;
+                    if (!syncObjs.Creatio_Departaments_ByOneSId.TryGetValue(subDiv.Id, out dep))
+                    {
+                        dep = new Department();
+                        dep.ITISOneSId = subDiv.Id;
+                        dep.Name = subDiv.Description;
+                        //
+                        dep = HttpClientOfCreatio.CreateObj(dep);
+                        syncObjs.Creatio_Departaments_ByOneSId.Add(dep.ITISOneSId, dep);
+                    }
+                    else continue;
+                    c.DepartmentId = dep.Id;
+                    c.CustomDepartmentName = dep.Name;
+                    //
+                    c = HttpClientOfCreatio.CreateObj(c);
+                    syncObjs.Creatio_AccountOrganizationCharts_ByOneSId.Add(dep.ITISOneSId, c);
+                }
+            }
+        }
+
+
+
         private static void Creatio_MapObj_EmployeeJob(SyncObjs syncObjs, SyncSettings settings)
         {
             foreach(var x in syncObjs.OneS_Positions.Values)
@@ -186,13 +366,13 @@ namespace App
                 //
                 c = HttpClientOfCreatio.CreateObj(c);
                 syncObjs.Creatio_EmployeeJobs_ByOneSId.Add(c.ITISOneSId, c);
-                syncObjs.Creatio_EmployeeJobs_ById.Add((Guid)c.Id, c);
+                //syncObjs.Creatio_EmployeeJobs_ById.Add((Guid)c.Id, c);
             }
         }
 
         
         
-        private static void Cratio_MapObj_Job(SyncObjs syncObjs, SyncSettings settings)
+        private static void Creatio_MapObj_Job(SyncObjs syncObjs, SyncSettings settings)
         {
             foreach(var x in syncObjs.OneS_Positions.Values)
             {
@@ -204,51 +384,24 @@ namespace App
                 //
                 c = HttpClientOfCreatio.CreateObj(c);
                 syncObjs.Creatio_Jobs_ByOneSId.Add(c.ITISOneSId, c);
-                syncObjs.Creatio_Jobs_ById.Add((Guid)c.Id, c);
+                //syncObjs.Creatio_Jobs_ById.Add((Guid)c.Id, c);
             }
         }
 
 
-        private static ITIS.Contact Creatio_FirstSyncOfEmployeesInfo(Person p, SyncSettings settings, SyncObjs temp)
+        private static OneS.Employee OneS_GetPrimaryPosition(Person person, SyncObjs syncObjs, SyncSettings settings)
         {
-            ITIS.Contact c = new Contact();
-
-            c.ITISOneSId = p.Id;
-            c.TypeId = settings.CreatioGuidOfContactsWithTypeOurEmployees;
-            c.Surname = p.RelatedObj_NameInfo.Surname;
-            c.GivenName = p.RelatedObj_NameInfo.GivenName;
-            c.MiddleName = p.RelatedObj_NameInfo.MiddleName;
-            //Отключить авто заполнение фамилии имени и отчества из свойства Name; Наоборот брать Name из них:
-            //c.Name = $"# {c.Surname} {c.GivenName} {c.MiddleName}"; 
-            c.BirthDate = p.BirthDate;
-            c.GenderId = settings.Map_OneSEnum_Gender_CreatioGuidOf_Gender[p.Gender];
-            c.Email = p.RelatedObj_ContactInfoEmail.View;
-            c.Phone = p.RelatedObj_ContactInfoWorkPhone.View;
-            c.MobilePhone = p.RelatedObj_ContactInfoPhone.View;
-            
-            c.ITISCareeStartDate = (DateTime)p.RelatedObjs_RelatedEmployeePositions.Min(x => x.DateOfEmployment);
-            Boolean isActualEmployee = p.RelatedObjs_RelatedEmployeePositions.Any(x => x.DateOfDismisal == null || x.DateOfDismisal == default(DateTime));
-            c.ITISCareerEndDate = isActualEmployee ? null : (DateTime?)p.RelatedObjs_RelatedEmployeePositions.Max(x => x.DateOfDismisal);
-            c = HttpClientOfCreatio.CreateObj(c);
-
-            BindCareerJobs(settings, temp, p, c);
-
-            HttpClientOfCreatio.UpdateObj(c);
-            ITIS.Employee employee = Creatio_AddNewEmployee(c, p);
-            return c;
-        }
-
-        private static void BindCareerJobs(SyncSettings settings, SyncObjs temp, Person p, ITIS.Contact c)
-        {
-            List<OneS.Employee> orderedPositions = p.RelatedObjs_RelatedEmployeePositions.OrderByDescending(x => x.DateOfEmployment).ToList();
+            const String valueOfPrimaryPositionEnumInOneS = "ОсновноеМестоРаботы";
+            DateTime defaultDateTime = default(DateTime);
+            List<OneS.Employee> personPositionsOrderedByDescending = person.RelatedObjs_RelatedEmployeePositions.OrderByDescending(x => x.DateOfEmployment).ToList();
             OneS.Employee lastActualPrimaryPosition = null;
             OneS.Employee lastPosition = null;
 
-            foreach (var position in orderedPositions)
+            foreach (var position in personPositionsOrderedByDescending)
             {
-                if (lastActualPrimaryPosition == null && (position.DueDate == null || position.DueDate == default(DateTime)))
+                if (lastActualPrimaryPosition == null && (position.DueDate == null || position.DueDate == defaultDateTime))
                 {
-                    if (position.TypeOfEmployment == "ОсновноеМестоРаботы") lastActualPrimaryPosition = position;
+                    if (position.TypeOfEmployment == valueOfPrimaryPositionEnumInOneS) lastActualPrimaryPosition = position;
                     if (lastPosition == null) lastPosition = position;
                 }
             }
@@ -256,17 +409,41 @@ namespace App
             // Если возможно то присвоить последнюю актуальную должность с основным местом работы
             if (lastActualPrimaryPosition != null) lastPosition = lastActualPrimaryPosition;
             // Если актуальных должностей вообще нет просто задать самую крайнюю
-            if (lastPosition == null) lastPosition = orderedPositions.FirstOrDefault();
+            if (lastPosition == null) lastPosition = personPositionsOrderedByDescending.FirstOrDefault();
+            return lastPosition;
+        }
+
+        private static void BindCareerJobs(SyncSettings settings, SyncObjs syncObjs, Person person, ITIS.Contact contact)
+        {
+            const String valueOfPrimaryPositionEnumInOneS = "ОсновноеМестоРаботы";
+            DateTime defaultDateTime = default(DateTime);
+            List<OneS.Employee> personPositionsOrderedByDescending = person.RelatedObjs_RelatedEmployeePositions.OrderByDescending(x => x.DateOfEmployment).ToList();
+            OneS.Employee lastActualPrimaryPosition = null;
+            OneS.Employee lastPosition = null;
+
+            foreach (var position in personPositionsOrderedByDescending)
+            {
+                if (lastActualPrimaryPosition == null && (position.DueDate == null || position.DueDate == defaultDateTime))
+                {
+                    if (position.TypeOfEmployment == valueOfPrimaryPositionEnumInOneS) lastActualPrimaryPosition = position;
+                    if (lastPosition == null) lastPosition = position;
+                }
+            }
+
+            // Если возможно то присвоить последнюю актуальную должность с основным местом работы
+            if (lastActualPrimaryPosition != null) lastPosition = lastActualPrimaryPosition;
+            // Если актуальных должностей вообще нет просто задать самую крайнюю
+            if (lastPosition == null) lastPosition = personPositionsOrderedByDescending.FirstOrDefault();
             if (lastPosition != null)
             {
-                c.ITISEmploymentTypeId = settings.Map_OneSEnum_EmploymentType_CreatioGuidOf_EmploymentType[lastPosition.TypeOfEmployment];
-                c.JobTitle = lastPosition.NavProp_Position.Description;
+                contact.ITISEmploymentTypeId = settings.Map_OneSEnum_EmploymentType_CreatioGuidOf_EmploymentType[lastPosition.TypeOfEmployment];
+                contact.JobTitle = lastPosition.NavProp_Position.Description;
                 ITIS.EmployeeJob job = new ITIS.EmployeeJob();
                 job.Name = lastPosition.NavProp_Position.Description;
                 job.ITISOneSId = lastPosition.NavProp_Position.Id;
 
-                c.ITISEmployeePosition = HttpClientOfCreatio.CreateObj(job);
-                c.ITISEmployeePositionId = c.ITISEmployeePosition.Id;
+                contact.ITISEmployeePosition = HttpClientOfCreatio.CreateObj(job);
+                contact.ITISEmployeePositionId = contact.ITISEmployeePosition.Id;
             }
         }
 
@@ -532,36 +709,37 @@ namespace App
 
 
 
-        public static void Creatio_ShowContact(ITIS.Contact contact, Boolean showMapingsOrRemarks = true)
+        public static void Creatio_ShowContact(ITIS.Contact contact, Boolean shouldShowMapingsOrRemarks = true)
         {
-            contact?.Show(0, showMapingsOrRemarks);
+            contact?.Show(0, shouldShowMapingsOrRemarks);
             foreach(var career in contact?.Career)
             {
-                career.Show(1, showMapingsOrRemarks);
-                career.Account?.Show(2, showMapingsOrRemarks);
-                career.OrgStructureUnit?.Show(2, showMapingsOrRemarks);
-                career.ITISSubdivision?.Show(2, showMapingsOrRemarks);
-                career.Job?.Show(2, showMapingsOrRemarks);
+                career.Show(1, shouldShowMapingsOrRemarks);
+                career.Account?.Show(2, shouldShowMapingsOrRemarks);
+                career.OrgStructureUnit?.Show(2, shouldShowMapingsOrRemarks);
+                career.ITISSubdivision?.Show(2, shouldShowMapingsOrRemarks);
+                career.Job?.Show(2, shouldShowMapingsOrRemarks);
             }
 
             ITIS.Employee employee = (ITIS.Employee)contact?.Employee;
-            employee?.Show(1, showMapingsOrRemarks);
-            foreach(var career in employee?.Career)
-            {
-                career.Show(2, showMapingsOrRemarks);
-                career.Account?.Show(3, showMapingsOrRemarks);
-                career.OrgStructureUnit?.Show(3, showMapingsOrRemarks);
-                career.EmployeeJob?.Show(3, showMapingsOrRemarks);
-            }
-            employee?.Career.ForEach(x => x.Show(2, showMapingsOrRemarks));
+            employee?.Show(1, shouldShowMapingsOrRemarks);
 
-            contact?.ITISSubdivision?.Show(1, showMapingsOrRemarks);
-            contact?.ITISEmploymentType?.Show(1, showMapingsOrRemarks);
-            contact?.ITISOrganizationSubdivision?.Show(1, showMapingsOrRemarks);
-            contact?.Account?.Show(1, showMapingsOrRemarks);
-            contact?.Type?.Show(1, showMapingsOrRemarks);
-            (contact?.Job as ITIS.Job)?.Show(1, showMapingsOrRemarks);
-            contact?.Department?.Show(1, showMapingsOrRemarks);
+            if(employee != null)
+                foreach(var career in employee.Career)
+                {
+                    career.Show(2, shouldShowMapingsOrRemarks);
+                    career.Account?.Show(3, shouldShowMapingsOrRemarks);
+                    career.OrgStructureUnit?.Show(3, shouldShowMapingsOrRemarks);
+                    career.EmployeeJob?.Show(3, shouldShowMapingsOrRemarks);
+                }
+
+            contact?.ITISSubdivision?.Show(1, shouldShowMapingsOrRemarks);
+            contact?.ITISEmploymentType?.Show(1, shouldShowMapingsOrRemarks);
+            contact?.ITISOrganizationSubdivision?.Show(1, shouldShowMapingsOrRemarks);
+            contact?.Account?.Show(1, shouldShowMapingsOrRemarks);
+            contact?.Type?.Show(1, shouldShowMapingsOrRemarks);
+            (contact?.Job as ITIS.Job)?.Show(1, shouldShowMapingsOrRemarks);
+            contact?.Department?.Show(1, shouldShowMapingsOrRemarks);
         }
 
 

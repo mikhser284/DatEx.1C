@@ -92,7 +92,7 @@ namespace DatEx.OneC.DataModel
 
         [OneS("Double?", "ИспытательныйСрок", "Число", "ИспытательныйСрок")]
         [JsonProperty("ИспытательныйСрок")]
-        public Double? TrialPeriod { get; set; }
+        public Double? ProbationDueDate { get; set; }
 
         [OneS("Guid?", "ВидРасчета_Key", "-", "-")]
         [JsonProperty("ВидРасчета_Key")]

@@ -122,6 +122,19 @@ namespace App
         public static Boolean IsNotDefault(this Guid guid) => guid != DefaultValue;
     }
 
+    public static class Ext_DateTime
+    {
+        private static readonly DateTime DefaultValue = default(DateTime);
+
+        public static Boolean IsNotNullOrDefault(this DateTime? value) => value != null && value != DefaultValue;
+
+        public static Boolean IsNotDefault(this DateTime value) => value != DefaultValue;
+
+        public static DateTime? GetNotDefaultValue(this DateTime? value) => value.IsNotNullOrDefault() ? value : null;
+
+        public static DateTime? GetNotDefaultValue(this DateTime value) => value.IsNotDefault() ? (DateTime?)value : null;
+    }
+
     public static class Ext_Task
     {
         public static Task[] StartAndWaitForAll(this Task[] tasks)

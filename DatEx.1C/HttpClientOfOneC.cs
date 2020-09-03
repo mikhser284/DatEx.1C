@@ -23,7 +23,12 @@ namespace DatEx.OneC
             String separator = !String.IsNullOrEmpty(query) ? "&" : "";
             String fullQuery = $"{typeName}/?{query}{separator}{AsJson}";
             HttpResponseMessage response = HttpClient.GetAsync(fullQuery).Result;
-            response.EnsureSuccessStatusCode();
+            try { response.EnsureSuccessStatusCode(); }
+            catch (HttpRequestException ex)
+            {
+                String error = "\n\n" + JToken.Parse(response.Content.ReadAsStringAsync().Result).ToString(Formatting.Indented) + "\n";
+                throw new Exception(error, ex);
+            }
             String result = response.Content.ReadAsStringAsync().Result;
 #if DEBUG
             result = JToken.Parse(result).ToString(Formatting.Indented);
@@ -38,7 +43,12 @@ namespace DatEx.OneC
             String separator = !String.IsNullOrEmpty(query) ? " &" : "";
             String queryString = $"{typeName}/?{query}{separator}$select={nameOfGuidFieldToSelect} &{AsJson}";
             HttpResponseMessage response = HttpClient.GetAsync(queryString).Result;
-            response.EnsureSuccessStatusCode();
+            try { response.EnsureSuccessStatusCode(); }
+            catch (HttpRequestException ex)
+            {
+                String error = "\n\n" + JToken.Parse(response.Content.ReadAsStringAsync().Result).ToString(Formatting.Indented) + "\n";
+                throw new Exception(error, ex);
+            }
             String result = response.Content.ReadAsStringAsync().Result;
 #if DEBUG
             result = JToken.Parse(result).ToString(Formatting.Indented);

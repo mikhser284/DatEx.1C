@@ -1,17 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using DatEx.Creatio.DataModel;
-using DatEx.Creatio.DataModel.Terrasoft.Base;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-namespace DatEx.Creatio
+﻿namespace DatEx.Creatio
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Text;
+    using DatEx.Creatio.DataModel;
+    using DatEx.Creatio.DataModel.Terrasoft.Base;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+
+
+
     public partial class HttpClientOfCreatio
     {
         #region ————— Общие методы ——————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -65,7 +67,23 @@ namespace DatEx.Creatio
                 else bindedObjsGroupedByParentId.Add(parentKey, new List<T> { item });
             }
             return bindedObjsGroupedByParentId;
-        }        
+        }
+
+
+        public Dictionary<Guid, TObj> GetDistinctObjsWithPropValueIn<TObj, TProp>(String propName, IEnumerable<TProp> propValues) where TObj : BaseEntity
+        {
+            Dictionary<Guid, TObj> distinctObjs = new Dictionary<Guid, TObj>();
+            if (propValues.Count() == 0) return distinctObjs;
+            String query = $"filter={String.Join(" or ", propValues.Select(propValue => $"{propName} eq {propValue}"))}";
+            List<TObj> queryResult = GetObjs<TObj>(query);
+            foreach(TObj item in queryResult)
+            {
+                if (distinctObjs.ContainsKey((Guid)item.Id)) continue;
+                distinctObjs.Add((Guid)item.Id, item);
+            }
+
+            return distinctObjs;
+        }
 
         /// <summary> Получить объекты указанного типа </summary>
         public List<T> GetObjs<T>(String query = default(String)) where T : BaseEntity
@@ -121,7 +139,12 @@ namespace DatEx.Creatio
             StringContent content = new StringContent(serializedEntity, Encoding.UTF8, "application/json");
             Uri odataUri = new Uri(OdataUri, typeof(T).Name);
             HttpResponseMessage response = CreatioClient.PostAsync(odataUri, content).Result;
-            response.EnsureSuccessStatusCode();
+            try { response.EnsureSuccessStatusCode(); }
+            catch(HttpRequestException ex)
+            {
+                String error = "\n\n" + JToken.Parse(response.Content.ReadAsStringAsync().Result).ToString(Formatting.Indented) + "\n";
+                throw new Exception(error, ex);
+            }
             String result = response.Content.ReadAsStringAsync().Result;
 #if DEBUG
             result = JToken.Parse(result).ToString(Formatting.Indented);
@@ -156,7 +179,12 @@ namespace DatEx.Creatio
             StringContent content = new StringContent(serializedEntity, Encoding.UTF8, "application/json");
             Uri odataUri = new Uri(OdataUri, $"{typeof(T).Name}({obj.Id})");
             HttpResponseMessage response = CreatioClient.PatchAsync(odataUri, content).Result;
-            response.EnsureSuccessStatusCode();
+            try { response.EnsureSuccessStatusCode(); }
+            catch (HttpRequestException ex)
+            {
+                String error = "\n\n" + JToken.Parse(response.Content.ReadAsStringAsync().Result).ToString(Formatting.Indented) + "\n";
+                throw new Exception(error, ex);
+            }
         }
 
         /// <summary> Удалить объект </summary>
@@ -165,7 +193,12 @@ namespace DatEx.Creatio
             if (obj.Id == null) throw new InvalidOperationException("Не указан идентификатор изменяемого объекта");
             Uri odataUri = new Uri(OdataUri, $"{typeof(T).Name}({obj.Id})");
             HttpResponseMessage response = CreatioClient.DeleteAsync(odataUri).Result;
-            response.EnsureSuccessStatusCode();
+            try { response.EnsureSuccessStatusCode(); }
+            catch (HttpRequestException ex)
+            {
+                String error = "\n\n" + JToken.Parse(response.Content.ReadAsStringAsync().Result).ToString(Formatting.Indented) + "\n";
+                throw new Exception(error, ex);
+            }
         }
 
         #endregion ————— Общие методы
@@ -207,7 +240,12 @@ namespace DatEx.Creatio
             String authData = JsonConvert.SerializeObject(new AuthRequest(userName, userPassword));
             StringContent content = new StringContent(authData, Encoding.UTF8, "application/json");
             HttpResponseMessage response = client.PostAsync(creatioClient.AuthServiceUri, content).Result;
-            response.EnsureSuccessStatusCode();
+            try { response.EnsureSuccessStatusCode(); }
+            catch (HttpRequestException ex)
+            {
+                String error = "\n\n" + JToken.Parse(response.Content.ReadAsStringAsync().Result).ToString(Formatting.Indented) + "\n";
+                throw new Exception(error, ex);
+            }
             String result = response.Content.ReadAsStringAsync().Result;
 #if DEBUG
             result = JToken.Parse(result).ToString(Formatting.Indented);
@@ -224,7 +262,12 @@ namespace DatEx.Creatio
         private String GetRequest(String query)
         {
             HttpResponseMessage response = CreatioClient.GetAsync(query).Result;
-            response.EnsureSuccessStatusCode();
+            try { response.EnsureSuccessStatusCode(); }
+            catch (HttpRequestException ex)
+            {
+                String error = "\n\n" + JToken.Parse(response.Content.ReadAsStringAsync().Result).ToString(Formatting.Indented) + "\n";
+                throw new Exception(error, ex);
+            }
             String result = response.Content.ReadAsStringAsync().Result;
 #if DEBUG
             result = JToken.Parse(result).ToString(Formatting.Indented);
@@ -239,7 +282,7 @@ namespace DatEx.Creatio
 
         #region ————— Временные (удалить) ———————————————————————————————————————————————————————————————————————————————————————————————————————————
         
-        public String GetODataRequestResult(String dataSource, String query) => GetRequest($"{OdataUri}{dataSource}{query}");
+        //public String GetODataRequestResult(String dataSource, String query) => GetRequest($"{OdataUri}{dataSource}{query}");
 
         #endregion ————— Временные (удалить)
     }

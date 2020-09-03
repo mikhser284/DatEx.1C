@@ -27,11 +27,12 @@
         /// <summary> Форма собственности (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
         [JsonProperty("OwnershipId", Order = 9)]
+        [MapRemarks("Значение береться из объекта настроек (Подставляется Guid для значения 'ТОВ')")]
+        [Map(true)]
         [CreatioProp("Форма собственности (Id)", Color = ConsoleColor.Blue)]
         public Guid? OwnershipId { get; set; }
 
         /// <summary> Форма собственности </summary>
-        [Map]
         [JsonIgnoreSerialization]
         [CreatioProp("Форма собственности", Color = ConsoleColor.Yellow)]
         public AccountOwnership Ownership { get; set; }
@@ -79,7 +80,6 @@
         public Guid? TypeId { get; set; }
 
         /// <summary> Тип </summary>
-        [Map]
         [JsonIgnoreSerialization]
         [CreatioProp("Тип", Color = ConsoleColor.Yellow)]
         public AccountType Type { get; set; }
@@ -211,12 +211,14 @@
         public Image AccountLogo { get; set; }
 
         /// <summary> ИНН </summary>
-        [Map]
+        [MapRemarks("В 1С связь между справочником Организации и Контрагенты осуществляется при помощи информационного регистра СобственныеКонтрагенты")]
+        [Map(true, DataType.Lookup, "Catalog_Контрагенты", DataType.String, "ИНН")]
         [CreatioProp("ИНН", Color = ConsoleColor.Yellow)]
         public String INN { get; set; }
 
         /// <summary> ЕДРПОУ </summary>
-        [Map]
+        [MapRemarks("В 1С связь между справочником Организации и Контрагенты осуществляется при помощи информационного регистра СобственныеКонтрагенты")]
+        [Map(true, DataType.Lookup, "Catalog_Контрагенты", DataType.String, "КодПоЕДРПОУ")]
         [CreatioProp("ЕДРПОУ", Color = ConsoleColor.Yellow)]
         public String KPP { get; set; }
 
