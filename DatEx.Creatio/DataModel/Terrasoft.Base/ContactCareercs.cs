@@ -34,16 +34,15 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
 
         /// <summary> Подразделение (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
-        [MapRemarks("Объект Подразделение должен быть уже синхронизирован с 1С, здесь же необходимо найти ранее созданный объект по его ITISOneSId и присвоить его Id в Creatio")]
+        [MapRemarks("Объект Департамент должен быть уже синхронизирован с 1С, здесь же необходимо найти ранее созданный объект по его ITISOneSId и присвоить его Id в Creatio")]
         [Map(true)]
         [CreatioProp("Департамент (Id)", Color = ConsoleColor.Blue)]
-        public Guid? OrgStructureUnitId { get; set; }
+        public Guid? DepartmentId { get; set; }
 
         /// <summary> Подразделение </summary>
         [JsonIgnoreSerialization]
-        [Map]
         [CreatioProp("Департамент", Color = ConsoleColor.Yellow)]
-        public OrgStructureUnit OrgStructureUnit { get; set; }
+        public Department OrgStructureUnit { get; set; }
 
         /// <summary> Должность (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]

@@ -145,7 +145,7 @@ namespace App
                     career.JobTitle = pos.NavProp_CurrentPositionInOrganization?.Description;
                     career.Primary = pos.TypeOfEmployment == valueOfPrimaryEmploymentTypeEnum;
                     career.ITISEmploymentTypeId = settings.Map_OneSEnum_EmploymentType_CreatioGuidOf_EmploymentType[pos.TypeOfEmployment];
-                    //career.OrgStructureUnitId = syncObjs.Creatio_OrgStructureUnits_ByOneSId[pos.NavProp_CurrentOrganizationSubdivision.Id].Id;
+                    career.DepartmentId = syncObjs.Creatio_Departaments_ByOneSId[pos.NavProp_CurrentOrganizationSubdivision.Id].Id;
                     career.JobId = syncObjs.Creatio_Jobs_ByOneSId[pos.NavProp_CurrentPositionInOrganization.Id].Id;
                     //
                     //
@@ -302,11 +302,6 @@ namespace App
             }
         }
 
-        private static void Creatio_MapObjs_Career(SyncObjs syncObjs, SyncSettings settings)
-        {
-            //TODO Заполнение карьеры сотрудника
-        }
-
         private static void Creatio_MapObj_Account(SyncObjs syncObjs, SyncSettings settings)
         {
             foreach(var x in syncObjs.OneS_Organizations.Values)
@@ -328,7 +323,6 @@ namespace App
                 //
                 c = HttpClientOfCreatio.CreateObj(c);
                 syncObjs.Creatio_Accounts_ByOneSId.Add((Guid)c.ITISOneSId, c);
-                //syncObjs.Creatio_Accounts_ById.Add((Guid)c.Id, c);
             }
         }
 
