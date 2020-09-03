@@ -15,7 +15,6 @@ namespace App
         /// <summary> 1С даные из справочника ПодразделенияОрганизаций </summary>
         public Dictionary<Guid, OneS.OrganizationSubdivision> OneS_Subdivisions = new Dictionary<Guid, OneS.OrganizationSubdivision>();
         public Dictionary<Guid, ITIS.OrgStructureUnit> Creatio_OrgStructureUnits_ByOneSId = new Dictionary<Guid, ITIS.OrgStructureUnit>();
-        //public Dictionary<Guid, ITIS.OrgStructureUnit> Creatio_OrgStructureUnits_ById = new Dictionary<Guid, ITIS.OrgStructureUnit>();
         public Dictionary<Guid, ITIS.Department> Creatio_Departaments_ByOneSId = new Dictionary<Guid, ITIS.Department>();
         public Dictionary<Guid, AccountOrganizationChart> Creatio_AccountOrganizationCharts_ByOneSId = new Dictionary<Guid, AccountOrganizationChart>();
         
@@ -25,24 +24,20 @@ namespace App
         /// <summary> 1С даные из справочника ДолжностиОрганизаций </summary>
         public Dictionary<Guid, OneS.PositionInOrganization> OneS_Positions = new Dictionary<Guid, OneS.PositionInOrganization>();
         public Dictionary<Guid, ITIS.Job> Creatio_Jobs_ByOneSId = new Dictionary<Guid, ITIS.Job>();
-        //public Dictionary<Guid, ITIS.Job> Creatio_Jobs_ById = new Dictionary<Guid, ITIS.Job>();
         public Dictionary<Guid, ITIS.EmployeeJob> Creatio_EmployeeJobs_ByOneSId = new Dictionary<Guid, ITIS.EmployeeJob>();
-        //public Dictionary<Guid, ITIS.EmployeeJob> Creatio_EmployeeJobs_ById = new Dictionary<Guid, ITIS.EmployeeJob>();
 
 
 
         /// <summary> 1С даные из справочника Организации </summary>
         public Dictionary<Guid, OneS.Organization> OneS_Organizations = new Dictionary<Guid, OneS.Organization>();
         public Dictionary<Guid, ITIS.Account> Creatio_Accounts_ByOneSId = new Dictionary<Guid, ITIS.Account>();
-        //public Dictionary<Guid, ITIS.Account> Creatio_Accounts_ById = new Dictionary<Guid, ITIS.Account>();
 
 
 
         /// <summary> 1C Физ. лица упорядоченные по Id </summary>
         public Dictionary<Guid, OneS.Person> OneS_PersonsOrderedById { get; set; } = new Dictionary<Guid, OneS.Person>();
-        //public Dictionary<Guid, ITIS.Contact> Creatio_ContractsOrderedById = new Dictionary<Guid, ITIS.Contact>();
         public Dictionary<Guid, ITIS.Contact> Creatio_ContractsOrderedByOneSId = new Dictionary<Guid, ITIS.Contact>();
-        public Dictionary<Guid, ITIS.ContactCareer> Creatio_ContactCareers = new Dictionary<Guid, ITIS.ContactCareer>();
+        public Dictionary<Guid, List<ITIS.ContactCareer>> Creatio_ContactCareersGrouppedByContactId = new Dictionary<Guid, List<ITIS.ContactCareer>>();
         public Dictionary<Guid, ITIS.Employee> Creatio_EmployeesOrderedByContactId = new Dictionary<Guid, ITIS.Employee>();
         public Dictionary<Guid, List<ITIS.EmployeeCareer>> Creatio_EmployeeCareersGrouppedByEmployeeId = new Dictionary<Guid, List<ITIS.EmployeeCareer>>();
 

@@ -11,6 +11,8 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
     {
         /// <summary> Сотрудник (Id) </summary>
         [JsonConverter(typeof(JsonConverter_Guid))]
+        [MapRemarks("Объект Сотрудник должен быть уже синхронизирован с 1С, здесь же необходимо найти ранее созданный объект по его ITISOneSId и присвоить его Id в Creatio")]
+        [Map(true)]
         [CreatioProp("Сотрудник (Id)", Color = ConsoleColor.Blue)]
         public Guid? EmployeeId { get; set; }
 
@@ -61,8 +63,8 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public String FullJobTitle { get; set; }
 
         /// <summary> Начало </summary>
-        [Map(true, DataType.Lookup, "Catalog_СотрудникиОрганизаций", DataType.Date, "ДатаПриемаНаРаботу")]
         [JsonConverter(typeof(JsonConverter_Date))]
+        [Map(true, DataType.Lookup, "Catalog_СотрудникиОрганизаций", DataType.Date, "ДатаПриемаНаРаботу")]
         [CreatioProp("Начало", Color = ConsoleColor.Yellow)]
         public DateTime? StartDate { get; set; }
 
@@ -73,7 +75,7 @@ namespace DatEx.Creatio.DataModel.Terrasoft.Base
         public DateTime? DueDate { get; set; }
 
         /// <summary> Текущее </summary>
-        [MapRemarks("Если дата окончания равна значению по умолчанию или null то true, иначе false; ? При попытке установить значение true - Internal server error")]
+        [MapRemarks("Если дата окончания равна значению по умолчанию или null то true, иначе false; ? При попытке установить значение true - Internal server error, либо же система не реагирует никак")]
         [Map(false, DataType.Lookup, "Catalog_СотрудникиОрганизаций", DataType.Date, "ДатаОкончания")]
         [CreatioProp("Текущее", Color = ConsoleColor.Yellow)]
         public Boolean? IsCurrent { get; set; }

@@ -121,8 +121,41 @@ namespace App
 
         private static void Creatio_MapObj_ContactCareer(SyncObjs syncObjs, SyncSettings settings)
         {
-            //TODO Удалить автоматически созданные записи о карьере контакта (так как у них не заполнено поле ITISOneSId)
-            //TODO Синхронизация карьеры контакта
+            ITIS.ContactCareer c;
+            var deletableCareers = HttpClientOfCreatio.GetDistinctObjsWithPropValueIn<ITIS.ContactCareer, Guid>($"{nameof(c.Contact)}/Id", syncObjs.Creatio_ContractsOrderedByOneSId.Values.Select(e => (Guid)e.Id));
+            deletableCareers.Values.ForEach(x => HttpClientOfCreatio.DeleteObj(x));
+
+            const string valueOfPrimaryEmploymentTypeEnum = "ОсновноеМестоРаботы";
+
+            foreach (Person person in syncObjs.OneS_PersonsOrderedById.Values)
+            {
+                ITIS.Contact contact = syncObjs.Creatio_ContractsOrderedByOneSId[person.Id];                
+
+                foreach (OneS.Employee pos in person.RelatedObjs_RelatedEmployeePositions)
+                {
+                    ITIS.ContactCareer career = new ContactCareer();
+                    //
+                    //
+                    career.ContactId = contact.Id;
+                    career.ITISOneSId = pos.Id;
+                    career.AccountId = syncObjs.Creatio_Accounts_ByOneSId[pos.NavProp_Organization.Id].Id;
+                    career.StartDate = pos.DateOfEmployment;
+                    career.DueDate = pos.DateOfDismisal.GetNotDefaultValue();
+                    career.Current = pos.DateOfDismisal.IsNotNullOrDefault() ? false : true;
+                    career.JobTitle = pos.NavProp_CurrentPositionInOrganization?.Description;
+                    career.Primary = pos.TypeOfEmployment == valueOfPrimaryEmploymentTypeEnum;
+                    career.ITISEmploymentTypeId = settings.Map_OneSEnum_EmploymentType_CreatioGuidOf_EmploymentType[pos.TypeOfEmployment];
+                    //career.OrgStructureUnitId = syncObjs.Creatio_OrgStructureUnits_ByOneSId[pos.NavProp_CurrentOrganizationSubdivision.Id].Id;
+                    career.JobId = syncObjs.Creatio_Jobs_ByOneSId[pos.NavProp_CurrentPositionInOrganization.Id].Id;
+                    //
+                    //
+                    career = HttpClientOfCreatio.CreateObj<ITIS.ContactCareer>(career);
+                    List<ITIS.ContactCareer> contactCareers = new List<ContactCareer>();
+                    if (!syncObjs.Creatio_ContactCareersGrouppedByContactId.TryGetValue((Guid)contact.Id, out contactCareers))
+                        syncObjs.Creatio_ContactCareersGrouppedByContactId.Add((Guid)contact.Id, new List<ContactCareer> { career });
+                    else contactCareers.Add(career);
+                }
+            }
         }
 
         private static void Creatio_MapObj_EmployeeCareer(SyncObjs syncObjs, SyncSettings settings)
@@ -147,8 +180,7 @@ namespace App
             
             foreach(Person person in syncObjs.OneS_PersonsOrderedById.Values)
             {
-                ITIS.Contact contact = syncObjs.Creatio_ContractsOrderedByOneSId[person.Id];
-                
+                ITIS.Contact contact = syncObjs.Creatio_ContractsOrderedByOneSId[person.Id];                
                 ITIS.Employee employee = syncObjs.Creatio_EmployeesOrderedByContactId[(Guid)contact.Id];
 
                 
@@ -156,20 +188,20 @@ namespace App
                 {
                     ITIS.EmployeeCareer career = new EmployeeCareer();
                     //
+                    //
                     career.EmployeeId = employee.Id;
                     career.ITISOneSId = pos.Id;
                     career.AccountId = syncObjs.Creatio_Accounts_ByOneSId[pos.NavProp_Organization.Id].Id;
                     career.StartDate = pos.DateOfEmployment;
                     career.DueDate = pos.DateOfDismisal.GetNotDefaultValue();
-                    //? Используеться ли испытательный срок в 1С, если да то в каких ед. измерения дни или месяцы
-                    //career.ProbationDueDate = pos.ProbationDueDate;
-                    //? При попытке установить значение true - Internal server error (такое впе
-                    career.IsCurrent = true; // pos.DateOfDismisal.IsNotNullOrDefault() ? false : true;
+                    //? При попытке установить значение true - Internal server error, либо же система не реагирует никак
+                    career.IsCurrent = pos.DateOfDismisal.IsNotNullOrDefault() ? false : true;
                     career.FullJobTitle = pos.NavProp_CurrentPositionInOrganization?.Description;
                     career.ITISPrimary = pos.TypeOfEmployment == valueOfPrimaryEmploymentTypeEnum;
                     career.ITISTypeOfEmploymentId = settings.Map_OneSEnum_EmploymentType_CreatioGuidOf_EmploymentType[pos.TypeOfEmployment];
                     career.OrgStructureUnitId = syncObjs.Creatio_OrgStructureUnits_ByOneSId[pos.NavProp_CurrentOrganizationSubdivision.Id].Id;
                     career.EmployeeJobId = syncObjs.Creatio_EmployeeJobs_ByOneSId[pos.NavProp_CurrentPositionInOrganization.Id].Id;
+                    //
                     //
                     career = HttpClientOfCreatio.CreateObj<ITIS.EmployeeCareer>(career);
                     List<ITIS.EmployeeCareer> employeeCareers = new List<EmployeeCareer>();
