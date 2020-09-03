@@ -169,7 +169,7 @@ namespace App
                 {
                     HttpClientOfCreatio.DeleteObj(del);
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     //? Почему система не позволяет нормально удалить автоматически созданные объекты
                     Console.WriteLine("!!! При попытке удалить объек карьера сотрудника возникло исключение");
@@ -471,35 +471,6 @@ namespace App
                 contact.ITISEmployeePosition = HttpClientOfCreatio.CreateObj(job);
                 contact.ITISEmployeePositionId = contact.ITISEmployeePosition.Id;
             }
-        }
-
-        private static ITIS.Employee Creatio_AddNewEmployee(ITIS.Contact c, Person p)
-        {
-            ITIS.Employee e = HttpClientOfCreatio.GetObjsByIds<ITIS.Employee>(new List<Guid> { (Guid)c.Id }, "Contact").Values.FirstOrDefault();
-            Boolean employeeCreated = false;
-            if (e == null)
-            {
-                employeeCreated = true;
-                e = new ITIS.Employee();
-            }
-
-            e.ContactId = (Guid)c.Id;
-            e.ITISSurName = p.RelatedObj_NameInfo.Surname;
-            e.ITISGivenName = p.RelatedObj_NameInfo.GivenName;
-            e.ITISMiddleName = p.RelatedObj_NameInfo.MiddleName;
-            e.Notes = "* Создано/обновлено во время синхнонизации с 1С";
-
-
-            // Создать или обновить связанного с контактом сотрудника
-            // 1. При попытке обновить объект Сотрудник по протоколу oData возникает ошибка Internal server error, именно для данного типа объектов (возможно это связанно с его автоматическим создании после создания объекта Контакт)
-            // 2. Во время автоматического создания Сотрудника почему-то создаеться пустой объект в детали Карьера
-
-            //if (employeeCreated) CreatioHttpClient.CreateObj(e);
-            //else CreatioHttpClient.UpdateObj(e);
-
-            
-
-            return e;
         }
     }
 
