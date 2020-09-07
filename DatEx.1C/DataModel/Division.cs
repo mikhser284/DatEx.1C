@@ -1,6 +1,6 @@
-﻿namespace DatEx.OneC.DataModel
+﻿namespace DatEx.OneS.DataModel
 {
-    using DatEx.OneC.DataModel.Auxilary;
+    using DatEx.OneS.DataModel.Auxilary;
     using Newtonsoft.Json;
     using System;
 

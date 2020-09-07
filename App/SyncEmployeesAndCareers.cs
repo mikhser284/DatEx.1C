@@ -3,27 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using OneS = DatEx.OneC.DataModel;
+using OneS = DatEx.OneS.DataModel;
 using ITIS = DatEx.Creatio.DataModel.ITIS;
 using Terrasoft = DatEx.Creatio.DataModel.Terrasoft.Base;
-using System.Runtime;
-using DatEx.OneC.DataModel;
-using System.Runtime.CompilerServices;
+using DatEx.OneS.DataModel;
 using DatEx.Creatio.DataModel.ITIS;
 using DatEx.Creatio;
-using System.Threading;
-using System.Security.Cryptography.X509Certificates;
-using System.Net.WebSockets;
-using System.IO;
 
 namespace App
 {
     /// <summary> Первичная синхронизация контактов, сотрудников и контактной информации </summary>
     public partial class Program
     {
-        public static void SyncEmployees(SyncSettings settings)
+        public static void SyncEmployeesAndCareers(SyncSettings settings)
         {
-            Task<SyncObjs> oneS_getSyncObjects = new Task<SyncObjs>(() => OneC_GetPersonsAndRelatedInfoForSync(settings));
+            Task<SyncEmployeesAndCareers_SyncObjs> oneS_getSyncObjects = new Task<SyncEmployeesAndCareers_SyncObjs>(() => OneC_GetPersonsAndRelatedInfoForSync(settings));
             
             Task[] tasks = new Task[]
             {
@@ -31,7 +25,7 @@ namespace App
                 oneS_getSyncObjects
             }.StartAndWaitForAll();
 
-            SyncObjs syncObjs = oneS_getSyncObjects.Result;
+            SyncEmployeesAndCareers_SyncObjs syncObjs = oneS_getSyncObjects.Result;
             OneC_ShowPersonFullInfo(syncObjs.OneS_PersonsOrderedById.Values.Take(2));
             syncObjs.OneS_PersonsOrderedById.Values.ForEach(person => Console.WriteLine(person.GetShortNameAndActualPositions()));
 
@@ -76,7 +70,7 @@ namespace App
 
 
 
-        public static void Creatio_EmployeesFirstSyncWithOneS(SyncObjs syncObjs, SyncSettings settings)
+        public static void Creatio_EmployeesFirstSyncWithOneS(SyncEmployeesAndCareers_SyncObjs syncObjs, SyncSettings settings)
         {
             HashSet<Guid> contactIds = new HashSet<Guid>();
             List<ITIS.Contact> contacts = new List<Contact>();
@@ -103,7 +97,7 @@ namespace App
         }
 
         
-        private static void Creatio_EmployeesInfo_MapObjectsFromOneSToObjectsFromCreatio(SyncObjs syncObjs, SyncSettings settings)
+        private static void Creatio_EmployeesInfo_MapObjectsFromOneSToObjectsFromCreatio(SyncEmployeesAndCareers_SyncObjs syncObjs, SyncSettings settings)
         {
             Creatio_MapObj_Account(syncObjs, settings);
             Creatio_MapObj_OrgStructureUnit(syncObjs, settings);
@@ -119,7 +113,7 @@ namespace App
 
 
 
-        private static void Creatio_MapObj_ContactCareer(SyncObjs syncObjs, SyncSettings settings)
+        private static void Creatio_MapObj_ContactCareer(SyncEmployeesAndCareers_SyncObjs syncObjs, SyncSettings settings)
         {
             ITIS.ContactCareer c;
             var deletableCareers = HttpClientOfCreatio.GetDistinctObjsWithPropValueIn<ITIS.ContactCareer, Guid>($"{nameof(c.Contact)}/Id", syncObjs.Creatio_ContractsOrderedByOneSId.Values.Select(e => (Guid)e.Id));
@@ -158,7 +152,7 @@ namespace App
             }
         }
 
-        private static void Creatio_MapObj_EmployeeCareer(SyncObjs syncObjs, SyncSettings settings)
+        private static void Creatio_MapObj_EmployeeCareer(SyncEmployeesAndCareers_SyncObjs syncObjs, SyncSettings settings)
         {
             ITIS.EmployeeCareer c;
             var deletableCareers = HttpClientOfCreatio.GetDistinctObjsWithPropValueIn<ITIS.EmployeeCareer, Guid>($"{nameof(c.Employee)}/Id", syncObjs.Creatio_EmployeesOrderedByContactId.Values.Select(e => (Guid)e.Id));
@@ -212,7 +206,7 @@ namespace App
             }
         }
 
-        private static void Creataio_MapObj_Employee(SyncObjs syncObjs, SyncSettings settings)
+        private static void Creataio_MapObj_Employee(SyncEmployeesAndCareers_SyncObjs syncObjs, SyncSettings settings)
         {
             // Создаеться ли объект Сотрудник автоматически при создании соответствующего типа конракта
             Boolean autoCreationOfEmployeesActivated = true;
@@ -249,7 +243,7 @@ namespace App
             }
         }
 
-        private static void Creatio_MapObj_Contacts(SyncObjs syncObjs, SyncSettings settings)
+        private static void Creatio_MapObj_Contacts(SyncEmployeesAndCareers_SyncObjs syncObjs, SyncSettings settings)
         {
             foreach(var p in syncObjs.OneS_PersonsOrderedById.Values)
             {
@@ -302,7 +296,7 @@ namespace App
             }
         }
 
-        private static void Creatio_MapObj_Account(SyncObjs syncObjs, SyncSettings settings)
+        private static void Creatio_MapObj_Account(SyncEmployeesAndCareers_SyncObjs syncObjs, SyncSettings settings)
         {
             foreach(var x in syncObjs.OneS_Organizations.Values)
             {
@@ -327,7 +321,7 @@ namespace App
         }
 
 
-        private static void Creatio_MapObj_OrgStructureUnit(SyncObjs syncObjs, SyncSettings settings)
+        private static void Creatio_MapObj_OrgStructureUnit(SyncEmployeesAndCareers_SyncObjs syncObjs, SyncSettings settings)
         {
             foreach(var x in syncObjs.OneS_Subdivisions.Values)
             {
@@ -345,7 +339,7 @@ namespace App
         }
 
         
-        private static void Creatio_MapObj_AccountOrganizationChart(SyncObjs syncObjs, SyncSettings settings)
+        private static void Creatio_MapObj_AccountOrganizationChart(SyncEmployeesAndCareers_SyncObjs syncObjs, SyncSettings settings)
         {
             foreach(var x in syncObjs.OneS_PersonsOrderedById.Values)
             {
@@ -380,7 +374,7 @@ namespace App
 
 
 
-        private static void Creatio_MapObj_EmployeeJob(SyncObjs syncObjs, SyncSettings settings)
+        private static void Creatio_MapObj_EmployeeJob(SyncEmployeesAndCareers_SyncObjs syncObjs, SyncSettings settings)
         {
             foreach(var x in syncObjs.OneS_Positions.Values)
             {
@@ -398,7 +392,7 @@ namespace App
 
         
         
-        private static void Creatio_MapObj_Job(SyncObjs syncObjs, SyncSettings settings)
+        private static void Creatio_MapObj_Job(SyncEmployeesAndCareers_SyncObjs syncObjs, SyncSettings settings)
         {
             foreach(var x in syncObjs.OneS_Positions.Values)
             {
@@ -415,7 +409,7 @@ namespace App
         }
 
 
-        private static OneS.Employee OneS_GetPrimaryPosition(Person person, SyncObjs syncObjs, SyncSettings settings)
+        private static OneS.Employee OneS_GetPrimaryPosition(Person person, SyncEmployeesAndCareers_SyncObjs syncObjs, SyncSettings settings)
         {
             const String valueOfPrimaryPositionEnumInOneS = "ОсновноеМестоРаботы";
             DateTime defaultDateTime = default(DateTime);
@@ -439,7 +433,7 @@ namespace App
             return lastPosition;
         }
 
-        private static void BindCareerJobs(SyncSettings settings, SyncObjs syncObjs, Person person, ITIS.Contact contact)
+        private static void BindCareerJobs(SyncSettings settings, SyncEmployeesAndCareers_SyncObjs syncObjs, Person person, ITIS.Contact contact)
         {
             const String valueOfPrimaryPositionEnumInOneS = "ОсновноеМестоРаботы";
             DateTime defaultDateTime = default(DateTime);
@@ -517,9 +511,9 @@ namespace App
         }
 
         /// <summary> Получить из 1С физ. лица и всю связанную с ними информацию необходимою для синхронизации </summary>
-        public static SyncObjs OneC_GetPersonsAndRelatedInfoForSync(SyncSettings settings)
+        public static SyncEmployeesAndCareers_SyncObjs OneC_GetPersonsAndRelatedInfoForSync(SyncSettings settings)
         {
-            SyncObjs syncObjs = new SyncObjs();
+            SyncEmployeesAndCareers_SyncObjs syncObjs = new SyncEmployeesAndCareers_SyncObjs();
             OneC_GetPersonsWithSufficientEmail(settings, syncObjs);
             Task[] tasks = new Task[]
             {
@@ -531,7 +525,7 @@ namespace App
         }
 
         /// <summary> Получить из 1С физ. лица с подходящим email </summary>
-        public static Dictionary<Guid, OneS.Person> OneC_GetPersonsWithSufficientEmail(SyncSettings settings, SyncObjs syncObjs)
+        public static Dictionary<Guid, OneS.Person> OneC_GetPersonsWithSufficientEmail(SyncSettings settings, SyncEmployeesAndCareers_SyncObjs syncObjs)
         {
             // Получаем идентификаторы физ. лиц с почтовыми адресами, которые оканчиваются на указанный домен
             List<Guid> idsPersonsWithEmails = HttpClientOfOneS.GetIdsOfObjs<OneS.IRContactInfo>(
@@ -545,7 +539,7 @@ namespace App
         }
 
         /// <summary> Получить из 1С контактную информацию и связать ее с физ. лицам </summary>
-        public static void OneC_GetContactInfoAndBindWithPersons(SyncObjs syncObjs, SyncSettings settings)
+        public static void OneC_GetContactInfoAndBindWithPersons(SyncEmployeesAndCareers_SyncObjs syncObjs, SyncSettings settings)
         {
             syncObjs.OneS_ContactInfosGroupedByPersonId = HttpClientOfOneS
                 .GetObjsByIds<OneS.IRContactInfo>(syncObjs.OneS_PersonsOrderedById.Keys, "cast(Объект, 'Catalog_ФизическиеЛица')")
@@ -569,7 +563,7 @@ namespace App
         }
 
         /// <summary> Получить из 1С типы контактной информации и связать с контактной информацией </summary>
-        static void OneC_GetAndBindContactInfoTypes(SyncObjs syncObjs)
+        static void OneC_GetAndBindContactInfoTypes(SyncEmployeesAndCareers_SyncObjs syncObjs)
         {
             HashSet<Guid> idsOfcontactInfoTypes = new HashSet<Guid>();
             syncObjs.OneS_ContactInfosGroupedByPersonId.ForEach(key => key.Value.ForEach(value => idsOfcontactInfoTypes.Add(new Guid(value.KeyKind))));
@@ -579,7 +573,7 @@ namespace App
         }
 
         /// <summary> Получить из 1С данные из инфо. регистра InformationRegister_ФИОФизЛиц и связываем з физлицами </summary>
-        public static void OneC_GetNamesAndBindWithPersons(SyncObjs syncObjs)
+        public static void OneC_GetNamesAndBindWithPersons(SyncEmployeesAndCareers_SyncObjs syncObjs)
         {
             syncObjs.OneS_NamesOfPersons = HttpClientOfOneS
                 .GetObjsByIds<OneS.IRNamesOfPersons>(syncObjs.OneS_PersonsOrderedById.Keys, "cast(ФизЛицо, 'Catalog_ФизическиеЛица')");
@@ -588,7 +582,7 @@ namespace App
         }
 
         /// <summary> Получить из 1С сотрудников и связать с физ. лицами </summary>
-        public static void OneC_GetEmployeesAndBindWithPersons(SyncObjs syncObjs)
+        public static void OneC_GetEmployeesAndBindWithPersons(SyncEmployeesAndCareers_SyncObjs syncObjs)
         {
             // Связать сотрудников с физ. лицами
             syncObjs.OneS_Employees = HttpClientOfOneS.GetObjsByIds<OneS.Employee>(syncObjs.OneS_PersonsOrderedById.Keys, "Физлицо_Key");
@@ -606,7 +600,7 @@ namespace App
         }
 
         /// <summary> Получить из 1С должности и связать их с сотрудниками </summary>
-        static void OneC_GetPositionsAndBindWithEmployees(SyncObjs syncObjs)
+        static void OneC_GetPositionsAndBindWithEmployees(SyncEmployeesAndCareers_SyncObjs syncObjs)
         {
             syncObjs.OneS_Positions = null;
             {
@@ -629,7 +623,7 @@ namespace App
         }
 
         /// <summary> Получить из 1С организации и связать их с сотрудниками </summary>
-        static void OneC_GetOrganizationsAndBindWithEmployees(SyncObjs syncObjs)
+        static void OneC_GetOrganizationsAndBindWithEmployees(SyncEmployeesAndCareers_SyncObjs syncObjs)
         {
             syncObjs.OneS_Organizations = HttpClientOfOneS.GetObjs<OneS.Organization>().ToDictionary(k => k.Id);
             foreach (var employee in syncObjs.OneS_Employees)
@@ -638,7 +632,7 @@ namespace App
             OneS_GetContractorsAndBindWithOrganizations(syncObjs);
         }
 
-        public static void OneS_GetContractorsAndBindWithOrganizations(SyncObjs syncObjs)
+        public static void OneS_GetContractorsAndBindWithOrganizations(SyncEmployeesAndCareers_SyncObjs syncObjs)
         {
             //OneCHttpClient.GetObjsByIds<OneC.IROwnContracror>(syncObjs.OneS_Organizations.Keys, "Объект").ToDictionary(k => k.ObjectId);
             syncObjs.OneS_IROwnContractorsOrderedByOrganizationId = HttpClientOfOneS.GetObjs<OneS.IROwnContracror>().ToDictionary(k => k.ObjectId);
@@ -660,7 +654,7 @@ namespace App
         }
 
         /// <summary> Получить из 1С подразделения и связать их с сотрудниками </summary>
-        static void OneC_GetSubdivisionsAndBindWithEmployees(SyncObjs syncObjs)
+        static void OneC_GetSubdivisionsAndBindWithEmployees(SyncEmployeesAndCareers_SyncObjs syncObjs)
         {
 
             List<Guid> subdivisionIds = syncObjs.OneS_Employees.DistinctValuesExcluding(default(Guid), x => x.OrganizationSubdivisionId).Cast<Guid>().ToList();

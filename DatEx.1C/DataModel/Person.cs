@@ -1,9 +1,9 @@
-﻿namespace DatEx.OneC.DataModel
+﻿namespace DatEx.OneS.DataModel
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using DatEx.OneC.DataModel.Auxilary;
+    using DatEx.OneS.DataModel.Auxilary;
     using Newtonsoft.Json;
 
     [OneS("Catalog_ФизическиеЛица", "Catalog_ФизическиеЛица", "Справочник.ФизическиеЛица", "Справочник.ФизическиеЛица")]

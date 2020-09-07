@@ -1,10 +1,10 @@
-﻿using DatEx.OneC.DataModel.Auxilary;
+﻿using DatEx.OneS.DataModel.Auxilary;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DatEx.OneC.DataModel
+namespace DatEx.OneS.DataModel
 {
     [OneS("InformationRegister_СобственныеКонтрагенты", "InformationRegister_СобственныеКонтрагенты", "СобственныеКонтрагенты", "СобственныеКонтрагенты")]
     [JsonObject("InformationRegister_СобственныеКонтрагенты")]

@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using OneS = DatEx.OneC.DataModel;
+using OneS = DatEx.OneS.DataModel;
 using ITIS = DatEx.Creatio.DataModel.ITIS;
 using Terrasoft = DatEx.Creatio.DataModel.Terrasoft.Base;
-using DatEx.OneC.DataModel;
+using DatEx.OneS.DataModel;
 using DatEx.Creatio.DataModel.Terrasoft.Base;
 
 namespace App
 {
     /// <summary> Временные объекты, используемые на протяжении синхронизации </summary>
-    public class SyncObjs
+    public class SyncEmployeesAndCareers_SyncObjs
     {
         /// <summary> 1С даные из справочника ПодразделенияОрганизаций </summary>
         public Dictionary<Guid, OneS.OrganizationSubdivision> OneS_Subdivisions = new Dictionary<Guid, OneS.OrganizationSubdivision>();

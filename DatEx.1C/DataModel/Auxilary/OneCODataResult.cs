@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using DatEx.OneC.DataModel;
+using DatEx.OneS.DataModel;
 using Newtonsoft.Json;
 
-namespace DatEx.OneC
+namespace DatEx.OneS
 {
     class OneCODataResult<T>
     {

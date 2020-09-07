@@ -4,11 +4,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using DatEx.OneC.DataModel;
+using DatEx.OneS.DataModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace DatEx.OneC
+namespace DatEx.OneS
 {   
     /// <summary> Получение контрагентов </summary>
     public partial class HttpClientOfOneC

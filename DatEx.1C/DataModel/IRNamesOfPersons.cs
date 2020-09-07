@@ -1,7 +1,7 @@
-﻿namespace DatEx.OneC.DataModel
+﻿namespace DatEx.OneS.DataModel
 {
     using System;
-    using DatEx.OneC.DataModel.Auxilary;
+    using DatEx.OneS.DataModel.Auxilary;
     using Newtonsoft.Json;
 
     [OneS("InformationRegister_ФИОФизЛиц", "InformationRegister_ФИОФизЛиц", "ФИОФизЛиц", "ФИОФизЛиц")]

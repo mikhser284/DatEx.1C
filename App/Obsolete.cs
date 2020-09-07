@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DatEx.OneC;
-using OneC = DatEx.OneC.DataModel;
+using DatEx.OneS;
+using OneC = DatEx.OneS.DataModel;
 using DatEx.Creatio;
 using ITIS = DatEx.Creatio.DataModel.ITIS;
 using System.Security.Cryptography.X509Certificates;

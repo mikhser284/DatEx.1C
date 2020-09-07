@@ -1,5 +1,5 @@
 ﻿
-namespace DatEx.OneC.DataModel.Auxilary
+namespace DatEx.OneS.DataModel.Auxilary
 {
     using System;
     using System.Collections.Generic;

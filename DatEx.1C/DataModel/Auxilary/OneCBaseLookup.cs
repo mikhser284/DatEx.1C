@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DatEx.OneC.DataModel.Auxilary;
+using DatEx.OneS.DataModel.Auxilary;
 using Newtonsoft.Json;
 
-namespace DatEx.OneC.DataModel
+namespace DatEx.OneS.DataModel
 {
     public class OneCBaseLookup : OneCObject
     {
