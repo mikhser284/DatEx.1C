@@ -46,7 +46,7 @@ namespace DatEx.OneC.DataModel
         public override string ToString() => Description;
     }
 
-    public class OneCBaseHierarchicalLookup : OneCBaseLookup
+    public class OneSBaseHierarchicalLookup : OneCBaseLookup
     {
         /// <summary> Родитель </summary>
         [OneS("Guid?", "Parent_Key", "?", "Родитель", Color = ConsoleColor.Blue)]

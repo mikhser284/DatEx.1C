@@ -8,7 +8,7 @@ namespace DatEx.OneC.DataModel
 {
     [OneS("Catalog_СотрудникиОрганизаций", "Catalog_СотрудникиОрганизаций", "Справочник.СотрудникиОрганизаций", "Справочник.СотрудникиОрганизаций")]
     [JsonObject("Catalog_СотрудникиОрганизаций")]
-    public class Employee : OneCBaseHierarchicalLookup
+    public class Employee : OneSBaseHierarchicalLookup
     {
         [OneS("Guid?", "Физлицо_Key", "-", "-", Color = ConsoleColor.Blue)]
         [JsonProperty("Физлицо_Key")]

@@ -7,7 +7,7 @@ namespace DatEx.OneC.DataModel
 
     [OneS("Catalog_Организации", "Catalog_Организации", "Организации", "Организации")]
     [JsonObject("Catalog_Организации")]
-    public class Organization : OneCBaseHierarchicalLookup
+    public class Organization : OneSBaseHierarchicalLookup
     {
         /// <summary> Связанный объект. Связь с контрагентом (из регистра сведений собственные контрагенты) </summary>
         public IROwnContracror RelatedObj_LinkWithContractor { get; set; }

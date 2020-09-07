@@ -30,6 +30,7 @@
 				<Property Name="Parent_Key" Type="Edm.Guid" Nullable="true"/>
 				<Property Name="IsFolder" Type="Edm.Boolean" Nullable="true"/>
 				<Property Name="DeletionMark" Type="Edm.Boolean" Nullable="true"/>
+        
 				<Property Name="Артикул" Type="Edm.String" Nullable="true"/>
 				<Property Name="НаименованиеПолное" Type="Edm.String" Nullable="true"/>
 				<Property Name="Весовой" Type="Edm.Boolean" Nullable="true"/>

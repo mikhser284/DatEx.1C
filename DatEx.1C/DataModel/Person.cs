@@ -8,7 +8,7 @@
 
     [OneS("Catalog_ФизическиеЛица", "Catalog_ФизическиеЛица", "Справочник.ФизическиеЛица", "Справочник.ФизическиеЛица")]
     [JsonObject("Catalog_ФизическиеЛица")]
-    public class Person : OneCBaseHierarchicalLookup
+    public class Person : OneSBaseHierarchicalLookup
     {
         /// <summary> Список соттудников (и их должностей) которые соответствуют одному физ. лицу </summary>
         [JsonIgnore]

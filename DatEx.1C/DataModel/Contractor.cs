@@ -11,7 +11,7 @@ namespace DatEx.OneC.DataModel
     /// <summary> Контрагенты </summary>
     [OneS("Catalog_Контрагенты", "Catalog_Контрагенты", "Справочник.Контрагенты", "Справочник.Контрагенты")]
     [JsonObject("Catalog_Контрагенты")]
-    public class Contractor : OneCBaseHierarchicalLookup
+    public class Contractor : OneSBaseHierarchicalLookup
     {
         /// <summary> Полное наименование </summary>
         [OneS("String", "НаименованиеПолное", "Строка", "НаименованиеПолное", Color = ConsoleColor.Yellow)]
