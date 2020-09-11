@@ -7,7 +7,7 @@
     using Terrasoft = DatEx.Creatio.DataModel.Terrasoft.Base;
     using DatEx.Creatio.DataModel.Terrasoft.Base;
 
-    public class SyncNomenclature_SyncObjs
+    public class SyncObjs_SyncNomenclature
     {
         public Dictionary<Guid, OneS.Nomenclature> OneS_NomenclatureById { get; set; } = new Dictionary<Guid, OneS.Nomenclature>();
     }

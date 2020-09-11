@@ -27,9 +27,9 @@ namespace App
         {
             SyncSettings settings = SyncSettings.GetDefaultSettings();
 
-            
+            SyncNomenclature(settings);
 
-            SyncEmployeesAndCareers(settings);
+            //SyncEmployeesAndCareers(settings);
         }
 
         

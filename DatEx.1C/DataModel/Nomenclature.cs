@@ -13,7 +13,7 @@
         /// <summary> Артикул </summary>
         [OneS("String", "Артикул", "Строка", "Артикул")]
         [JsonProperty("Артикул")]
-        public Guid VendorCode { get; set; }
+        public Guid? VendorCode { get; set; }
 
 
 
@@ -117,7 +117,7 @@
 
         /// <summary> Комментарий </summary>
         [OneS("String", "Комментарий", "Строка", "Комментарий")]
-        [JsonProperty("СтавкаНДС")]
+        [JsonProperty("Комментарий")]
         public String Comments { get; set; }
 
 

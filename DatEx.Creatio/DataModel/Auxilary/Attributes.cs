@@ -5,6 +5,7 @@ using System.Text;
 
 namespace DatEx.Creatio.DataModel.Auxilary
 {
+    /// <summary> Свойство в Creatio </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class CreatioPropAttribute : Attribute
     {
@@ -29,6 +30,28 @@ namespace DatEx.Creatio.DataModel.Auxilary
         {
             CreatioType = creatioType;
             CreatioTitle = creatioTitle;
+        }
+    }
+
+
+
+    /// <summary> Устаревшее свойство в Creatio (очень желательно по возможности его удалить) </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public class ObsoleteCreatioPropAttribute : Attribute
+    {
+        /// <summary> Заголовок свойства </summary>
+        public String CreatioTitle { get; private set; }
+
+        /// <summary> цвет при выводе на консоль </summary>
+        public ConsoleColor ForegroundColor { get; set; } = ConsoleColor.Red;
+
+        /// <summary> Примечания </summary>
+        public String Remarks { get; set; }
+
+        public ObsoleteCreatioPropAttribute(String creatioTitle)
+        {
+            CreatioTitle = creatioTitle;
+            Remarks = "По возможности очень желательно удалить это свойство из объекта в конфигураторе, так как оно просто замусоривает объек и по существу нигде не используется.";
         }
     }
 

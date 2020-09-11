@@ -126,7 +126,8 @@ namespace DatEx.OneS
             { typeof(ContactInfoType), "Catalog_ВидыКонтактнойИнформации" },
             { typeof(Organization), "Catalog_Организации" },
             { typeof(OrganizationSubdivision), "Catalog_ПодразделенияОрганизаций" },
-            { typeof(PositionInOrganization), "Catalog_ДолжностиОрганизаций" }
+            { typeof(PositionInOrganization), "Catalog_ДолжностиОрганизаций" },
+            { typeof(Nomenclature), "Catalog_Номенклатура" }
         };
 
         #endregion ————— Служебные

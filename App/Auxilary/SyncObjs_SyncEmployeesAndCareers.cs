@@ -9,7 +9,7 @@ using DatEx.Creatio.DataModel.Terrasoft.Base;
 namespace App
 {
     /// <summary> Временные объекты, используемые на протяжении синхронизации </summary>
-    public class SyncEmployeesAndCareers_SyncObjs
+    public class SyncObjs_SyncEmployeesAndCareers
     {
         /// <summary> 1С даные из справочника ПодразделенияОрганизаций </summary>
         public Dictionary<Guid, OneS.OrganizationSubdivision> OneS_Subdivisions = new Dictionary<Guid, OneS.OrganizationSubdivision>();

@@ -11,13 +11,16 @@ namespace App
         public String EmailDomain { get; set; }
         
         /// <summary> Guid типа записи информационного регистра которая хронит eMail </summary>
-        public Guid OneCGuidOfEmailContactInfo { get; set; }
+        public Guid OneSGuidOfEmailContactInfo { get; set; }
 
         /// <summary> Guid типа записи информационного регистра которая хронит телефон (по умолчанию: F1862C22-BB94-11EA-80C7-00155D65B747) </summary>
-        public Guid OneCGuidOfPhoneContactInfo { get; set; }
+        public Guid OneSGuidOfPhoneContactInfo { get; set; }
 
         /// <summary> Guid типа записи информационного регистра которая хронит рабочий телефон (по умолчанию: 08188400-BB94-11EA-80C7-00155D65B747) </summary>
-        public Guid OneCGuidOfWorkPhoneContactInfo { get; set; }
+        public Guid OneSGuidOfWorkPhoneContactInfo { get; set; }
+
+        /// <summary> Guid корневой папки "Новая номенклатура" (код: 99016918) с номенклатурой которая подлежит синхронизации (по умолчанию: 491f383d-e148-11e5-80bf-00155dc80407)</summary>
+        public Guid OneSGuidOfNomenclatureRootFolder { get; set; }
 
         /// <summary> Guid записи Справочника Тип контакта со значением "Сотрудник" (по умолчанию: 60733EFC-F36B-1410-A883-16D83CAB0980) </summary>
         public Guid CreatioGuidOfContactsWithTypeOurEmployees { get; set; }
@@ -39,9 +42,10 @@ namespace App
             SyncSettings settings = new SyncSettings()
             {
                 EmailDomain = "@kustoagro.com",
-                OneCGuidOfEmailContactInfo = new Guid("6B1AE98E-BB91-11EA-80C7-00155D65B747"),
-                OneCGuidOfPhoneContactInfo = new Guid("F1862C22-BB94-11EA-80C7-00155D65B747"),
-                OneCGuidOfWorkPhoneContactInfo = new Guid("08188400-BB94-11EA-80C7-00155D65B747"),
+                OneSGuidOfEmailContactInfo = new Guid("6B1AE98E-BB91-11EA-80C7-00155D65B747"),
+                OneSGuidOfPhoneContactInfo = new Guid("F1862C22-BB94-11EA-80C7-00155D65B747"),
+                OneSGuidOfWorkPhoneContactInfo = new Guid("08188400-BB94-11EA-80C7-00155D65B747"),
+                OneSGuidOfNomenclatureRootFolder = new Guid("491f383d-e148-11e5-80bf-00155dc80407"),
                 CreatioGuidOfContactsWithTypeOurEmployees = new Guid("60733EFC-F36B-1410-A883-16D83CAB0980"),
                 CreatioGuidOfOurCompany = new Guid("57412FAD-53E6-DF11-971B-001D60E938C6"),
                 CreatioGuidOfLLCOwnershipType = new Guid("54441A90-B515-4616-9390-2C1FEE7F3428"),
