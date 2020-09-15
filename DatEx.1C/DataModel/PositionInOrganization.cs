@@ -9,7 +9,7 @@ namespace DatEx.OneS.DataModel
 
     [OneS("Catalog_ДолжностиОрганизаций", "Catalog_ДолжностиОрганизаций", "Справочник.ДолжностиОрганизаций", "Справочник.ДолжностиОрганизаций")]
     [JsonObject("ДолжностиОрганизаций")]
-    public class PositionInOrganization : OneCBaseLookup
+    public class PositionInOrganization : OneSBaseLookup
     {
         [OneS("Boolean?", "АУП", "Булево", "АУП")]
         [JsonProperty("АУП")]

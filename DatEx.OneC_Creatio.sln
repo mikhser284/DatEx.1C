@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30309.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatEx.OneC", "DatEx.1C\DatEx.OneC.csproj", "{BBB37FEB-38FF-4F52-B8FD-14091A8FC257}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatEx.OneS", "DatEx.1C\DatEx.OneS.csproj", "{BBB37FEB-38FF-4F52-B8FD-14091A8FC257}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatEx.Creatio", "DatEx.Creatio\DatEx.Creatio.csproj", "{9BCF7DA7-20AE-458A-B509-679164EBEC1A}"
 EndProject

@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DatEx.OneS.DataModel.Auxilary;
-using Newtonsoft.Json;
-
+﻿
 namespace DatEx.OneS.DataModel
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using DatEx.OneS.DataModel.Auxilary;
+    using Newtonsoft.Json;
+
     [OneS("Catalog_СотрудникиОрганизаций", "Catalog_СотрудникиОрганизаций", "Справочник.СотрудникиОрганизаций", "Справочник.СотрудникиОрганизаций")]
     [JsonObject("Catalog_СотрудникиОрганизаций")]
     public class Employee : OneSBaseHierarchicalLookup

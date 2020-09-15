@@ -8,7 +8,7 @@ namespace DatEx.OneS.DataModel
 {
     [OneS("Catalog_ВидыКонтактнойИнформации", "Catalog_ВидыКонтактнойИнформации", "ВидыКонтактнойИнформации", "ВидыКонтактнойИнформации")]
     [JsonObject("Catalog_ВидыКонтактнойИнформации")]
-    public class ContactInfoType : OneCBaseLookup
+    public class ContactInfoType : OneSBaseLookup
     {
         [OneS("String", "Тип", "Перечисление.ТипыКонтактнойИнформации", "Тип", Color = ConsoleColor.Yellow)]
         [JsonProperty("Тип")]

@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace DatEx.OneS.DataModel
 {
-    public class OneCBaseLookup : OneCObject
+    public class OneSBaseLookup : OneCObject
     {
         /// <summary> Id </summary>
         [OneS("Guid", "Ref_Key", "-", "-", Color = ConsoleColor.Magenta)]
@@ -46,7 +46,7 @@ namespace DatEx.OneS.DataModel
         public override string ToString() => Description;
     }
 
-    public class OneSBaseHierarchicalLookup : OneCBaseLookup
+    public class OneSBaseHierarchicalLookup : OneSBaseLookup
     {
         /// <summary> Родитель </summary>
         [OneS("Guid?", "Parent_Key", "?", "Родитель", Color = ConsoleColor.Blue)]

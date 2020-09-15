@@ -17,15 +17,15 @@ namespace App
     {
         public static void SyncNomenclature(SyncSettings settings)
         {
-            Task<SyncObjs_SyncNomenclature> oneS_Nomenclature_GetSyncObjs = new Task<SyncObjs_SyncNomenclature>(() => OneC_GetSyncObjs_Nomenclature(settings));
+            Task<SyncObjs_SyncNomenclature> oneS_NomenclatureInfo_GetSyncObjs = new Task<SyncObjs_SyncNomenclature>(() => OneS_GetSyncObjs_NomenclatureInfo(settings));
             Task[] tasks = new Task[]
             {
                 new Task(() => Creatio_Nomenclature_ClearSyncObjs()),
-                oneS_Nomenclature_GetSyncObjs
+                oneS_NomenclatureInfo_GetSyncObjs
             }.StartAndWaitForAll();
 
-            SyncObjs_SyncNomenclature syncObjs = oneS_Nomenclature_GetSyncObjs.Result;
-            OneS_Nomenclature_ShowSyncObjs(syncObjs.OneS_NomenclatureById.Values.Take(2));
+            SyncObjs_SyncNomenclature syncObjs = oneS_NomenclatureInfo_GetSyncObjs.Result;
+            OneS_Nomenclature_ShowSyncObjs(syncObjs);
 
             Creatio_Nomenclature_FirstSyncWithOneS(syncObjs, settings);
         }
@@ -67,22 +67,77 @@ namespace App
     public partial class Program
     {
         /// <summary> Отобразить объекты номенклатуры полученные из 1C </summary>
-        public static void OneS_Nomenclature_ShowSyncObjs(IEnumerable<OneS.Nomenclature> nomenclatures)
+        public static void OneS_Nomenclature_ShowSyncObjs(SyncObjs_SyncNomenclature syncObjs)
         {
             //TODO Показать структуру объектов полученных из 1С
+            syncObjs.OneS_NomenclatureGroupsById.FirstOrDefault().Value.Show();
+            syncObjs.OneS_NomenclatureItemsById.Values.Where(e => e.CostItemId.IsNotNullOrDefault()).Skip(0).Take(10).ToList().ShowOneCObjects();
         }
 
         /// <summary> Получить объекты для синхронизации с 1С </summary>
-        public static SyncObjs_SyncNomenclature OneC_GetSyncObjs_Nomenclature(SyncSettings settings)
+        public static SyncObjs_SyncNomenclature OneS_GetSyncObjs_NomenclatureInfo(SyncSettings settings)
         {
+            //TODO Получить объекты из 1С
             SyncObjs_SyncNomenclature syncObjs = new SyncObjs_SyncNomenclature();
 
-            //var res = HttpClientOfOneS.GetObjs<OneS.Nomenclature>("$filter=Description eq 'Нова Номенклатура'");
-            OneS.Nomenclature rootNomenclatureFolder = HttpClientOfOneS.GetObjsByIds<OneS.Nomenclature>(settings.OneSGuidOfNomenclatureRootFolder).FirstOrDefault();
-            if (rootNomenclatureFolder == null) throw new EntityNotFoundException("Не удалось получить корневую папку для синхронизации номенклатуры с ключом ");
-            //TODO Получить объекты из 1С
+            OneS_GetSyncObjs_NomenclatureGroups(settings, syncObjs);
+            OneS_GetSyncObjs_NomenclatureItems(settings, syncObjs);
+
 
             return syncObjs;
+        }
+
+        private static void OneS_GetSyncObjs_NomenclatureGroups(SyncSettings settings, SyncObjs_SyncNomenclature syncObjs)
+        {
+            const Int32 MaxIdsPerPage = 25;
+            Stack<List<OneS.Nomenclature>> stack = new Stack<List<OneS.Nomenclature>>();
+            stack.Push(HttpClientOfOneS.GetObjsByIds<OneS.Nomenclature>(settings.OneSGuidOfNomenclatureRootFolder));
+
+            while (stack.Count > 0)
+            {
+                List<OneS.Nomenclature> nmcDirs = stack.Pop();
+                if (nmcDirs.Count < 1) continue;
+
+                nmcDirs.ForEach(e => syncObjs.OneS_NomenclatureGroupsById.Add(e.Id, e));
+
+                List<List<OneS.Nomenclature>> queries = nmcDirs.Paginate(MaxIdsPerPage);//.ToList();
+                Task<List<OneS.Nomenclature>>[] queriesTasks = new Task<List<OneS.Nomenclature>>[queries.Count];
+                for (int i = 0; i < queries.Count; i++)
+                {
+                    String query = $"$filter=IsFolder eq true and ({String.Join("\n or ", queries[i].Select(n => $"Parent_Key eq guid'{n.Id}'"))})";
+                    queriesTasks[i] = new Task<List<OneS.Nomenclature>>(() => HttpClientOfOneS.GetObjs<OneS.Nomenclature>(query));
+                }
+                queriesTasks.StartAndWaitForAll();
+                List<OneS.Nomenclature> childDirs = new List<Nomenclature>();
+                queriesTasks.ForEach(e => childDirs.AddRange(e.Result));
+                stack.Push(childDirs);
+            }
+        }
+
+        private static void OneS_GetSyncObjs_NomenclatureItems(SyncSettings settings, SyncObjs_SyncNomenclature syncObjs)
+        {
+            const Int32 MaxParallelQueries = 6;
+            const Int32 MaxIdsPerPage = 25;
+
+            List<List<Guid>> paginatedIds = syncObjs.OneS_NomenclatureGroupsById.Keys.Paginate(MaxParallelQueries * MaxIdsPerPage);
+
+            foreach(var idsPage in paginatedIds)
+            {
+                List<Task<List<OneS.Nomenclature>>> parallelQueries = new List<Task<List<Nomenclature>>>();
+
+                Int32 pageIndex = 0;
+                foreach(var page in idsPage.Paginate(MaxIdsPerPage))
+                {
+                    String query = $"$filter=IsFolder eq false and ({String.Join("\n or ", page.Select(e => $"Parent_Key eq guid'{e}'"))})";
+                    parallelQueries.Add(new Task<List<OneS.Nomenclature>>(() => HttpClientOfOneS.GetObjs<OneS.Nomenclature>(query)));
+                }
+                
+                parallelQueries.StartAndWaitForAll();
+
+                foreach(var query in parallelQueries)
+                    foreach(var nomenclature in query.Result)
+                        syncObjs.OneS_NomenclatureItemsById.Add(nomenclature.Id, nomenclature);   
+            }
         }
     }
 }

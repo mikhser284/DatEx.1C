@@ -26,14 +26,25 @@ namespace DatEx.OneS
             try { response.EnsureSuccessStatusCode(); }
             catch (HttpRequestException ex)
             {
-                String error = "\n\n" + JToken.Parse(response.Content.ReadAsStringAsync().Result).ToString(Formatting.Indented) + "\n";
+                String res = response.Content.ReadAsStringAsync().Result;
+                String error;
+
+                try
+                {
+                    error = "\n\n" + JToken.Parse(res).ToString(Formatting.Indented) + "\n";
+                }
+                catch(Exception parsingException)
+                {
+                    error = "\n\n" + res + "\n";
+                }
+
                 throw new Exception(error, ex);
             }
             String result = response.Content.ReadAsStringAsync().Result;
 #if DEBUG
             result = JToken.Parse(result).ToString(Formatting.Indented);
 #endif
-            return JsonConvert.DeserializeObject<OneCODataResult<R>>(result).Values;
+            return JsonConvert.DeserializeObject<OneSODataResult<R>>(result).Values;
         }
         
 

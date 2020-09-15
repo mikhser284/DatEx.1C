@@ -13,19 +13,19 @@
         /// <summary> Артикул </summary>
         [OneS("String", "Артикул", "Строка", "Артикул")]
         [JsonProperty("Артикул")]
-        public Guid? VendorCode { get; set; }
+        public String VendorCode { get; set; }
 
 
 
         /// <summary> Полное наименование </summary>
-        [OneS("String", "НаименованиеПолное", "Строка", "НаименованиеПолное")]
+        [OneS("String", "НаименованиеПолное", "Строка", "НаименованиеПолное", Color = ConsoleColor.White)]
         [JsonProperty("НаименованиеПолное")]
         public String FullName { get; set; }
 
 
 
         /// <summary> Весовой </summary>
-        [OneS("Boolean?", "Весовой", "Строка", "Весовой")]
+        [OneS("Boolean?", "Весовой", "Строка", "Весовой", Color = ConsoleColor.White)]
         [JsonProperty("Весовой")]
         public Boolean? IsWeighting { get; set; }
 
@@ -81,21 +81,21 @@
 
 
         /// <summary> Вид номенклатуры (Id) </summary>
-        [OneS("Guid?", "ВидНоменклатуры_Key", "Справочник.ВидыНоменклатуры", "ВидНоменклатуры")]
+        [OneS("Guid?", "ВидНоменклатуры_Key", "Справочник.ВидыНоменклатуры", "ВидНоменклатуры", Color = ConsoleColor.White)]
         [JsonProperty("ВидНоменклатуры_Key")]
         public Guid? NomenclatureTypeId { get; set; }
 
 
 
         /// <summary> Единица для отчетов (Id) </summary>
-        [OneS("Guid?", "ЕдиницаДляОтчетов_Key", "Справочник.ЕдиницыИзмерения", "ЕдиницаДляОтчетов")]
+        [OneS("Guid?", "ЕдиницаДляОтчетов_Key", "Справочник.ЕдиницыИзмерения", "ЕдиницаДляОтчетов", Color = ConsoleColor.White)]
         [JsonProperty("ЕдиницаДляОтчетов_Key")]
         public Guid? MeasureUnitForReportsId { get; set; }
 
 
 
         /// <summary> Единица хранения остатков (Id) </summary>
-        [OneS("Guid?", "ЕдиницаХраненияОстатков_Key", "Справочник.ЕдиницыИзмерения", "ЕдиницаХраненияОстатков")]
+        [OneS("Guid?", "ЕдиницаХраненияОстатков_Key", "Справочник.ЕдиницыИзмерения", "ЕдиницаХраненияОстатков", Color = ConsoleColor.White)]
         [JsonProperty("ЕдиницаХраненияОстатков_Key")]
         public Guid? MeasureUnitForRemainsStoragingId { get; set; }
 
@@ -179,7 +179,7 @@
 
 
         /// <summary> Статья затрат (Id) </summary>
-        [OneS("Guid?", "СтатьяЗатрат_Key", "Справочник.СтатьиЗатрат", "СтатьяЗатрат")]
+        [OneS("Guid?", "СтатьяЗатрат_Key", "Справочник.СтатьиЗатрат", "СтатьяЗатрат", Color = ConsoleColor.White)]
         [JsonProperty("СтатьяЗатрат_Key")]
         public Guid? CostItemId { get; set; }
 
@@ -256,7 +256,7 @@
 
 
         /// <summary> Единица измерения мест (Id) </summary>
-        [OneS("Guid?", "ЕдиницаИзмеренияМест_Key", "Справочник.ЕдиницыИзмерения", "ЕдиницаИзмеренияМест")]
+        [OneS("Guid?", "ЕдиницаИзмеренияМест_Key", "Справочник.ЕдиницыИзмерения", "ЕдиницаИзмеренияМест", Color = ConsoleColor.White)]
         [JsonProperty("ЕдиницаИзмеренияМест_Key")]
         public Guid? PlacesMeasureUnit { get; set; }
 

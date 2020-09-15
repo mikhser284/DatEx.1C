@@ -30,7 +30,6 @@
 				<Property Name="Parent_Key" Type="Edm.Guid" Nullable="true"/>
 				<Property Name="IsFolder" Type="Edm.Boolean" Nullable="true"/>
 				<Property Name="DeletionMark" Type="Edm.Boolean" Nullable="true"/>
-        
 				<Property Name="Артикул" Type="Edm.String" Nullable="true"/>
 				<Property Name="НаименованиеПолное" Type="Edm.String" Nullable="true"/>
 				<Property Name="Весовой" Type="Edm.Boolean" Nullable="true"/>
@@ -91,7 +90,13 @@
 				<Property Name="IdCreatio" Type="Edm.String" Nullable="true"/>
 				<Property Name="НоменклатураГТД_Type" Type="Edm.String" Nullable="true"/>
 				<NavigationProperty Name="Parent" Relationship="StandardODATA.Catalog_Номенклатура_Parent" FromRole="Begin" ToRole="End"/>
+				<NavigationProperty Name="ЕдиницаДляОтчетов" Relationship="StandardODATA.Catalog_Номенклатура_ЕдиницаДляОтчетов" FromRole="Begin" ToRole="End"/>
+				<NavigationProperty Name="ЕдиницаХраненияОстатков" Relationship="StandardODATA.Catalog_Номенклатура_ЕдиницаХраненияОстатков" FromRole="Begin" ToRole="End"/>
+				<NavigationProperty Name="НоменклатурнаяГруппаЗатрат" Relationship="StandardODATA.Catalog_Номенклатура_НоменклатурнаяГруппаЗатрат" FromRole="Begin" ToRole="End"/>
 				<NavigationProperty Name="ОсновнойПоставщик" Relationship="StandardODATA.Catalog_Номенклатура_ОсновнойПоставщик" FromRole="Begin" ToRole="End"/>
+				<NavigationProperty Name="НоменклатурнаяГруппа" Relationship="StandardODATA.Catalog_Номенклатура_НоменклатурнаяГруппа" FromRole="Begin" ToRole="End"/>
+				<NavigationProperty Name="СтатьяЗатрат" Relationship="StandardODATA.Catalog_Номенклатура_СтатьяЗатрат" FromRole="Begin" ToRole="End"/>
+				<NavigationProperty Name="ЕдиницаИзмеренияМест" Relationship="StandardODATA.Catalog_Номенклатура_ЕдиницаИзмеренияМест" FromRole="Begin" ToRole="End"/>
 			</EntityType>
 			<EntityType Name="Catalog_ВидыКонтактнойИнформации">
 				<Key>
@@ -107,110 +112,18 @@
 				<Property Name="Тип" Type="Edm.String" Nullable="true"/>
 				<Property Name="ВидОбъектаКонтактнойИнформации" Type="Edm.String" Nullable="true"/>
 			</EntityType>
-			<EntityType Name="Catalog_ФизическиеЛица">
+			<EntityType Name="InformationRegister_ФИОФизЛиц" OpenType="true">
 				<Key>
-					<PropertyRef Name="Ref_Key"/>
+					<PropertyRef Name="Period"/>
+					<PropertyRef Name="ФизЛицо"/>
+					<PropertyRef Name="ФизЛицо_Type"/>
 				</Key>
-				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
-				<Property Name="Predefined" Type="Edm.Boolean" Nullable="true"/>
-				<Property Name="PredefinedDataName" Type="Edm.String" Nullable="true"/>
-				<Property Name="DataVersion" Type="Edm.String" Nullable="true"/>
-				<Property Name="Description" Type="Edm.String" Nullable="true"/>
-				<Property Name="Code" Type="Edm.String" Nullable="true"/>
-				<Property Name="Parent_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="IsFolder" Type="Edm.Boolean" Nullable="true"/>
-				<Property Name="DeletionMark" Type="Edm.Boolean" Nullable="true"/>
-				<Property Name="ДатаРождения" Type="Edm.DateTime" Nullable="true"/>
-				<Property Name="ИНН" Type="Edm.String" Nullable="true"/>
-				<Property Name="Комментарий" Type="Edm.String" Nullable="true"/>
-				<Property Name="Пол" Type="Edm.String" Nullable="true"/>
-				<Property Name="МестоРождения" Type="Edm.String" Nullable="true"/>
-				<Property Name="ОсновноеИзображение_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="КодПоДРФО" Type="Edm.String" Nullable="true"/>
-				<Property Name="ГруппаДоступаФизическогоЛица_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="IdCreatio" Type="Edm.String" Nullable="true"/>
-				<Property Name="СоставСемьи" Type="Collection(StandardODATA.Catalog_ФизическиеЛица_СоставСемьи_RowType)" Nullable="true"/>
-				<Property Name="Образование" Type="Collection(StandardODATA.Catalog_ФизическиеЛица_Образование_RowType)" Nullable="true"/>
-				<Property Name="ТрудоваяДеятельность" Type="Collection(StandardODATA.Catalog_ФизическиеЛица_ТрудоваяДеятельность_RowType)" Nullable="true"/>
-				<Property Name="ЗнаниеЯзыков" Type="Collection(StandardODATA.Catalog_ФизическиеЛица_ЗнаниеЯзыков_RowType)" Nullable="true"/>
-				<Property Name="Профессии" Type="Collection(StandardODATA.Catalog_ФизическиеЛица_Профессии_RowType)" Nullable="true"/>
-				<Property Name="Стажи" Type="Collection(StandardODATA.Catalog_ФизическиеЛица_Стажи_RowType)" Nullable="true"/>
-				<NavigationProperty Name="Parent" Relationship="StandardODATA.Catalog_ФизическиеЛица_Parent" FromRole="Begin" ToRole="End"/>
-			</EntityType>
-			<EntityType Name="Catalog_ФизическиеЛица_СоставСемьи">
-				<Key>
-					<PropertyRef Name="Ref_Key"/>
-					<PropertyRef Name="LineNumber"/>
-				</Key>
-				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
-				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
-				<Property Name="СтепеньРодства_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="ФизЛицо_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="ГодРождения" Type="Edm.Int16" Nullable="true"/>
-				<Property Name="Иждивенец" Type="Edm.Boolean" Nullable="true"/>
-				<NavigationProperty Name="ФизЛицо" Relationship="StandardODATA.Catalog_ФизическиеЛица_СоставСемьи_ФизЛицо" FromRole="Begin" ToRole="End"/>
-			</EntityType>
-			<EntityType Name="Catalog_ФизическиеЛица_Образование">
-				<Key>
-					<PropertyRef Name="Ref_Key"/>
-					<PropertyRef Name="LineNumber"/>
-				</Key>
-				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
-				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
-				<Property Name="ВидОбразования_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="УчебноеЗаведение_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="Специальность_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="Диплом" Type="Edm.String" Nullable="true"/>
-				<Property Name="ГодОкончания" Type="Edm.Int16" Nullable="true"/>
-				<Property Name="Квалификация" Type="Edm.String" Nullable="true"/>
-				<Property Name="Факультет" Type="Edm.String" Nullable="true"/>
-				<Property Name="УченаяСтепень" Type="Edm.String" Nullable="true"/>
-				<Property Name="ФормаОбучения" Type="Edm.String" Nullable="true"/>
-			</EntityType>
-			<EntityType Name="Catalog_ФизическиеЛица_ТрудоваяДеятельность">
-				<Key>
-					<PropertyRef Name="Ref_Key"/>
-					<PropertyRef Name="LineNumber"/>
-				</Key>
-				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
-				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
-				<Property Name="Организация" Type="Edm.String" Nullable="true"/>
-				<Property Name="ДатаНачала" Type="Edm.DateTime" Nullable="true"/>
-				<Property Name="ДатаОкончания" Type="Edm.DateTime" Nullable="true"/>
-				<Property Name="Должность" Type="Edm.String" Nullable="true"/>
-			</EntityType>
-			<EntityType Name="Catalog_ФизическиеЛица_ЗнаниеЯзыков">
-				<Key>
-					<PropertyRef Name="Ref_Key"/>
-					<PropertyRef Name="LineNumber"/>
-				</Key>
-				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
-				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
-				<Property Name="Язык_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="СтепеньЗнанияЯзыка_Key" Type="Edm.Guid" Nullable="true"/>
-			</EntityType>
-			<EntityType Name="Catalog_ФизическиеЛица_Профессии">
-				<Key>
-					<PropertyRef Name="Ref_Key"/>
-					<PropertyRef Name="LineNumber"/>
-				</Key>
-				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
-				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
-				<Property Name="Профессия_Key" Type="Edm.Guid" Nullable="true"/>
-			</EntityType>
-			<EntityType Name="Catalog_ФизическиеЛица_Стажи">
-				<Key>
-					<PropertyRef Name="Ref_Key"/>
-					<PropertyRef Name="LineNumber"/>
-				</Key>
-				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
-				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
-				<Property Name="ВидСтажа_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="УДАЛИТЬДатаОтсчета" Type="Edm.DateTime" Nullable="true"/>
-				<Property Name="УДАЛИТЬРазмерМесяцев" Type="Edm.Int16" Nullable="true"/>
-				<Property Name="УДАЛИТЬРазмерДней" Type="Edm.Int16" Nullable="true"/>
-				<Property Name="ДатаНачала" Type="Edm.DateTime" Nullable="true"/>
-				<Property Name="ДатаОкончания" Type="Edm.DateTime" Nullable="true"/>
+				<Property Name="Period" Type="Edm.DateTime" Nullable="false"/>
+				<Property Name="ФизЛицо" Type="Edm.String" Nullable="false"/>
+				<Property Name="Фамилия" Type="Edm.String" Nullable="true"/>
+				<Property Name="Имя" Type="Edm.String" Nullable="true"/>
+				<Property Name="Отчество" Type="Edm.String" Nullable="true"/>
+				<Property Name="ФизЛицо_Type" Type="Edm.String" Nullable="false"/>
 			</EntityType>
 			<EntityType Name="Catalog_ДолжностиОрганизаций">
 				<Key>
@@ -234,6 +147,26 @@
 				<Property Name="Кусто_Агрономы" Type="Edm.Boolean" Nullable="true"/>
 				<Property Name="Кусто_МенеджерыПоля" Type="Edm.Boolean" Nullable="true"/>
 				<Property Name="Кусто_Заправщики" Type="Edm.Boolean" Nullable="true"/>
+			</EntityType>
+			<EntityType Name="Catalog_ЕдиницыИзмерения" OpenType="true">
+				<Key>
+					<PropertyRef Name="Ref_Key"/>
+				</Key>
+				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="Predefined" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="PredefinedDataName" Type="Edm.String" Nullable="true"/>
+				<Property Name="DataVersion" Type="Edm.String" Nullable="true"/>
+				<Property Name="Description" Type="Edm.String" Nullable="true"/>
+				<Property Name="Code" Type="Edm.String" Nullable="true"/>
+				<Property Name="Owner" Type="Edm.String" Nullable="true"/>
+				<Property Name="DeletionMark" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="ЕдиницаПоКлассификатору_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="Вес" Type="Edm.Double" Nullable="true"/>
+				<Property Name="Объем" Type="Edm.Double" Nullable="true"/>
+				<Property Name="Коэффициент" Type="Edm.Double" Nullable="true"/>
+				<Property Name="ПорогОкругления" Type="Edm.Int64" Nullable="true"/>
+				<Property Name="ПредупреждатьОНецелыхМестах" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="Owner_Type" Type="Edm.String" Nullable="true"/>
 			</EntityType>
 			<EntityType Name="Catalog_Контрагенты">
 				<Key>
@@ -297,6 +230,27 @@
 				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
 				<Property Name="МенеджерПокупателя_Key" Type="Edm.Guid" Nullable="true"/>
 			</EntityType>
+			<EntityType Name="Catalog_НоменклатурныеГруппы">
+				<Key>
+					<PropertyRef Name="Ref_Key"/>
+				</Key>
+				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="Predefined" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="PredefinedDataName" Type="Edm.String" Nullable="true"/>
+				<Property Name="DataVersion" Type="Edm.String" Nullable="true"/>
+				<Property Name="Description" Type="Edm.String" Nullable="true"/>
+				<Property Name="Code" Type="Edm.String" Nullable="true"/>
+				<Property Name="Parent_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="IsFolder" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="DeletionMark" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="ЕдиницаХраненияОстатков_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="БазоваяЕдиницаИзмерения_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="СтавкаНДС" Type="Edm.String" Nullable="true"/>
+				<Property Name="НалоговоеНазначение_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="ПоказательДляДекларацииПоСХН" Type="Edm.String" Nullable="true"/>
+				<NavigationProperty Name="Parent" Relationship="StandardODATA.Catalog_НоменклатурныеГруппы_Parent" FromRole="Begin" ToRole="End"/>
+				<NavigationProperty Name="ЕдиницаХраненияОстатков" Relationship="StandardODATA.Catalog_НоменклатурныеГруппы_ЕдиницаХраненияОстатков" FromRole="Begin" ToRole="End"/>
+			</EntityType>
 			<EntityType Name="Catalog_Организации">
 				<Key>
 					<PropertyRef Name="Ref_Key"/>
@@ -325,6 +279,57 @@
 				<NavigationProperty Name="Parent" Relationship="StandardODATA.Catalog_Организации_Parent" FromRole="Begin" ToRole="End"/>
 				<NavigationProperty Name="ГоловнаяОрганизация" Relationship="StandardODATA.Catalog_Организации_ГоловнаяОрганизация" FromRole="Begin" ToRole="End"/>
 				<NavigationProperty Name="ИндивидуальныйПредприниматель" Relationship="StandardODATA.Catalog_Организации_ИндивидуальныйПредприниматель" FromRole="Begin" ToRole="End"/>
+			</EntityType>
+			<EntityType Name="InformationRegister_КонтактнаяИнформация" OpenType="true">
+				<Key>
+					<PropertyRef Name="Объект"/>
+					<PropertyRef Name="Тип"/>
+					<PropertyRef Name="Вид"/>
+					<PropertyRef Name="Объект_Type"/>
+					<PropertyRef Name="Вид_Type"/>
+				</Key>
+				<Property Name="Объект" Type="Edm.String" Nullable="false"/>
+				<Property Name="Тип" Type="Edm.String" Nullable="false"/>
+				<Property Name="Вид" Type="Edm.String" Nullable="false"/>
+				<Property Name="Представление" Type="Edm.String" Nullable="true"/>
+				<Property Name="Поле1" Type="Edm.String" Nullable="true"/>
+				<Property Name="Поле2" Type="Edm.String" Nullable="true"/>
+				<Property Name="Поле3" Type="Edm.String" Nullable="true"/>
+				<Property Name="Поле4" Type="Edm.String" Nullable="true"/>
+				<Property Name="Поле5" Type="Edm.String" Nullable="true"/>
+				<Property Name="Поле6" Type="Edm.String" Nullable="true"/>
+				<Property Name="Поле7" Type="Edm.String" Nullable="true"/>
+				<Property Name="Поле8" Type="Edm.String" Nullable="true"/>
+				<Property Name="Поле9" Type="Edm.String" Nullable="true"/>
+				<Property Name="Поле10" Type="Edm.String" Nullable="true"/>
+				<Property Name="Комментарий" Type="Edm.String" Nullable="true"/>
+				<Property Name="ЗначениеПоУмолчанию" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="ТипДома" Type="Edm.String" Nullable="true"/>
+				<Property Name="ТипКорпуса" Type="Edm.String" Nullable="true"/>
+				<Property Name="ТипКвартиры" Type="Edm.String" Nullable="true"/>
+				<Property Name="Объект_Type" Type="Edm.String" Nullable="false"/>
+				<Property Name="Вид_Type" Type="Edm.String" Nullable="false"/>
+			</EntityType>
+			<EntityType Name="Catalog_Подразделения">
+				<Key>
+					<PropertyRef Name="Ref_Key"/>
+				</Key>
+				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="Predefined" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="PredefinedDataName" Type="Edm.String" Nullable="true"/>
+				<Property Name="DataVersion" Type="Edm.String" Nullable="true"/>
+				<Property Name="Description" Type="Edm.String" Nullable="true"/>
+				<Property Name="Code" Type="Edm.String" Nullable="true"/>
+				<Property Name="Parent_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="DeletionMark" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="ВидПодразделения" Type="Edm.String" Nullable="true"/>
+				<Property Name="ВидЦФО_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="ОсновнойПроект" Type="Edm.String" Nullable="true"/>
+				<Property Name="Порядок" Type="Edm.Int64" Nullable="true"/>
+				<Property Name="Организация_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="ОсновнойПроект_Type" Type="Edm.String" Nullable="true"/>
+				<NavigationProperty Name="Parent" Relationship="StandardODATA.Catalog_Подразделения_Parent" FromRole="Begin" ToRole="End"/>
+				<NavigationProperty Name="Организация" Relationship="StandardODATA.Catalog_Подразделения_Организация" FromRole="Begin" ToRole="End"/>
 			</EntityType>
 			<EntityType Name="Catalog_СотрудникиОрганизаций">
 				<Key>
@@ -441,8 +446,8 @@
 				<NavigationProperty Name="Owner" Relationship="StandardODATA.Catalog_ПодразделенияОрганизаций_Owner" FromRole="Begin" ToRole="End"/>
 				<NavigationProperty Name="Parent" Relationship="StandardODATA.Catalog_ПодразделенияОрганизаций_Parent" FromRole="Begin" ToRole="End"/>
 				<NavigationProperty Name="ИНАГРО_Подразделение" Relationship="StandardODATA.Catalog_ПодразделенияОрганизаций_ИНАГРО_Подразделение" FromRole="Begin" ToRole="End"/>
-			</EntityType> 
-			<EntityType Name="Catalog_Подразделения">
+			</EntityType>
+			<EntityType Name="Catalog_СтатьиЗатрат">
 				<Key>
 					<PropertyRef Name="Ref_Key"/>
 				</Key>
@@ -453,15 +458,123 @@
 				<Property Name="Description" Type="Edm.String" Nullable="true"/>
 				<Property Name="Code" Type="Edm.String" Nullable="true"/>
 				<Property Name="Parent_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="IsFolder" Type="Edm.Boolean" Nullable="true"/>
 				<Property Name="DeletionMark" Type="Edm.Boolean" Nullable="true"/>
-				<Property Name="ВидПодразделения" Type="Edm.String" Nullable="true"/>
-				<Property Name="ВидЦФО_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="ОсновнойПроект" Type="Edm.String" Nullable="true"/>
-				<Property Name="Порядок" Type="Edm.Int64" Nullable="true"/>
-				<Property Name="Организация_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="ОсновнойПроект_Type" Type="Edm.String" Nullable="true"/>
-				<NavigationProperty Name="Parent" Relationship="StandardODATA.Catalog_Подразделения_Parent" FromRole="Begin" ToRole="End"/>
-				<NavigationProperty Name="Организация" Relationship="StandardODATA.Catalog_Подразделения_Организация" FromRole="Begin" ToRole="End"/>
+				<Property Name="ВидЗатрат" Type="Edm.String" Nullable="true"/>
+				<Property Name="СтатусМатериальныхЗатрат" Type="Edm.String" Nullable="true"/>
+				<Property Name="ХарактерЗатрат" Type="Edm.String" Nullable="true"/>
+				<Property Name="ПостояннаяЗатрата" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="Счет8Класса_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="СтатьяДекларацииПоНалогуНаПрибыль_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="ИНАГРО_НеДобавлятьВПаруБазисов" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="ИНАГРО_МестоВозникновения" Type="Edm.String" Nullable="true"/>
+				<Property Name="ИНАГРО_Операционная" Type="Edm.Boolean" Nullable="true"/>
+				<NavigationProperty Name="Parent" Relationship="StandardODATA.Catalog_СтатьиЗатрат_Parent" FromRole="Begin" ToRole="End"/>
+			</EntityType>
+			<EntityType Name="Catalog_ФизическиеЛица">
+				<Key>
+					<PropertyRef Name="Ref_Key"/>
+				</Key>
+				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="Predefined" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="PredefinedDataName" Type="Edm.String" Nullable="true"/>
+				<Property Name="DataVersion" Type="Edm.String" Nullable="true"/>
+				<Property Name="Description" Type="Edm.String" Nullable="true"/>
+				<Property Name="Code" Type="Edm.String" Nullable="true"/>
+				<Property Name="Parent_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="IsFolder" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="DeletionMark" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="ДатаРождения" Type="Edm.DateTime" Nullable="true"/>
+				<Property Name="ИНН" Type="Edm.String" Nullable="true"/>
+				<Property Name="Комментарий" Type="Edm.String" Nullable="true"/>
+				<Property Name="Пол" Type="Edm.String" Nullable="true"/>
+				<Property Name="МестоРождения" Type="Edm.String" Nullable="true"/>
+				<Property Name="ОсновноеИзображение_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="КодПоДРФО" Type="Edm.String" Nullable="true"/>
+				<Property Name="ГруппаДоступаФизическогоЛица_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="IdCreatio" Type="Edm.String" Nullable="true"/>
+				<Property Name="СоставСемьи" Type="Collection(StandardODATA.Catalog_ФизическиеЛица_СоставСемьи_RowType)" Nullable="true"/>
+				<Property Name="Образование" Type="Collection(StandardODATA.Catalog_ФизическиеЛица_Образование_RowType)" Nullable="true"/>
+				<Property Name="ТрудоваяДеятельность" Type="Collection(StandardODATA.Catalog_ФизическиеЛица_ТрудоваяДеятельность_RowType)" Nullable="true"/>
+				<Property Name="ЗнаниеЯзыков" Type="Collection(StandardODATA.Catalog_ФизическиеЛица_ЗнаниеЯзыков_RowType)" Nullable="true"/>
+				<Property Name="Профессии" Type="Collection(StandardODATA.Catalog_ФизическиеЛица_Профессии_RowType)" Nullable="true"/>
+				<Property Name="Стажи" Type="Collection(StandardODATA.Catalog_ФизическиеЛица_Стажи_RowType)" Nullable="true"/>
+				<NavigationProperty Name="Parent" Relationship="StandardODATA.Catalog_ФизическиеЛица_Parent" FromRole="Begin" ToRole="End"/>
+			</EntityType>
+			<EntityType Name="Catalog_ФизическиеЛица_СоставСемьи">
+				<Key>
+					<PropertyRef Name="Ref_Key"/>
+					<PropertyRef Name="LineNumber"/>
+				</Key>
+				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
+				<Property Name="СтепеньРодства_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="ФизЛицо_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="ГодРождения" Type="Edm.Int16" Nullable="true"/>
+				<Property Name="Иждивенец" Type="Edm.Boolean" Nullable="true"/>
+				<NavigationProperty Name="ФизЛицо" Relationship="StandardODATA.Catalog_ФизическиеЛица_СоставСемьи_ФизЛицо" FromRole="Begin" ToRole="End"/>
+			</EntityType>
+			<EntityType Name="Catalog_ФизическиеЛица_Образование">
+				<Key>
+					<PropertyRef Name="Ref_Key"/>
+					<PropertyRef Name="LineNumber"/>
+				</Key>
+				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
+				<Property Name="ВидОбразования_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="УчебноеЗаведение_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="Специальность_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="Диплом" Type="Edm.String" Nullable="true"/>
+				<Property Name="ГодОкончания" Type="Edm.Int16" Nullable="true"/>
+				<Property Name="Квалификация" Type="Edm.String" Nullable="true"/>
+				<Property Name="Факультет" Type="Edm.String" Nullable="true"/>
+				<Property Name="УченаяСтепень" Type="Edm.String" Nullable="true"/>
+				<Property Name="ФормаОбучения" Type="Edm.String" Nullable="true"/>
+			</EntityType>
+			<EntityType Name="Catalog_ФизическиеЛица_ТрудоваяДеятельность">
+				<Key>
+					<PropertyRef Name="Ref_Key"/>
+					<PropertyRef Name="LineNumber"/>
+				</Key>
+				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
+				<Property Name="Организация" Type="Edm.String" Nullable="true"/>
+				<Property Name="ДатаНачала" Type="Edm.DateTime" Nullable="true"/>
+				<Property Name="ДатаОкончания" Type="Edm.DateTime" Nullable="true"/>
+				<Property Name="Должность" Type="Edm.String" Nullable="true"/>
+			</EntityType>
+			<EntityType Name="Catalog_ФизическиеЛица_ЗнаниеЯзыков">
+				<Key>
+					<PropertyRef Name="Ref_Key"/>
+					<PropertyRef Name="LineNumber"/>
+				</Key>
+				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
+				<Property Name="Язык_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="СтепеньЗнанияЯзыка_Key" Type="Edm.Guid" Nullable="true"/>
+			</EntityType>
+			<EntityType Name="Catalog_ФизическиеЛица_Профессии">
+				<Key>
+					<PropertyRef Name="Ref_Key"/>
+					<PropertyRef Name="LineNumber"/>
+				</Key>
+				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
+				<Property Name="Профессия_Key" Type="Edm.Guid" Nullable="true"/>
+			</EntityType>
+			<EntityType Name="Catalog_ФизическиеЛица_Стажи">
+				<Key>
+					<PropertyRef Name="Ref_Key"/>
+					<PropertyRef Name="LineNumber"/>
+				</Key>
+				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
+				<Property Name="ВидСтажа_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="УДАЛИТЬДатаОтсчета" Type="Edm.DateTime" Nullable="true"/>
+				<Property Name="УДАЛИТЬРазмерМесяцев" Type="Edm.Int16" Nullable="true"/>
+				<Property Name="УДАЛИТЬРазмерДней" Type="Edm.Int16" Nullable="true"/>
+				<Property Name="ДатаНачала" Type="Edm.DateTime" Nullable="true"/>
+				<Property Name="ДатаОкончания" Type="Edm.DateTime" Nullable="true"/>
 			</EntityType>
 			<EntityType Name="InformationRegister_СобственныеКонтрагенты" OpenType="true">
 				<Key>
@@ -501,6 +614,40 @@
 			<ComplexType Name="PointInTime">
 				<Property Name="Ref" Type="Edm.String" Nullable="false"/>
 				<Property Name="Date" Type="Edm.DateTime" Nullable="false"/>
+			</ComplexType>
+			<ComplexType Name="Catalog_Контрагенты_ВидыДеятельности_RowType">
+				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
+				<Property Name="ВидДеятельности_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="Ответственный_Key" Type="Edm.Guid" Nullable="true"/>
+			</ComplexType>
+			<ComplexType Name="Catalog_Контрагенты_МенеджерыПокупателя_RowType">
+				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
+				<Property Name="МенеджерПокупателя_Key" Type="Edm.Guid" Nullable="true"/>
+			</ComplexType>
+			<ComplexType Name="Catalog_СотрудникиОрганизаций_ПерсональныеНадбавки_RowType">
+				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
+				<Property Name="Надбавка_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="Показатель1" Type="Edm.Double" Nullable="true"/>
+				<Property Name="Показатель2" Type="Edm.Double" Nullable="true"/>
+				<Property Name="Показатель3" Type="Edm.Double" Nullable="true"/>
+				<Property Name="Показатель4" Type="Edm.Double" Nullable="true"/>
+				<Property Name="Валюта1_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="Валюта2_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="Валюта3_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="Валюта4_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="ТарифныйРазряд1_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="ТарифныйРазряд2_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="ТарифныйРазряд3_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="ТарифныйРазряд4_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="Показатель5" Type="Edm.Double" Nullable="true"/>
+				<Property Name="Показатель6" Type="Edm.Double" Nullable="true"/>
+				<Property Name="Валюта5_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="Валюта6_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="ТарифныйРазряд5_Key" Type="Edm.Guid" Nullable="true"/>
+				<Property Name="ТарифныйРазряд6_Key" Type="Edm.Guid" Nullable="true"/>
 			</ComplexType>
 			<ComplexType Name="Catalog_ФизическиеЛица_СоставСемьи_RowType">
 				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
@@ -552,55 +699,37 @@
 				<Property Name="ДатаНачала" Type="Edm.DateTime" Nullable="true"/>
 				<Property Name="ДатаОкончания" Type="Edm.DateTime" Nullable="true"/>
 			</ComplexType>
-			<ComplexType Name="Catalog_Контрагенты_ВидыДеятельности_RowType">
-				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
-				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
-				<Property Name="ВидДеятельности_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="Ответственный_Key" Type="Edm.Guid" Nullable="true"/>
-			</ComplexType>
-			<ComplexType Name="Catalog_Контрагенты_МенеджерыПокупателя_RowType">
-				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
-				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
-				<Property Name="МенеджерПокупателя_Key" Type="Edm.Guid" Nullable="true"/>
-			</ComplexType>
-			<ComplexType Name="Catalog_СотрудникиОрганизаций_ПерсональныеНадбавки_RowType">
-				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
-				<Property Name="LineNumber" Type="Edm.Int64" Nullable="false"/>
-				<Property Name="Надбавка_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="Показатель1" Type="Edm.Double" Nullable="true"/>
-				<Property Name="Показатель2" Type="Edm.Double" Nullable="true"/>
-				<Property Name="Показатель3" Type="Edm.Double" Nullable="true"/>
-				<Property Name="Показатель4" Type="Edm.Double" Nullable="true"/>
-				<Property Name="Валюта1_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="Валюта2_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="Валюта3_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="Валюта4_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="ТарифныйРазряд1_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="ТарифныйРазряд2_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="ТарифныйРазряд3_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="ТарифныйРазряд4_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="Показатель5" Type="Edm.Double" Nullable="true"/>
-				<Property Name="Показатель6" Type="Edm.Double" Nullable="true"/>
-				<Property Name="Валюта5_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="Валюта6_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="ТарифныйРазряд5_Key" Type="Edm.Guid" Nullable="true"/>
-				<Property Name="ТарифныйРазряд6_Key" Type="Edm.Guid" Nullable="true"/>
-			</ComplexType>
 			<Association Name="Catalog_Номенклатура_Parent">
 				<End Role="Begin" Type="StandardODATA.Catalog_Номенклатура" Multiplicity="*"/>
 				<End Role="End" Type="StandardODATA.Catalog_Номенклатура" Multiplicity="0..1"/>
+			</Association>
+			<Association Name="Catalog_Номенклатура_ЕдиницаДляОтчетов">
+				<End Role="Begin" Type="StandardODATA.Catalog_Номенклатура" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_ЕдиницыИзмерения" Multiplicity="0..1"/>
+			</Association>
+			<Association Name="Catalog_Номенклатура_ЕдиницаХраненияОстатков">
+				<End Role="Begin" Type="StandardODATA.Catalog_Номенклатура" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_ЕдиницыИзмерения" Multiplicity="0..1"/>
+			</Association>
+			<Association Name="Catalog_Номенклатура_НоменклатурнаяГруппаЗатрат">
+				<End Role="Begin" Type="StandardODATA.Catalog_Номенклатура" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_НоменклатурныеГруппы" Multiplicity="0..1"/>
 			</Association>
 			<Association Name="Catalog_Номенклатура_ОсновнойПоставщик">
 				<End Role="Begin" Type="StandardODATA.Catalog_Номенклатура" Multiplicity="*"/>
 				<End Role="End" Type="StandardODATA.Catalog_Контрагенты" Multiplicity="0..1"/>
 			</Association>
-			<Association Name="Catalog_ФизическиеЛица_Parent">
-				<End Role="Begin" Type="StandardODATA.Catalog_ФизическиеЛица" Multiplicity="*"/>
-				<End Role="End" Type="StandardODATA.Catalog_ФизическиеЛица" Multiplicity="0..1"/>
+			<Association Name="Catalog_Номенклатура_НоменклатурнаяГруппа">
+				<End Role="Begin" Type="StandardODATA.Catalog_Номенклатура" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_НоменклатурныеГруппы" Multiplicity="0..1"/>
 			</Association>
-			<Association Name="Catalog_ФизическиеЛица_СоставСемьи_ФизЛицо">
-				<End Role="Begin" Type="StandardODATA.Catalog_ФизическиеЛица_СоставСемьи" Multiplicity="*"/>
-				<End Role="End" Type="StandardODATA.Catalog_ФизическиеЛица" Multiplicity="0..1"/>
+			<Association Name="Catalog_Номенклатура_СтатьяЗатрат">
+				<End Role="Begin" Type="StandardODATA.Catalog_Номенклатура" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_СтатьиЗатрат" Multiplicity="0..1"/>
+			</Association>
+			<Association Name="Catalog_Номенклатура_ЕдиницаИзмеренияМест">
+				<End Role="Begin" Type="StandardODATA.Catalog_Номенклатура" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_ЕдиницыИзмерения" Multiplicity="0..1"/>
 			</Association>
 			<Association Name="Catalog_Контрагенты_Parent">
 				<End Role="Begin" Type="StandardODATA.Catalog_Контрагенты" Multiplicity="*"/>
@@ -609,6 +738,14 @@
 			<Association Name="Catalog_Контрагенты_ГоловнойКонтрагент">
 				<End Role="Begin" Type="StandardODATA.Catalog_Контрагенты" Multiplicity="*"/>
 				<End Role="End" Type="StandardODATA.Catalog_Контрагенты" Multiplicity="0..1"/>
+			</Association>
+			<Association Name="Catalog_НоменклатурныеГруппы_Parent">
+				<End Role="Begin" Type="StandardODATA.Catalog_НоменклатурныеГруппы" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_НоменклатурныеГруппы" Multiplicity="0..1"/>
+			</Association>
+			<Association Name="Catalog_НоменклатурныеГруппы_ЕдиницаХраненияОстатков">
+				<End Role="Begin" Type="StandardODATA.Catalog_НоменклатурныеГруппы" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_ЕдиницыИзмерения" Multiplicity="0..1"/>
 			</Association>
 			<Association Name="Catalog_Организации_Parent">
 				<End Role="Begin" Type="StandardODATA.Catalog_Организации" Multiplicity="*"/>
@@ -621,6 +758,14 @@
 			<Association Name="Catalog_Организации_ИндивидуальныйПредприниматель">
 				<End Role="Begin" Type="StandardODATA.Catalog_Организации" Multiplicity="*"/>
 				<End Role="End" Type="StandardODATA.Catalog_ФизическиеЛица" Multiplicity="0..1"/>
+			</Association>
+			<Association Name="Catalog_Подразделения_Parent">
+				<End Role="Begin" Type="StandardODATA.Catalog_Подразделения" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_Подразделения" Multiplicity="0..1"/>
+			</Association>
+			<Association Name="Catalog_Подразделения_Организация">
+				<End Role="Begin" Type="StandardODATA.Catalog_Подразделения" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_Организации" Multiplicity="0..1"/>
 			</Association>
 			<Association Name="Catalog_СотрудникиОрганизаций_Parent">
 				<End Role="Begin" Type="StandardODATA.Catalog_СотрудникиОрганизаций" Multiplicity="*"/>
@@ -710,13 +855,17 @@
 				<End Role="Begin" Type="StandardODATA.Catalog_ПодразделенияОрганизаций" Multiplicity="*"/>
 				<End Role="End" Type="StandardODATA.Catalog_Подразделения" Multiplicity="0..1"/>
 			</Association>
-			<Association Name="Catalog_Подразделения_Parent">
-				<End Role="Begin" Type="StandardODATA.Catalog_Подразделения" Multiplicity="*"/>
-				<End Role="End" Type="StandardODATA.Catalog_Подразделения" Multiplicity="0..1"/>
+			<Association Name="Catalog_СтатьиЗатрат_Parent">
+				<End Role="Begin" Type="StandardODATA.Catalog_СтатьиЗатрат" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_СтатьиЗатрат" Multiplicity="0..1"/>
 			</Association>
-			<Association Name="Catalog_Подразделения_Организация">
-				<End Role="Begin" Type="StandardODATA.Catalog_Подразделения" Multiplicity="*"/>
-				<End Role="End" Type="StandardODATA.Catalog_Организации" Multiplicity="0..1"/>
+			<Association Name="Catalog_ФизическиеЛица_Parent">
+				<End Role="Begin" Type="StandardODATA.Catalog_ФизическиеЛица" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_ФизическиеЛица" Multiplicity="0..1"/>
+			</Association>
+			<Association Name="Catalog_ФизическиеЛица_СоставСемьи_ФизЛицо">
+				<End Role="Begin" Type="StandardODATA.Catalog_ФизическиеЛица_СоставСемьи" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_ФизическиеЛица" Multiplicity="0..1"/>
 			</Association>
 			<Association Name="InformationRegister_СобственныеКонтрагенты_Контрагент">
 				<End Role="Begin" Type="StandardODATA.InformationRegister_СобственныеКонтрагенты" Multiplicity="*"/>
@@ -756,6 +905,20 @@
 				<EntitySet Name="Catalog_Валюты" EntityType="StandardODATA.Catalog_Валюты"/>
 				<EntitySet Name="Catalog_Номенклатура" EntityType="StandardODATA.Catalog_Номенклатура"/>
 				<EntitySet Name="Catalog_ВидыКонтактнойИнформации" EntityType="StandardODATA.Catalog_ВидыКонтактнойИнформации"/>
+				<EntitySet Name="InformationRegister_ФИОФизЛиц" EntityType="StandardODATA.InformationRegister_ФИОФизЛиц"/>
+				<EntitySet Name="Catalog_ДолжностиОрганизаций" EntityType="StandardODATA.Catalog_ДолжностиОрганизаций"/>
+				<EntitySet Name="Catalog_ЕдиницыИзмерения" EntityType="StandardODATA.Catalog_ЕдиницыИзмерения"/>
+				<EntitySet Name="Catalog_Контрагенты" EntityType="StandardODATA.Catalog_Контрагенты"/>
+				<EntitySet Name="Catalog_Контрагенты_ВидыДеятельности" EntityType="StandardODATA.Catalog_Контрагенты_ВидыДеятельности"/>
+				<EntitySet Name="Catalog_Контрагенты_МенеджерыПокупателя" EntityType="StandardODATA.Catalog_Контрагенты_МенеджерыПокупателя"/>
+				<EntitySet Name="Catalog_НоменклатурныеГруппы" EntityType="StandardODATA.Catalog_НоменклатурныеГруппы"/>
+				<EntitySet Name="Catalog_Организации" EntityType="StandardODATA.Catalog_Организации"/>
+				<EntitySet Name="InformationRegister_КонтактнаяИнформация" EntityType="StandardODATA.InformationRegister_КонтактнаяИнформация"/>
+				<EntitySet Name="Catalog_Подразделения" EntityType="StandardODATA.Catalog_Подразделения"/>
+				<EntitySet Name="Catalog_СотрудникиОрганизаций" EntityType="StandardODATA.Catalog_СотрудникиОрганизаций"/>
+				<EntitySet Name="Catalog_СотрудникиОрганизаций_ПерсональныеНадбавки" EntityType="StandardODATA.Catalog_СотрудникиОрганизаций_ПерсональныеНадбавки"/>
+				<EntitySet Name="Catalog_ПодразделенияОрганизаций" EntityType="StandardODATA.Catalog_ПодразделенияОрганизаций"/>
+				<EntitySet Name="Catalog_СтатьиЗатрат" EntityType="StandardODATA.Catalog_СтатьиЗатрат"/>
 				<EntitySet Name="Catalog_ФизическиеЛица" EntityType="StandardODATA.Catalog_ФизическиеЛица"/>
 				<EntitySet Name="Catalog_ФизическиеЛица_СоставСемьи" EntityType="StandardODATA.Catalog_ФизическиеЛица_СоставСемьи"/>
 				<EntitySet Name="Catalog_ФизическиеЛица_Образование" EntityType="StandardODATA.Catalog_ФизическиеЛица_Образование"/>
@@ -763,16 +926,27 @@
 				<EntitySet Name="Catalog_ФизическиеЛица_ЗнаниеЯзыков" EntityType="StandardODATA.Catalog_ФизическиеЛица_ЗнаниеЯзыков"/>
 				<EntitySet Name="Catalog_ФизическиеЛица_Профессии" EntityType="StandardODATA.Catalog_ФизическиеЛица_Профессии"/>
 				<EntitySet Name="Catalog_ФизическиеЛица_Стажи" EntityType="StandardODATA.Catalog_ФизическиеЛица_Стажи"/>
-				<EntitySet Name="Catalog_ДолжностиОрганизаций" EntityType="StandardODATA.Catalog_ДолжностиОрганизаций"/>
-				<EntitySet Name="Catalog_Контрагенты" EntityType="StandardODATA.Catalog_Контрагенты"/>
-				<EntitySet Name="Catalog_Контрагенты_ВидыДеятельности" EntityType="StandardODATA.Catalog_Контрагенты_ВидыДеятельности"/>
-				<EntitySet Name="Catalog_Контрагенты_МенеджерыПокупателя" EntityType="StandardODATA.Catalog_Контрагенты_МенеджерыПокупателя"/>
-				<EntitySet Name="Catalog_Организации" EntityType="StandardODATA.Catalog_Организации"/>
-				<EntitySet Name="Catalog_СотрудникиОрганизаций" EntityType="StandardODATA.Catalog_СотрудникиОрганизаций"/>
-				<EntitySet Name="Catalog_СотрудникиОрганизаций_ПерсональныеНадбавки" EntityType="StandardODATA.Catalog_СотрудникиОрганизаций_ПерсональныеНадбавки"/>
-				<EntitySet Name="Catalog_ПодразделенияОрганизаций" EntityType="StandardODATA.Catalog_ПодразделенияОрганизаций"/>
-				<EntitySet Name="Catalog_Подразделения" EntityType="StandardODATA.Catalog_Подразделения"/>
 				<EntitySet Name="InformationRegister_СобственныеКонтрагенты" EntityType="StandardODATA.InformationRegister_СобственныеКонтрагенты"/>
+				<FunctionImport Name="SliceLast" IsBindable="true" IsSideEffecting="false" ReturnType="Collection(StandardODATA.InformationRegister_ФИОФизЛиц)">
+					<Parameter Name="bindingParameter" Type="StandardODATA.InformationRegister_ФИОФизЛиц"/>
+					<Parameter Name="Condition" Type="Edm.String"/>
+					<Parameter Name="Period" Type="Edm.DateTime"/>
+				</FunctionImport>
+				<FunctionImport Name="SliceFirst" IsBindable="true" IsSideEffecting="false" ReturnType="Collection(StandardODATA.InformationRegister_ФИОФизЛиц)">
+					<Parameter Name="bindingParameter" Type="StandardODATA.InformationRegister_ФИОФизЛиц"/>
+					<Parameter Name="Condition" Type="Edm.String"/>
+					<Parameter Name="Period" Type="Edm.DateTime"/>
+				</FunctionImport>
+				<FunctionImport Name="SliceLast" IsBindable="true" IsSideEffecting="false" ReturnType="Collection(StandardODATA.InformationRegister_КонтактнаяИнформация)">
+					<Parameter Name="bindingParameter" Type="StandardODATA.InformationRegister_КонтактнаяИнформация"/>
+					<Parameter Name="Condition" Type="Edm.String"/>
+					<Parameter Name="Period" Type="Edm.DateTime"/>
+				</FunctionImport>
+				<FunctionImport Name="SliceFirst" IsBindable="true" IsSideEffecting="false" ReturnType="Collection(StandardODATA.InformationRegister_КонтактнаяИнформация)">
+					<Parameter Name="bindingParameter" Type="StandardODATA.InformationRegister_КонтактнаяИнформация"/>
+					<Parameter Name="Condition" Type="Edm.String"/>
+					<Parameter Name="Period" Type="Edm.DateTime"/>
+				</FunctionImport>
 				<FunctionImport Name="SliceLast" IsBindable="true" IsSideEffecting="false" ReturnType="Collection(StandardODATA.InformationRegister_СобственныеКонтрагенты)">
 					<Parameter Name="bindingParameter" Type="StandardODATA.InformationRegister_СобственныеКонтрагенты"/>
 					<Parameter Name="Condition" Type="Edm.String"/>

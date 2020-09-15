@@ -11,18 +11,31 @@ namespace App
 {
     public static class Ext_Linq
     {
-        public static IEnumerable<IEnumerable<T>> Paginate<T>(this IEnumerable<T> source, Int32 pageSize)
+        public static List<List<T>> Paginate<T>(this IEnumerable<T> source, Int32 pageSize)
         {
+            List<List<T>> paginatedCollection = new List<List<T>>();
             IEnumerator<T> enumerator = source.GetEnumerator();
-            while (enumerator.MoveNext()) yield return NextPartition(enumerator, pageSize);
-        }
-
-        private static IEnumerable<T> NextPartition<T>(IEnumerator<T> enumerator, Int32 blockSize)
-        {
+            
+            if (!enumerator.MoveNext())
+            {
+                paginatedCollection.Add(new List<T>());
+                return paginatedCollection;
+            }
+            
             do
             {
-                yield return enumerator.Current;
-            } while (--blockSize > 0 && enumerator.MoveNext());
+                Int32 elapsedItems = pageSize;
+                List<T> page = new List<T>(pageSize);
+                paginatedCollection.Add(page);
+                do
+                {
+                    page.Add(enumerator.Current);
+                }
+                while (--elapsedItems > 0 && enumerator.MoveNext());
+            }
+            while (enumerator.MoveNext());
+
+            return paginatedCollection;
         }
 
         public static IEnumerable<ObjType> ObjsWithDistinctValues<ObjType, ValType>(this IEnumerable<ObjType> source, Func<ObjType, ValType> keySelector)
@@ -139,8 +152,20 @@ namespace App
     {
         public static Task[] StartAndWaitForAll(this Task[] tasks)
         {
-            tasks.ForEach(task => task.Start());
+            tasks.ForEach(task => task?.Start());
             Task.WaitAll(tasks);
+            return tasks;
+        }
+
+        public static List<Task> StartAndWaitForAll(this List<Task> tasks)
+        {
+            tasks.ToArray().StartAndWaitForAll();
+            return tasks;
+        }
+
+        public static List<Task<T>> StartAndWaitForAll<T>(this List<Task<T>> tasks)
+        {
+            tasks.ToArray().StartAndWaitForAll();
             return tasks;
         }
     }

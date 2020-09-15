@@ -6,7 +6,7 @@
 
     [OneS("Catalog_ПодразделенияОрганизаций", "Catalog_ПодразделенияОрганизаций", "Справочник.ПодразделенияОрганизаций", "Справочник.ПодразделенияОрганизаций")]
     [JsonObject("Catalog_ПодразделенияОрганизаций")]
-    public class OrganizationSubdivision : OneCBaseLookup
+    public class OrganizationSubdivision : OneSBaseLookup
     {
         /// <summary> Родитель </summary>
         [OneS("Guid?", "Parent_Key", "-", "-")]
