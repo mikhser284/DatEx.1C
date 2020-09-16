@@ -19,26 +19,5 @@ namespace DatEx.OneS.DataModel
         public String KindOfContactInfoObject { get; set; }
 
         public override String ToString() => $"{Type} {KindOfContactInfoObject}";
-
-        // ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-
-        //[OneC("", "", "", "")]
-
-        //[OneC("String", "", "Строка", "")]
-        //[JsonProperty("")]
-        //public String Prop { get; set; }
-
-        //[OneC("Boolean", "", "Булево", "")]
-        //[JsonProperty("")]
-        //public Boolean? Prop { get; set; }
-
-
-        //[OneC("Guid?", "", "-", "-")]
-        //[JsonProperty("")]
-        //public Guid? PropId { get; set; }
-
-        //[OneC("?", "NavProp()", "", "")]
-        //[JsonIgnore]
-        //public Object NavProp_ { get; set; }
     }
 }

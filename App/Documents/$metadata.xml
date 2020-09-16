@@ -92,6 +92,7 @@
 				<NavigationProperty Name="Parent" Relationship="StandardODATA.Catalog_Номенклатура_Parent" FromRole="Begin" ToRole="End"/>
 				<NavigationProperty Name="ЕдиницаДляОтчетов" Relationship="StandardODATA.Catalog_Номенклатура_ЕдиницаДляОтчетов" FromRole="Begin" ToRole="End"/>
 				<NavigationProperty Name="ЕдиницаХраненияОстатков" Relationship="StandardODATA.Catalog_Номенклатура_ЕдиницаХраненияОстатков" FromRole="Begin" ToRole="End"/>
+				<NavigationProperty Name="БазоваяЕдиницаИзмерения" Relationship="StandardODATA.Catalog_Номенклатура_БазоваяЕдиницаИзмерения" FromRole="Begin" ToRole="End"/>
 				<NavigationProperty Name="НоменклатурнаяГруппаЗатрат" Relationship="StandardODATA.Catalog_Номенклатура_НоменклатурнаяГруппаЗатрат" FromRole="Begin" ToRole="End"/>
 				<NavigationProperty Name="ОсновнойПоставщик" Relationship="StandardODATA.Catalog_Номенклатура_ОсновнойПоставщик" FromRole="Begin" ToRole="End"/>
 				<NavigationProperty Name="НоменклатурнаяГруппа" Relationship="StandardODATA.Catalog_Номенклатура_НоменклатурнаяГруппа" FromRole="Begin" ToRole="End"/>
@@ -124,6 +125,20 @@
 				<Property Name="Имя" Type="Edm.String" Nullable="true"/>
 				<Property Name="Отчество" Type="Edm.String" Nullable="true"/>
 				<Property Name="ФизЛицо_Type" Type="Edm.String" Nullable="false"/>
+			</EntityType>
+			<EntityType Name="Catalog_КлассификаторЕдиницИзмерения">
+				<Key>
+					<PropertyRef Name="Ref_Key"/>
+				</Key>
+				<Property Name="Ref_Key" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="Predefined" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="PredefinedDataName" Type="Edm.String" Nullable="true"/>
+				<Property Name="DataVersion" Type="Edm.String" Nullable="true"/>
+				<Property Name="Description" Type="Edm.String" Nullable="true"/>
+				<Property Name="Code" Type="Edm.String" Nullable="true"/>
+				<Property Name="DeletionMark" Type="Edm.Boolean" Nullable="true"/>
+				<Property Name="НаименованиеПолное" Type="Edm.String" Nullable="true"/>
+				<Property Name="МеждународноеСокращение" Type="Edm.String" Nullable="true"/>
 			</EntityType>
 			<EntityType Name="Catalog_ДолжностиОрганизаций">
 				<Key>
@@ -167,6 +182,7 @@
 				<Property Name="ПорогОкругления" Type="Edm.Int64" Nullable="true"/>
 				<Property Name="ПредупреждатьОНецелыхМестах" Type="Edm.Boolean" Nullable="true"/>
 				<Property Name="Owner_Type" Type="Edm.String" Nullable="true"/>
+				<NavigationProperty Name="ЕдиницаПоКлассификатору" Relationship="StandardODATA.Catalog_ЕдиницыИзмерения_ЕдиницаПоКлассификатору" FromRole="Begin" ToRole="End"/>
 			</EntityType>
 			<EntityType Name="Catalog_Контрагенты">
 				<Key>
@@ -250,6 +266,7 @@
 				<Property Name="ПоказательДляДекларацииПоСХН" Type="Edm.String" Nullable="true"/>
 				<NavigationProperty Name="Parent" Relationship="StandardODATA.Catalog_НоменклатурныеГруппы_Parent" FromRole="Begin" ToRole="End"/>
 				<NavigationProperty Name="ЕдиницаХраненияОстатков" Relationship="StandardODATA.Catalog_НоменклатурныеГруппы_ЕдиницаХраненияОстатков" FromRole="Begin" ToRole="End"/>
+				<NavigationProperty Name="БазоваяЕдиницаИзмерения" Relationship="StandardODATA.Catalog_НоменклатурныеГруппы_БазоваяЕдиницаИзмерения" FromRole="Begin" ToRole="End"/>
 			</EntityType>
 			<EntityType Name="Catalog_Организации">
 				<Key>
@@ -711,6 +728,10 @@
 				<End Role="Begin" Type="StandardODATA.Catalog_Номенклатура" Multiplicity="*"/>
 				<End Role="End" Type="StandardODATA.Catalog_ЕдиницыИзмерения" Multiplicity="0..1"/>
 			</Association>
+			<Association Name="Catalog_Номенклатура_БазоваяЕдиницаИзмерения">
+				<End Role="Begin" Type="StandardODATA.Catalog_Номенклатура" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_КлассификаторЕдиницИзмерения" Multiplicity="0..1"/>
+			</Association>
 			<Association Name="Catalog_Номенклатура_НоменклатурнаяГруппаЗатрат">
 				<End Role="Begin" Type="StandardODATA.Catalog_Номенклатура" Multiplicity="*"/>
 				<End Role="End" Type="StandardODATA.Catalog_НоменклатурныеГруппы" Multiplicity="0..1"/>
@@ -731,6 +752,10 @@
 				<End Role="Begin" Type="StandardODATA.Catalog_Номенклатура" Multiplicity="*"/>
 				<End Role="End" Type="StandardODATA.Catalog_ЕдиницыИзмерения" Multiplicity="0..1"/>
 			</Association>
+			<Association Name="Catalog_ЕдиницыИзмерения_ЕдиницаПоКлассификатору">
+				<End Role="Begin" Type="StandardODATA.Catalog_ЕдиницыИзмерения" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_КлассификаторЕдиницИзмерения" Multiplicity="0..1"/>
+			</Association>
 			<Association Name="Catalog_Контрагенты_Parent">
 				<End Role="Begin" Type="StandardODATA.Catalog_Контрагенты" Multiplicity="*"/>
 				<End Role="End" Type="StandardODATA.Catalog_Контрагенты" Multiplicity="0..1"/>
@@ -746,6 +771,10 @@
 			<Association Name="Catalog_НоменклатурныеГруппы_ЕдиницаХраненияОстатков">
 				<End Role="Begin" Type="StandardODATA.Catalog_НоменклатурныеГруппы" Multiplicity="*"/>
 				<End Role="End" Type="StandardODATA.Catalog_ЕдиницыИзмерения" Multiplicity="0..1"/>
+			</Association>
+			<Association Name="Catalog_НоменклатурныеГруппы_БазоваяЕдиницаИзмерения">
+				<End Role="Begin" Type="StandardODATA.Catalog_НоменклатурныеГруппы" Multiplicity="*"/>
+				<End Role="End" Type="StandardODATA.Catalog_КлассификаторЕдиницИзмерения" Multiplicity="0..1"/>
 			</Association>
 			<Association Name="Catalog_Организации_Parent">
 				<End Role="Begin" Type="StandardODATA.Catalog_Организации" Multiplicity="*"/>
@@ -906,6 +935,7 @@
 				<EntitySet Name="Catalog_Номенклатура" EntityType="StandardODATA.Catalog_Номенклатура"/>
 				<EntitySet Name="Catalog_ВидыКонтактнойИнформации" EntityType="StandardODATA.Catalog_ВидыКонтактнойИнформации"/>
 				<EntitySet Name="InformationRegister_ФИОФизЛиц" EntityType="StandardODATA.InformationRegister_ФИОФизЛиц"/>
+				<EntitySet Name="Catalog_КлассификаторЕдиницИзмерения" EntityType="StandardODATA.Catalog_КлассификаторЕдиницИзмерения"/>
 				<EntitySet Name="Catalog_ДолжностиОрганизаций" EntityType="StandardODATA.Catalog_ДолжностиОрганизаций"/>
 				<EntitySet Name="Catalog_ЕдиницыИзмерения" EntityType="StandardODATA.Catalog_ЕдиницыИзмерения"/>
 				<EntitySet Name="Catalog_Контрагенты" EntityType="StandardODATA.Catalog_Контрагенты"/>

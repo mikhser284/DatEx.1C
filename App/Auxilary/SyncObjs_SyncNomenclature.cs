@@ -9,8 +9,12 @@
 
     public class SyncObjs_SyncNomenclature
     {
-        public Dictionary<Guid, OneS.Nomenclature> OneS_NomenclatureGroupsById { get; set; } = new Dictionary<Guid, OneS.Nomenclature>();
+        public Dictionary<Guid, OneS.Nomenclature> OneS_NomenclatureGroupsOrderedById { get; set; } = new Dictionary<Guid, OneS.Nomenclature>();
 
-        public Dictionary<Guid, OneS.Nomenclature> OneS_NomenclatureItemsById { get; set; } = new Dictionary<Guid, OneS.Nomenclature>();
+        public Dictionary<Guid, OneS.Nomenclature> OneS_NomenclatureItemsOrderedById { get; set; } = new Dictionary<Guid, OneS.Nomenclature>();
+
+        public Dictionary<Guid, OneS.MeasureUnit> OneS_MeasureUnitsOrderedById { get; set; } = new Dictionary<Guid, OneS.MeasureUnit>();
+
+        public Dictionary<Guid, OneS.CostItem> OneS_CostItemsOrderedById { get; set; } = new Dictionary<Guid, OneS.CostItem>();
     }
 }

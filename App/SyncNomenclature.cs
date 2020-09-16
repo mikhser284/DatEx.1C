@@ -70,8 +70,8 @@ namespace App
         public static void OneS_Nomenclature_ShowSyncObjs(SyncObjs_SyncNomenclature syncObjs)
         {
             //TODO Показать структуру объектов полученных из 1С
-            syncObjs.OneS_NomenclatureGroupsById.FirstOrDefault().Value.Show();
-            syncObjs.OneS_NomenclatureItemsById.Values.Where(e => e.CostItemId.IsNotNullOrDefault()).Skip(0).Take(10).ToList().ShowOneCObjects();
+            syncObjs.OneS_NomenclatureGroupsOrderedById.FirstOrDefault().Value.Show();
+            syncObjs.OneS_NomenclatureItemsOrderedById.Values.Where(e => e.CostItemId.IsNotNullOrDefault()).Skip(0).Take(10).ToList().ShowOneCObjects();
         }
 
         /// <summary> Получить объекты для синхронизации с 1С </summary>
@@ -98,7 +98,7 @@ namespace App
                 List<OneS.Nomenclature> nmcDirs = stack.Pop();
                 if (nmcDirs.Count < 1) continue;
 
-                nmcDirs.ForEach(e => syncObjs.OneS_NomenclatureGroupsById.Add(e.Id, e));
+                nmcDirs.ForEach(e => syncObjs.OneS_NomenclatureGroupsOrderedById.Add(e.Id, e));
 
                 List<List<OneS.Nomenclature>> queries = nmcDirs.Paginate(MaxIdsPerPage);//.ToList();
                 Task<List<OneS.Nomenclature>>[] queriesTasks = new Task<List<OneS.Nomenclature>>[queries.Count];
@@ -119,7 +119,7 @@ namespace App
             const Int32 MaxParallelQueries = 6;
             const Int32 MaxIdsPerPage = 25;
 
-            List<List<Guid>> paginatedIds = syncObjs.OneS_NomenclatureGroupsById.Keys.Paginate(MaxParallelQueries * MaxIdsPerPage);
+            List<List<Guid>> paginatedIds = syncObjs.OneS_NomenclatureGroupsOrderedById.Keys.Paginate(MaxParallelQueries * MaxIdsPerPage);
 
             foreach(var idsPage in paginatedIds)
             {
@@ -136,7 +136,7 @@ namespace App
 
                 foreach(var query in parallelQueries)
                     foreach(var nomenclature in query.Result)
-                        syncObjs.OneS_NomenclatureItemsById.Add(nomenclature.Id, nomenclature);   
+                        syncObjs.OneS_NomenclatureItemsOrderedById.Add(nomenclature.Id, nomenclature);   
             }
         }
     }
