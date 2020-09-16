@@ -25,13 +25,6 @@
 
 
 
-        /// <summary> Единица по классификатору </summary>
-        [OneS("Guid?", "ЕдиницаПоКлассификатору_Key", "Справочник.КлассификаторЕдиницИзмерения", "ЕдиницаПоКлассификатору")]
-        [JsonProperty("ЕдиницаПоКлассификатору_Key")]
-        public Guid? MeasureUnitByClassifier { get; set; }
-
-
-
         /// <summary> Вес </summary>
         [OneS("Double?", "Вес", "Число", "Вес")]
         [JsonProperty("Вес")]

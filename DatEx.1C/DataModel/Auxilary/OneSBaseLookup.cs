@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace DatEx.OneS.DataModel
 {
-    public class OneSBaseLookup : OneCObject
+    public class OneSBaseLookup : OneSObject
     {
         /// <summary> Id </summary>
         [OneS("Guid", "Ref_Key", "-", "-", Color = ConsoleColor.Magenta)]
@@ -59,7 +59,7 @@ namespace DatEx.OneS.DataModel
         public Boolean? IsFolder { get; set; }
     }
 
-    public class OneCObject
+    public class OneSObject
     {
         public void Show(Int32 indentLevel = 0)
         {

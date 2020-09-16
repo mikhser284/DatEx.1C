@@ -8,7 +8,7 @@ namespace DatEx.OneS.DataModel
 {
     [OneS("InformationRegister_КонтактнаяИнформация", "InformationRegister_КонтактнаяИнформация", "КонтактнаяИнформация", "КонтактнаяИнформация")]
     [JsonObject("InformationRegister_КонтактнаяИнформация")]
-    public class IRContactInfo : OneCObject
+    public class IRContactInfo : OneSObject
     {
         [OneS("Catalog_ВидыКонтактнойИнформации", "-", "Виды контактной информации", "-", Remarks = "Прямая связь между объектами отсутствует")]
         [JsonIgnore]

@@ -15,9 +15,9 @@ namespace DatEx.OneS
     {
         #region ————— Общие методы ——————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-        public List<T> GetObjs<T>(String query = default(String)) where T : OneCObject => GetObjs<T, T>(query);
+        public List<T> GetObjs<T>(String query = default(String)) where T : OneSObject => GetObjs<T, T>(query);
 
-        public List<R> GetObjs<T, R>(String query = default(String)) where T : OneCObject
+        public List<R> GetObjs<T, R>(String query = default(String)) where T : OneSObject
         {
             String typeName = TypesMap[typeof(T)];
             String separator = !String.IsNullOrEmpty(query) ? "&" : "";
@@ -48,7 +48,7 @@ namespace DatEx.OneS
         }
         
 
-        public List<Guid> GetIdsOfObjs<T>(String query = null, String nameOfGuidFieldToSelect = "Ref_Key") where T : OneCObject
+        public List<Guid> GetIdsOfObjs<T>(String query = null, String nameOfGuidFieldToSelect = "Ref_Key") where T : OneSObject
         {
             String typeName = TypesMap[typeof(T)];
             String separator = !String.IsNullOrEmpty(query) ? " &" : "";
@@ -68,14 +68,14 @@ namespace DatEx.OneS
             return JObject.Parse(result)["value"].Select(i => i[nameOfGuidFieldToSelect]).Select(x => new Guid(x.Value<String>())).ToList();
         }
 
-        public List<T> GetObjsByIds<T>(IEnumerable<Guid> identifiers, String nameOfGuidFieldToCompare = "Ref_Key") where T : OneCObject
+        public List<T> GetObjsByIds<T>(IEnumerable<Guid> identifiers, String nameOfGuidFieldToCompare = "Ref_Key") where T : OneSObject
         {
             String filter = String.Join(" or \n", identifiers.Select(id => $"{nameOfGuidFieldToCompare} eq guid'{id}'"));
             String query = $"$filter={filter}";
             return GetObjs<T>(query);
         }
 
-        public List<T> GetObjsByIds<T>(Guid identifier, params Guid[] identifiers) where T : OneCObject
+        public List<T> GetObjsByIds<T>(Guid identifier, params Guid[] identifiers) where T : OneSObject
         {
             List<Guid> ids = new List<Guid>(identifiers);
             ids.Add(identifier);
@@ -138,7 +138,13 @@ namespace DatEx.OneS
             { typeof(Organization), "Catalog_Организации" },
             { typeof(OrganizationSubdivision), "Catalog_ПодразделенияОрганизаций" },
             { typeof(PositionInOrganization), "Catalog_ДолжностиОрганизаций" },
-            { typeof(Nomenclature), "Catalog_Номенклатура" }
+            //
+            //
+            //
+            { typeof(Nomenclature), "Catalog_Номенклатура" },
+            { typeof(MeasureUnit), "Catalog_ЕдиницыИзмерения" },
+            { typeof(CostArticle), "Catalog_СтатьиЗатрат" },
+            { typeof(MeasureUnitsClassifier), "Catalog_КлассификаторЕдиницИзмерения" }
         };
 
         #endregion ————— Служебные

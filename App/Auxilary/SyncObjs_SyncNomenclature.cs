@@ -15,6 +15,8 @@
 
         public Dictionary<Guid, OneS.MeasureUnit> OneS_MeasureUnitsOrderedById { get; set; } = new Dictionary<Guid, OneS.MeasureUnit>();
 
-        public Dictionary<Guid, OneS.CostItem> OneS_CostItemsOrderedById { get; set; } = new Dictionary<Guid, OneS.CostItem>();
+        public Dictionary<Guid, OneS.CostArticle> OneS_CostArticlesOrderedById { get; set; } = new Dictionary<Guid, OneS.CostArticle>();
+
+        public Dictionary<Guid, OneS.MeasureUnitsClassifier>
     }
 }

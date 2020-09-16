@@ -1,11 +1,12 @@
-﻿using System;
+﻿using DatEx.OneS.DataModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using OneC = DatEx.OneS.DataModel;
+using OneS = DatEx.OneS.DataModel;
 
 namespace App
 {
@@ -172,7 +173,7 @@ namespace App
 
     public static class Ext_OneCObject
     {
-        public static List<T> ShowOneCObjects<T>(this List<T> objects) where T : OneC.OneCObject
+        public static List<T> ShowOneCObjects<T>(this List<T> objects) where T : OneS.OneSObject
         {
             foreach (T obj in objects)
             {
@@ -180,6 +181,16 @@ namespace App
                 Console.WriteLine($"\n\n");
             }
             return objects;
+        }
+    }
+
+    public static class Ext_Dictionary
+    {
+        public static Boolean AddGuidKey<T>(this Dictionary<Guid, T> dictionary, Guid? guid) where T : OneS.OneSObject
+        {
+            if (!guid.IsNotNullOrDefault() || dictionary.ContainsKey((Guid)guid)) return false;
+            dictionary.Add((Guid)guid, null);
+            return true;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace DatEx.OneS.DataModel
 {
     [OneS("InformationRegister_СобственныеКонтрагенты", "InformationRegister_СобственныеКонтрагенты", "СобственныеКонтрагенты", "СобственныеКонтрагенты")]
     [JsonObject("InformationRegister_СобственныеКонтрагенты")]
-    public class IROwnContracror : OneCObject
+    public class IROwnContracror : OneSObject
     {
         [OneS("Guid", "Контрагент_Key", "Справочник.Контрагенты", "Контрагент", Color = ConsoleColor.Blue)]
         [JsonProperty("Контрагент_Key")]

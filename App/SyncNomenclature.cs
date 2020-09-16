@@ -71,7 +71,7 @@ namespace App
         {
             //TODO Показать структуру объектов полученных из 1С
             syncObjs.OneS_NomenclatureGroupsOrderedById.FirstOrDefault().Value.Show();
-            syncObjs.OneS_NomenclatureItemsOrderedById.Values.Where(e => e.CostItemId.IsNotNullOrDefault()).Skip(0).Take(10).ToList().ShowOneCObjects();
+            syncObjs.OneS_NomenclatureItemsOrderedById.Values.Where(e => e.CostArticleId.IsNotNullOrDefault()).Skip(0).Take(10).ToList().ShowOneCObjects();
         }
 
         /// <summary> Получить объекты для синхронизации с 1С </summary>
@@ -82,7 +82,8 @@ namespace App
 
             OneS_GetSyncObjs_NomenclatureGroups(settings, syncObjs);
             OneS_GetSyncObjs_NomenclatureItems(settings, syncObjs);
-
+            OneS_GetSyncObjs_MeasureUnits(settings, syncObjs);
+            OneS_GetSyncObjs_CostItems(settings, syncObjs);
 
             return syncObjs;
         }
@@ -114,9 +115,11 @@ namespace App
             }
         }
 
+
+
         private static void OneS_GetSyncObjs_NomenclatureItems(SyncSettings settings, SyncObjs_SyncNomenclature syncObjs)
         {
-            const Int32 MaxParallelQueries = 6;
+            const Int32 MaxParallelQueries = 12;
             const Int32 MaxIdsPerPage = 25;
 
             List<List<Guid>> paginatedIds = syncObjs.OneS_NomenclatureGroupsOrderedById.Keys.Paginate(MaxParallelQueries * MaxIdsPerPage);
@@ -124,8 +127,6 @@ namespace App
             foreach(var idsPage in paginatedIds)
             {
                 List<Task<List<OneS.Nomenclature>>> parallelQueries = new List<Task<List<Nomenclature>>>();
-
-                Int32 pageIndex = 0;
                 foreach(var page in idsPage.Paginate(MaxIdsPerPage))
                 {
                     String query = $"$filter=IsFolder eq false and ({String.Join("\n or ", page.Select(e => $"Parent_Key eq guid'{e}'"))})";
@@ -136,7 +137,58 @@ namespace App
 
                 foreach(var query in parallelQueries)
                     foreach(var nomenclature in query.Result)
-                        syncObjs.OneS_NomenclatureItemsOrderedById.Add(nomenclature.Id, nomenclature);   
+                    {
+                        syncObjs.OneS_NomenclatureItemsOrderedById.Add(nomenclature.Id, nomenclature);
+                        //
+                        syncObjs.OneS_MeasureUnitsOrderedById.AddGuidKey(nomenclature.MeasureUnitForReportsId);
+                        syncObjs.OneS_MeasureUnitsOrderedById.AddGuidKey(nomenclature.MeasureUnitForRemainsStoragingId);
+                        syncObjs.OneS_MeasureUnitsOrderedById.AddGuidKey(nomenclature.PlacesMeasureUnitId);
+                        syncObjs.OneS_CostArticlesOrderedById.AddGuidKey(nomenclature.CostArticleId);
+                    }
+            }
+        }
+
+
+
+        private static void OneS_GetSyncObjs_MeasureUnits(SyncSettings settings, SyncObjs_SyncNomenclature syncObjs)
+        {
+            const Int32 MaxParallelQueries = 12;
+            const Int32 MaxIdsPerPage = 20;
+
+            var idsBatches = syncObjs.OneS_MeasureUnitsOrderedById.Keys.Paginate(MaxParallelQueries * MaxIdsPerPage);
+
+            foreach(var idsBatch in idsBatches)
+            {
+                List<Task<List<OneS.MeasureUnit>>> parallelQueries = new List<Task<List<MeasureUnit>>>();
+                foreach (var queryableIds in idsBatch.Paginate(MaxIdsPerPage))
+                    parallelQueries.Add(new Task<List<OneS.MeasureUnit>>(() => HttpClientOfOneS.GetObjsByIds<OneS.MeasureUnit>(queryableIds)));                
+                parallelQueries.StartAndWaitForAll();
+
+                foreach (var query in parallelQueries)
+                    foreach (var e in query.Result)
+                        syncObjs.OneS_MeasureUnitsOrderedById[e.Id] = e;
+            }
+        }
+
+
+
+        private static void OneS_GetSyncObjs_CostItems(SyncSettings settings, SyncObjs_SyncNomenclature syncObjs)
+        {
+            const Int32 MaxParallelQueries = 12;
+            const Int32 MaxIdsPerPage = 20;
+
+            var idsBatches = syncObjs.OneS_CostArticlesOrderedById.Keys.Paginate(MaxParallelQueries * MaxIdsPerPage);
+
+            foreach (var idsBatch in idsBatches)
+            {
+                List<Task<List<CostArticle>>> parallelQueries = new List<Task<List<CostArticle>>>();
+                foreach (var queryableIds in idsBatch.Paginate(MaxIdsPerPage))
+                    parallelQueries.Add(new Task<List<CostArticle>>(() => HttpClientOfOneS.GetObjsByIds<CostArticle>(queryableIds)));
+                parallelQueries.StartAndWaitForAll();
+
+                foreach (var query in parallelQueries)
+                    foreach (var e in query.Result)
+                        syncObjs.OneS_CostArticlesOrderedById[e.Id] = e;
             }
         }
     }

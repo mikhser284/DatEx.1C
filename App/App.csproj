@@ -6,14 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Documents\OneS.EditingTheCompositionOfStandardODataInterface.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="Documents\OneS.EditingTheCompositionOfStandardODataInterface.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\DatEx.1C\DatEx.OneS.csproj" />
     <ProjectReference Include="..\DatEx.Creatio\DatEx.Creatio.csproj" />
   </ItemGroup>

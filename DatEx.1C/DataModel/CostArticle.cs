@@ -9,7 +9,7 @@
     /// <summary> Стати затрат </summary>
     [OneS("Catalog_СтатьиЗатрат", "Catalog_СтатьиЗатрат", "Справочник.СтатьиЗатрат", "Справочник.СтатьиЗатрат")]
     [JsonObject("Catalog_СтатьиЗатрат")]
-    public class CostItem : OneSBaseHierarchicalLookup
+    public class CostArticle : OneSBaseHierarchicalLookup
     {
         /// <summary> Вид затрат </summary>
         [OneS("String", "ВидЗатрат", "Перечисление.ВидыЗатрат", "ВидЗатрат")]

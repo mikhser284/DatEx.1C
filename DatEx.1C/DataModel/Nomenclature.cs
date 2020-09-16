@@ -88,16 +88,30 @@
 
 
         /// <summary> Единица для отчетов (Id) </summary>
-        [OneS("Guid?", "ЕдиницаДляОтчетов_Key", "Справочник.ЕдиницыИзмерения", "ЕдиницаДляОтчетов", Color = ConsoleColor.White)]
+        [OneS("Guid?", "ЕдиницаДляОтчетов_Key", "Справочник.ЕдиницыИзмерения", "ЕдиницаДляОтчетов", Color = ConsoleColor.Blue)]
         [JsonProperty("ЕдиницаДляОтчетов_Key")]
         public Guid? MeasureUnitForReportsId { get; set; }
 
 
 
+        /// <summary> Единица для отчетов </summary>
+        [JsonIgnore]
+        [OneS("—", "—", "Справочник.ЕдиницыИзмерения", "ЕдиницаДляОтчетов", Color = ConsoleColor.Yellow)]
+        public MeasureUnit MeasureUnitForReports_NavProp { get; set; }
+
+
+
         /// <summary> Единица хранения остатков (Id) </summary>
-        [OneS("Guid?", "ЕдиницаХраненияОстатков_Key", "Справочник.ЕдиницыИзмерения", "ЕдиницаХраненияОстатков", Color = ConsoleColor.White)]
+        [OneS("Guid?", "ЕдиницаХраненияОстатков_Key", "Справочник.ЕдиницыИзмерения", "ЕдиницаХраненияОстатков", Color = ConsoleColor.Blue)]
         [JsonProperty("ЕдиницаХраненияОстатков_Key")]
         public Guid? MeasureUnitForRemainsStoragingId { get; set; }
+
+
+
+        /// <summary> Единица хранения остатков </summary>
+        [JsonIgnore]
+        [OneS("—", "—", "Справочник.ЕдиницыИзмерения", "ЕдиницаХраненияОстатков", Color = ConsoleColor.Yellow)]
+        public MeasureUnit MeasureUnitForRemainsStoraging_NavProp { get; set; }
 
 
 
@@ -179,9 +193,16 @@
 
 
         /// <summary> Статья затрат (Id) </summary>
-        [OneS("Guid?", "СтатьяЗатрат_Key", "Справочник.СтатьиЗатрат", "СтатьяЗатрат", Color = ConsoleColor.White)]
+        [OneS("Guid?", "СтатьяЗатрат_Key", "Справочник.СтатьиЗатрат", "СтатьяЗатрат", Color = ConsoleColor.Blue)]
         [JsonProperty("СтатьяЗатрат_Key")]
-        public Guid? CostItemId { get; set; }
+        public Guid? CostArticleId { get; set; }
+
+
+
+        /// <summary> Статья затрат (Id) </summary>
+        [OneS("—", "—", "Справочник.СтатьиЗатрат", "СтатьяЗатрат", Color = ConsoleColor.Yellow)]
+        [JsonIgnore]
+        public CostArticle CostArticle_NavProp { get; set; }
 
 
 
@@ -256,9 +277,16 @@
 
 
         /// <summary> Единица измерения мест (Id) </summary>
-        [OneS("Guid?", "ЕдиницаИзмеренияМест_Key", "Справочник.ЕдиницыИзмерения", "ЕдиницаИзмеренияМест", Color = ConsoleColor.White)]
+        [OneS("Guid?", "ЕдиницаИзмеренияМест_Key", "Справочник.ЕдиницыИзмерения", "ЕдиницаИзмеренияМест", Color = ConsoleColor.Blue)]
         [JsonProperty("ЕдиницаИзмеренияМест_Key")]
-        public Guid? PlacesMeasureUnit { get; set; }
+        public Guid? PlacesMeasureUnitId { get; set; }
+
+
+
+        /// <summary> Единица измерения мест </summary>
+        [JsonIgnore]
+        [OneS("—", "—", "Справочник.ЕдиницыИзмерения", "ЕдиницаИзмеренияМест", Color = ConsoleColor.Yellow)]
+        public MeasureUnit PlacesMeasureUnit_NavProp { get; set; }
 
 
 

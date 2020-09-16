@@ -6,7 +6,7 @@
 
     [OneS("InformationRegister_ФИОФизЛиц", "InformationRegister_ФИОФизЛиц", "ФИОФизЛиц", "ФИОФизЛиц")]
     [JsonObject("InformationRegister_ФИОФизЛиц")]
-    public class IRNamesOfPersons : OneCObject
+    public class IRNamesOfPersons : OneSObject
     {
         [OneS("DateTime", "Period", "Дата", "?", Color = ConsoleColor.Blue)]
         [JsonProperty("Period")]
