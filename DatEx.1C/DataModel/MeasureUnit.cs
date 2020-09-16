@@ -25,6 +25,13 @@
 
 
 
+        /// <summary> Единица по классификатору </summary>
+        [OneS("—", "—", "Справочник.КлассификаторЕдиницИзмерения", "ЕдиницаПоКлассификатору")]
+        [JsonIgnore]
+        public MeasureUnitsClassifier MeasureUnitByClassifier_NavProp { get; set; }
+
+
+
         /// <summary> Вес </summary>
         [OneS("Double?", "Вес", "Число", "Вес")]
         [JsonProperty("Вес")]

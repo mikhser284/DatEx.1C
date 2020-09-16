@@ -7,7 +7,7 @@
     /// <summary> Классификатор единиц измерения </summary>
     [OneS("Catalog_КлассификаторЕдиницИзмерения", "Catalog_КлассификаторЕдиницИзмерения", "Справочник.КлассификаторЕдиницИзмерения", "Справочник.КлассификаторЕдиницИзмерения")]
     [JsonObject("Catalog_КлассификаторЕдиницИзмерения")]
-    public class MeasureUnitsClassifier
+    public class MeasureUnitsClassifier : OneSBaseLookup
     {
         /// <summary> Полное наименование </summary>
         [OneS("String", "НаименованиеПолное", "Строка", "НаименованиеПолное")]
@@ -20,5 +20,8 @@
         [OneS("String", "МеждународноеСокращение", "Строка", "МеждународноеСокращение")]
         [JsonProperty("МеждународноеСокращение")]
         public String InternationalShortName { get; set; }
+
+
+        public override string ToString() => $"{Description.PadRight(15)} [{FullName}]";
     }
 }
