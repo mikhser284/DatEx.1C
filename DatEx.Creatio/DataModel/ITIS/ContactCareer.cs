@@ -7,7 +7,7 @@
     using Terrasoft = DatEx.Creatio.DataModel.Terrasoft.Base;
 
     /// <summary> Карьера контакта </summary>
-    [CreatioType("Контакт")]
+    [CreatioType("Карьера контакта")]
     public class ContactCareer : Terrasoft.ContactCareer
     {
         /// <summary> Подразделение (Id) </summary>

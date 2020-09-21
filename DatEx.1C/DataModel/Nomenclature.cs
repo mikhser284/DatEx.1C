@@ -10,6 +10,13 @@
     [JsonObject("Catalog_Номенклатура")]
     public class Nomenclature : OneSBaseHierarchicalLookup
     {
+        /// <summary> Родитель </summary>
+        [OneS("—", "—", "?", "Родитель", Color = ConsoleColor.Yellow)]
+        [JsonProperty("Parent_Key")]
+        public Nomenclature Parent_NavProp { get; set; }
+
+
+
         /// <summary> Артикул </summary>
         [OneS("String", "Артикул", "Строка", "Артикул")]
         [JsonProperty("Артикул")]

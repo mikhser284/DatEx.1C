@@ -90,7 +90,7 @@ namespace DatEx.Creatio.DataModel.Auxilary
         public override string ToString() => Remarks;
     }
 
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
     public class MapAttribute : Attribute
     {
         /// <summary> Вид типа данных </summary>
@@ -161,8 +161,8 @@ namespace DatEx.Creatio.DataModel.Auxilary
         public override string ToString()
         {
             if (ObjDataType == null) return String.Empty;
-            String propsChain = PropertiesChain.Count == 0 ? "" : $" -> {String.Join(" -> ", PropertiesChain)}";
-            return $"[{((DataType)ObjDataType).AsString()}] {ObjName} -> [{((DataType)PropDataType).AsString()}] {PropName}{propsChain}";
+            String propsChain = PropertiesChain.Count == 0 ? "" : $" → {String.Join(" -> ", PropertiesChain)}";
+            return $"[{((DataType)ObjDataType).AsString()}] {ObjName} → [{((DataType)PropDataType).AsString()}] {PropName}{propsChain}";
         }
     }
 

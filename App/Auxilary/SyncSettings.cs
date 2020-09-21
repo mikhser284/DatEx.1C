@@ -1,41 +1,58 @@
-﻿using System;
+﻿using App.Auxilary;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace App
 {
+    [Doc("Объект настроек синхнонизации между системами Creatio и 1C")]
     public class SyncSettings
     {
         public SyncSettings() { }
 
+        [Doc("Email домен"
+            , "К какому домену должен принадлежать email пользователя, чтобы он считался сотрудником нашей компании. \nНапример '@kustoagro.com'")]
         public String EmailDomain { get; set; }
         
-        /// <summary> Guid типа записи информационного регистра которая хронит eMail </summary>
+        [Doc("[1С → Catalog_ВидыКонтактнойИнформации] Guid вида контактной информации об eMail пользователя"
+            , "Guid (в 1С) типа записи информационного регистра Catalog_ВидыКонтактнойИнформации которая хронит сведения об eMail пользователя. \n(Для 1С, котора развернута на тестовом сервере Creatio-Dev1 это 6B1AE98E-BB91-11EA-80C7-00155D65B747)")]
         public Guid OneSGuidOfEmailContactInfo { get; set; }
 
-        /// <summary> Guid типа записи информационного регистра которая хронит телефон (по умолчанию: F1862C22-BB94-11EA-80C7-00155D65B747) </summary>
+        [Doc("[1С → Catalog_ВидыКонтактнойИнформации] Guid вида контактной информации об телефоне пользователя"
+            , "Guid (в 1С) типа записи информационного регистра Catalog_ВидыКонтактнойИнформации которая хронит сведения об телефоне пользователя. \n(Для 1С, котора развернута на тестовом сервере Creatio-Dev1 это F1862C22-BB94-11EA-80C7-00155D65B747)")]
         public Guid OneSGuidOfPhoneContactInfo { get; set; }
 
-        /// <summary> Guid типа записи информационного регистра которая хронит рабочий телефон (по умолчанию: 08188400-BB94-11EA-80C7-00155D65B747) </summary>
+        [Doc("[1С → Catalog_ВидыКонтактнойИнформации] Guid вида контактной информации об рабочем телефоне пользователя"
+            , "Guid (в 1С) типа записи информационного регистра Catalog_ВидыКонтактнойИнформации которая хронит сведения об рабочем телефоне пользователя. \n(Для 1С, котора развернута на тестовом сервере Creatio-Dev1 это 08188400-BB94-11EA-80C7-00155D65B747)")]
         public Guid OneSGuidOfWorkPhoneContactInfo { get; set; }
 
-        /// <summary> Guid корневой папки "Новая номенклатура" (код: 99016918) с номенклатурой которая подлежит синхронизации (по умолчанию: 491f383d-e148-11e5-80bf-00155dc80407)</summary>
+        [Doc("[1С → Catalog_Номенклатура] Guid конревой папки номенклатуры"
+            , "Guid (в 1С) корневой папки \"Новая номенклатура\" (код: 99016918) с номенклатурой которая подлежит синхронизации \n(для 1С, котора развернута на тестовом сервере Creatio-Dev1 это 491f383d-e148-11e5-80bf-00155dc80407)")]
         public Guid OneSGuidOfNomenclatureRootFolder { get; set; }
 
-        /// <summary> Guid записи Справочника Тип контакта со значением "Сотрудник" (по умолчанию: 60733EFC-F36B-1410-A883-16D83CAB0980) </summary>
+        [Doc("[Creatio → Тип контакта] Guid записи \"Cотрудник\""
+            , "Guid (в Creatio) записи cправочника \"Тип контакта\" со значением \"Сотрудник\" (для Creatio, которая развернута на тестовом сервере Creatio-Dev1 это 60733EFC-F36B-1410-A883-16D83CAB0980)")]
         public Guid CreatioGuidOfContactsWithTypeOurEmployees { get; set; }
 
-        /// <summary> Guid записи Справочника Тип контрагента контакта со значением "Наша компания" (по умолчанию: 57412FAD-53E6-DF11-971B-001D60E938C6) </summary>
+        [Doc("[Creatio → Тип контрагента] Guid записи \"Наша компания\""
+            , "Guid (в Creatio) записи cправочника \"Тип контрагента\" со значением \"Наша компания\" (для Creatio, которая развернута на тестовом сервере Creatio-Dev1 это 57412FAD-53E6-DF11-971B-001D60E938C6)")]
         public Guid CreatioGuidOfOurCompany { get; set; }
 
-        /// <summary> Guid записи Справочника Форма собственности контрагента контакта со значением "ТОВ" (по умолчанию: 54441A90-B515-4616-9390-2C1FEE7F3428) </summary>
+        [Doc("[Creatio → Форма собственности] Guid записи \"ТОВ\""
+            , "Guid записи cправочника \"Форма собственности\" со значением \"ТОВ\" (для Creatio, которая развернута на тестовом сервере Creatio-Dev1 это 54441A90-B515-4616-9390-2C1FEE7F3428)")]
         public Guid CreatioGuidOfLLCOwnershipType { get; set; }
 
-        public Dictionary<String, Guid> Map_OneSEnum_Gender_CreatioGuidOf_Gender = new Dictionary<string, Guid>();
+        [Doc("[Creatio → Пол] Проекция"
+            , "Проекция Перечисления \"ПолФизическихЛиц\" (1С) на записи справочника \"Пол\" (Creatio)")]
+        public Dictionary<String, Guid> Map_OneSEnum_Gender_CreatioGuidOf_Gender { get; set; } = new Dictionary<string, Guid>();
 
-        public Dictionary<String, Guid> Map_OneSEnum_EmploymentType_CreatioGuidOf_EmploymentType = new Dictionary<string, Guid>();
+        [Doc("[Creatio → Вид занятости] Проекция"
+            , "Проекция Перечисления \"ВидыЗанятостиВОрганизации\" (1С) на записи справочника \"Вид занятости\" (Creatio)")]
+        public Dictionary<String, Guid> Map_OneSEnum_EmploymentType_CreatioGuidOf_EmploymentType { get; set; } = new Dictionary<string, Guid>();
 
-        public Dictionary<Boolean, Guid> Map_OneSEnum_LegalStatus_CreatioGuidOf_ITISCounterpartyLegalStatus = new Dictionary<Boolean, Guid>();
+        [Doc("[Creatio → Юридический статус контрагента] Проекция"
+            , "Проекция булевого значения \"НеЯвляетсяРезидентом\" справочника \"Контрагент\" (1С) на записи справочника \"Юридический статус контрагента\" (Creatio)")]
+        public Dictionary<Boolean, Guid> Map_OneSEnum_LegalStatus_CreatioGuidOf_ITISCounterpartyLegalStatus { get; set; } = new Dictionary<Boolean, Guid>();
 
         public static SyncSettings GetDefaultSettings()
         {

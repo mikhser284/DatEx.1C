@@ -13,7 +13,9 @@
         public String ITISEmail { get; set; }
 
         [JsonConverter(typeof(JsonConverter_Guid))]
-        [MapAttribute(true, DataType.Lookup, "Catalog_Организации", DataType.Lookup, "#True")]
+        [MapRemarks("Значение береться из объекта настроек, это проекция булевого значения на справочник Юридический статус контрагента. \nЕсли true - Id записи Резидент, иначе записи Не резидент. \nКогда выполняеться синхронизация Catalog_Организации (во время синхронизации сотрудников и их карьеры) - проекция для значения true")]
+        [MapAttribute(true, DataType.Lookup, "Catalog_Организации", DataType.Bool, "#true")]
+        [MapAttribute(false, DataType.Lookup, "Catalog_Контрагенты", DataType.Bool, "НеЯвляетсяРезидентом")]
         [CreatioProp("Юридический статус контрагента (Id)", Color = ConsoleColor.Blue)]
         public Guid? ITISCounterpartyLegalStatusId { get; set; }
 

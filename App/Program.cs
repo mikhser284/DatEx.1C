@@ -27,9 +27,19 @@ namespace App
         {
             SyncSettings settings = SyncSettings.GetDefaultSettings();
 
-            SyncNomenclature(settings);
+            //SyncNomenclature(settings);
 
             //SyncEmployeesAndCareers(settings);
+
+            try
+            {
+                ExcellWriter excellWriter = new ExcellWriter(@$"X:\Mappings\{DateTime.Now: yyyy.MM.dd HH-mm-ss} ContactsMappings.xlsx");
+                excellWriter.SaveMappingsInfo();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         

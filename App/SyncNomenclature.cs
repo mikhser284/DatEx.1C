@@ -110,6 +110,8 @@ namespace App
             Console.WriteLine(stopwatch.Elapsed);
             stopwatch.Stop();
 
+            OneS_BindNomenclatureRelatedObjs(settings, syncObjs);
+
             return syncObjs;
         }
 
@@ -214,6 +216,27 @@ namespace App
             foreach (var query in parallelQueries)
                 foreach (var e in query.Result)
                     syncObjs.OneS_CostArticlesOrderedById[e.Id] = e;
+        }
+
+
+
+        private static void OneS_BindNomenclatureRelatedObjs(SyncSettings settings, SyncObjs_SyncNomenclature syncObjs)
+        {
+            // Связать номенклатурные группы
+            foreach(var e in syncObjs.OneS_NomenclatureGroupsOrderedById.Values)
+            {
+                if (!e.ParentId.IsNotNullOrDefault()) continue;
+                e.Parent_NavProp = syncObjs.OneS_NomenclatureGroupsOrderedById[(Guid)e.ParentId];
+            }
+
+            // Связать номенклатуру и номенклатурные группы
+            foreach(var e in syncObjs.OneS_NomenclatureItemsOrderedById.Values)
+            {
+
+            }
+
+            // Связать номенклатуру и единицы измерения
+            // Связать номенклатуру и статьи затрат
         }
     }
 }

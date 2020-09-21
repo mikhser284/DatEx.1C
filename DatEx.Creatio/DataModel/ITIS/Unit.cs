@@ -4,8 +4,8 @@
     using System;
     using Terrasoft = DatEx.Creatio.DataModel.Terrasoft.Base;
 
-    /// <summary> Элемент организационной структуры </summary>
-    [CreatioType("Элемент организационной структуры")]
+    /// <summary> Единицы измерения </summary>
+    [CreatioType("Единицы измерения")]
     public class Unit : Terrasoft.Unit
     {
         /// <summary> Id объекта в 1C </summary>

@@ -48,7 +48,7 @@ namespace DatEx.OneS.DataModel
 
     public class OneSBaseHierarchicalLookup : OneSBaseLookup
     {
-        /// <summary> Родитель </summary>
+        /// <summary> Родитель (Id) </summary>
         [OneS("Guid?", "Parent_Key", "?", "Родитель", Color = ConsoleColor.Blue)]
         [JsonProperty("Parent_Key")]
         public Guid? ParentId { get; set; }

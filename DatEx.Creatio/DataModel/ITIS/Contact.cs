@@ -90,5 +90,6 @@
         [JsonIgnoreSerialization]
         [CreatioProp("Подразделение организации", Color = ConsoleColor.Yellow)]
         public Terrasoft.OrgStructureUnit ITISOrganizationSubdivision { get; set; }
+
     }
 }

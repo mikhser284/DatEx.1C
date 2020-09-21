@@ -33,7 +33,7 @@ namespace DatEx.OneS
                 {
                     error = "\n\n" + JToken.Parse(res).ToString(Formatting.Indented) + "\n";
                 }
-                catch(Exception parsingException)
+                catch(Exception)
                 {
                     error = "\n\n" + res + "\n";
                 }

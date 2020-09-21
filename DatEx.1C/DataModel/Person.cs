@@ -42,7 +42,7 @@
         [JsonProperty("Комментарий")]
         public String Remarks { get; set; }
 
-        [OneS("String", "Пол", "ПеречислениеСсылка.ПолФизическихЛиц", "Пол", Color = ConsoleColor.Yellow)]
+        [OneS("String", "Пол", "Перечисление.ПолФизическихЛиц", "Пол", Color = ConsoleColor.Yellow)]
         [JsonProperty("Пол")]
         public String Gender { get; set; }
 
