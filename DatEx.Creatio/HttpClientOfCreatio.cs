@@ -88,15 +88,10 @@
         /// <summary> Получить объекты указанного типа </summary>
         public List<T> GetObjs<T>(String query = default(String)) where T : BaseEntity
         {
-            String fullQueryString = $"{OdataUri}{typeof(T).Name}/?${query}";
+            query = String.IsNullOrWhiteSpace(query) ? query : $"/?${query}";
+            String fullQueryString = $"{OdataUri}{typeof(T).Name}{query}";
             String requestResult = GetRequest(fullQueryString);
             CreatioOdataRequestResult<T> result = JsonConvert.DeserializeObject<CreatioOdataRequestResult<T>>(requestResult);
-            //if (result.Values.Count == 0)
-            //{
-            //    T singleValue = JsonConvert.DeserializeObject<T>(requestResult);
-            //    return new List<T> { singleValue };
-            //}
-
             return result.Values;
         }
 

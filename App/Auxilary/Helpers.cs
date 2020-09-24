@@ -193,4 +193,13 @@ namespace App
             return true;
         }
     }
+
+    public static class Ext_String
+    {
+        public static String IfIsNullOrEmpty(this String valueA, String valueB)
+        {
+            if (String.IsNullOrEmpty(valueA)) return valueB;
+            return valueA;
+        }
+    }
 }

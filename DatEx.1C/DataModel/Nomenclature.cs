@@ -12,7 +12,7 @@
     {
         /// <summary> Родитель </summary>
         [OneS("—", "—", "?", "Родитель", Color = ConsoleColor.Yellow)]
-        [JsonProperty("Parent_Key")]
+        [JsonIgnore]
         public Nomenclature Parent_NavProp { get; set; }
 
 
@@ -109,6 +109,20 @@
 
 
         /// <summary> Единица хранения остатков (Id) </summary>
+        [OneS("Guid?", "БазоваяЕдиницаИзмерения_Key", "Справочник.ЕдиницыИзмерения", "БазоваяЕдиницаИзмерения", Color = ConsoleColor.Blue)]
+        [JsonProperty("БазоваяЕдиницаИзмерения_Key")]
+        public Guid? BaseMeasureUnitId { get; set; }
+
+
+
+        /// <summary> Единица хранения остатков (Id) </summary>
+        [OneS("Guid?", "БазоваяЕдиницаИзмерения_Key", "Справочник.ЕдиницыИзмерения", "БазоваяЕдиницаИзмерения", Color = ConsoleColor.Blue)]
+        [JsonIgnore]
+        public MeasureUnit BaseMeasureUnit_NavProp { get; set; }
+
+
+
+        /// <summary> Единица хранения остатков (Id) </summary>
         [OneS("Guid?", "ЕдиницаХраненияОстатков_Key", "Справочник.ЕдиницыИзмерения", "ЕдиницаХраненияОстатков", Color = ConsoleColor.Blue)]
         [JsonProperty("ЕдиницаХраненияОстатков_Key")]
         public Guid? MeasureUnitForRemainsStoragingId { get; set; }
@@ -120,6 +134,9 @@
         [OneS("—", "—", "Справочник.ЕдиницыИзмерения", "ЕдиницаХраненияОстатков", Color = ConsoleColor.Yellow)]
         public MeasureUnit MeasureUnitForRemainsStoraging_NavProp { get; set; }
 
+        /// <summary> Единица измерения </summary>
+        [JsonIgnore]
+        public MeasureUnitsClassifier MeasureUnit_VirtualProp { get; set; }
 
 
         /// <summary> Набор </summary>

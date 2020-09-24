@@ -42,6 +42,12 @@ namespace App
             , "Guid записи cправочника \"Форма собственности\" со значением \"ТОВ\" (для Creatio, которая развернута на тестовом сервере Creatio-Dev1 это 54441A90-B515-4616-9390-2C1FEE7F3428)")]
         public Guid CreatioGuidOfLLCOwnershipType { get; set; }
 
+        [Doc("[Creatio → Номенклатура] Guid ответственного по умолчанию (Supervisor)"
+            , "Guid записи cправочника \"Контакты\" который являеться ответственным за елемент номенклатуры по умолчанию (для Creatio, которая развернута на тестовом сервере Creatio-Dev1 это 410006e1-ca4e-4502-a9ec-e54d922d2c00 — Supervisor)")]
+        public Guid CreatioGuidOfNomenclatureItemOwnerByDefault { get; set; }
+
+        Guid ownerId = new Guid("410006e1-ca4e-4502-a9ec-e54d922d2c00"); // Supervisor
+
         [Doc("[Creatio → Пол] Проекция"
             , "Проекция Перечисления \"ПолФизическихЛиц\" (1С) на записи справочника \"Пол\" (Creatio)")]
         public Dictionary<String, Guid> Map_OneSEnum_Gender_CreatioGuidOf_Gender { get; set; } = new Dictionary<string, Guid>();
@@ -64,6 +70,7 @@ namespace App
                 OneSGuidOfWorkPhoneContactInfo = new Guid("08188400-BB94-11EA-80C7-00155D65B747"),
                 OneSGuidOfNomenclatureRootFolder = new Guid("491f383d-e148-11e5-80bf-00155dc80407"),
                 CreatioGuidOfContactsWithTypeOurEmployees = new Guid("60733EFC-F36B-1410-A883-16D83CAB0980"),
+                CreatioGuidOfNomenclatureItemOwnerByDefault = new Guid("410006e1-ca4e-4502-a9ec-e54d922d2c00"),
                 CreatioGuidOfOurCompany = new Guid("57412FAD-53E6-DF11-971B-001D60E938C6"),
                 CreatioGuidOfLLCOwnershipType = new Guid("54441A90-B515-4616-9390-2C1FEE7F3428"),
             };

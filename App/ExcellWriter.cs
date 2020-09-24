@@ -46,10 +46,10 @@ namespace App
 
             List<Type> dataTypes2 = new List<Type>
             {
-                typeof(ITIS.ITISPurchasingArticle),
-                typeof(ITIS.ITISCompaniesNomenclature),
                 typeof(ITIS.ITISNomenclatureGroups),
+                typeof(ITIS.ITISCompaniesNomenclature),
                 typeof(ITIS.Unit),
+                typeof(ITIS.ITISPurchasingArticle),
             };
 
             SaveSyncSettingsObjectInfo();
@@ -136,6 +136,7 @@ namespace App
                 sheet.Set(row, col++, EStyle.TableHeader, "Type");
                 sheet.Set(row, col++, EStyle.TableHeader, "Name");
                 sheet.Set(row, col++, EStyle.TableHeader, "Новое");
+                sheet.Set(row, col++, EStyle.TableHeader, "Устар.");
                 sheet.Set(row, col++, EStyle.TableHeader, "Маппинг в OData");
                 sheet.Set(row, col++, EStyle.TableHeader, "Примечания");
 
@@ -147,17 +148,20 @@ namespace App
                     MapRemarksAttribute mapRemmAttr = prop.GetCustomAttribute<MapRemarksAttribute>(true);
                     CreatioTypeAttribute creatioTypeAttr = prop.GetCustomAttribute<CreatioTypeAttribute>(true);
                     CreatioPropNotExistInDataModelOfITISAttribute newPropAttr = prop.GetCustomAttribute<CreatioPropNotExistInDataModelOfITISAttribute>(true);
+                    ObsoleteCreatioPropAttribute obsoleteAttr = prop.GetCustomAttribute<ObsoleteCreatioPropAttribute>(true);
                     ++row;
 
-                    EStyle currentRowStyle = mapAttrs.Count > 0 ? EStyle.MappableProp : EStyle.Default;
+                    EStyle currentRowStyle = obsoleteAttr != null ? EStyle.ObsoleteProp : (mapAttrs.Count > 0 ? EStyle.MappableProp : EStyle.Default);
                     col = 0;
                     sheet.Set(row, col++, currentRowStyle, GetCreatioTypeName(prop));
                     sheet.Set(row, col++, currentRowStyle, creatioPropAttr.CreatioTitle);
                     sheet.Set(row, col++, currentRowStyle, prop.PropertyType.Name);
                     sheet.Set(row, col++, currentRowStyle, prop.Name);
                     sheet.Set(row, col++, currentRowStyle, newPropAttr != null ? "✔": null);
-                    sheet.Set(row, col++, currentRowStyle, mapAttrs.Count > 0 ? String.Join("\n", mapAttrs.Select(x => $"{(x.Implemented ? "✔" : "❌")} {x}")) : null);                    
-                    sheet.Set(row, col++, currentRowStyle, mapRemmAttr);
+                    sheet.Set(row, col++, currentRowStyle, obsoleteAttr != null ? "✔" : null);
+                    sheet.Set(row, col++, currentRowStyle, mapAttrs.Count > 0 ? String.Join("\n", mapAttrs.Select(x => $"{(x.Implemented ? "✔" : "❌")} {x}")) : null);
+                    String obsoleteReason = obsoleteAttr == null ? "" : $"■ Считаеться устаревшим потому что: {obsoleteAttr.Remarks}";
+                    sheet.Set(row, col++, currentRowStyle, $"{mapRemmAttr} {(!String.IsNullOrEmpty(mapRemmAttr?.Remarks) && (!String.IsNullOrEmpty(obsoleteReason)) ? "\n" : "")}{obsoleteReason}");
                 }
 
                 sheet.AutoFitColumns(0, 10);
@@ -178,6 +182,7 @@ namespace App
             { typeof(Boolean?), "Булево" },
             { typeof(Guid?), "Guid" },
             { typeof(Guid), "Guid" },
+            { typeof(Object), "Справочник<?>"}
         };
 
         static String GetCreatioTypeName(PropertyInfo p)
@@ -200,7 +205,8 @@ namespace App
         SheetHeaader,
         TableHeader,
         Default,
-        MappableProp
+        MappableProp,
+        ObsoleteProp
     }
 
     public static class Ext_Excell
@@ -260,6 +266,20 @@ namespace App
             mapablePropStyle.SetBorder(BorderType.RightBorder, CellBorderType.Thin, Color.LightSteelBlue);
             mapablePropStyle.SetBorder(BorderType.BottomBorder, CellBorderType.Thin, Color.LightSteelBlue);
             Styles.Add(EStyle.MappableProp, mapablePropStyle);
+
+            Style obsoleteProp = wb.CreateStyle();
+            obsoleteProp.VerticalAlignment = TextAlignmentType.Top;
+            obsoleteProp.HorizontalAlignment = TextAlignmentType.Left;
+            obsoleteProp.IsTextWrapped = true;
+            obsoleteProp.Font.Color = Color.PaleVioletRed;
+            obsoleteProp.Font.IsStrikeout = true;
+            obsoleteProp.Font.Name = "Calibri";
+            obsoleteProp.Font.Size = 8;
+            obsoleteProp.SetBorder(BorderType.LeftBorder, CellBorderType.Thin, Color.LightSteelBlue);
+            obsoleteProp.SetBorder(BorderType.TopBorder, CellBorderType.Thin, Color.LightSteelBlue);
+            obsoleteProp.SetBorder(BorderType.RightBorder, CellBorderType.Thin, Color.LightSteelBlue);
+            obsoleteProp.SetBorder(BorderType.BottomBorder, CellBorderType.Thin, Color.LightSteelBlue);
+            Styles.Add(EStyle.ObsoleteProp, obsoleteProp);
         }
 
 

@@ -51,7 +51,6 @@ namespace DatEx.Creatio.DataModel.Auxilary
         public ObsoleteCreatioPropAttribute(String creatioTitle)
         {
             CreatioTitle = creatioTitle;
-            Remarks = "По возможности очень желательно удалить это свойство из объекта в конфигураторе, так как оно просто замусоривает объек и по существу нигде не используется.";
         }
     }
 

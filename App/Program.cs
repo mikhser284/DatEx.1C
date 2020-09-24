@@ -27,14 +27,35 @@ namespace App
         {
             SyncSettings settings = SyncSettings.GetDefaultSettings();
 
-            //SyncNomenclature(settings);
-
-            //SyncEmployeesAndCareers(settings);
 
             try
             {
-                ExcellWriter excellWriter = new ExcellWriter(@$"X:\Mappings\{DateTime.Now: yyyy.MM.dd HH-mm-ss} ContactsMappings.xlsx");
+                //var unit = HttpClientOfCreatio.GetSingleObjById<ITIS.Unit>(new Guid("4cd297f2-3d10-4bce-b8a5-9a9465e6d93f"));
+                //var group = HttpClientOfCreatio.GetSingleObjById<ITIS.ITISNomenclatureGroups>(new Guid("df7e2d21-643b-409a-927c-a6f59c248474"));
+                //var contact = HttpClientOfCreatio.GetSingleObjById<ITIS.Contact>(new Guid("410006e1-ca4e-4502-a9ec-e54d922d2c00"));
+
+                //ITIS.ITISCompaniesNomenclature nmc = new ITIS.ITISCompaniesNomenclature
+                //{
+                //    ITISName = "Елемент фільтра паливного",
+                //    ITISNotes = "Примечания",
+                //    ITISOneCCode = "8765431",
+                //    ITISNomenclatureUnitOfMeasurementId = new Guid("4cd297f2-3d10-4bce-b8a5-9a9465e6d93f"),
+                //    ITISNomenclaturesGroupId = new Guid("df7e2d21-643b-409a-927c-a6f59c248474"),
+                //    ITISOneSId = new Guid("2c214b1a-49a9-486f-8062-2fd9022db7a9"),
+                //    ITISOwnerId = new Guid("410006e1-ca4e-4502-a9ec-e54d922d2c00")
+                    
+                //};
+
+                //nmc = HttpClientOfCreatio.CreateObj(nmc);
+
+                ExcellWriter excellWriter = new ExcellWriter(@$"X:\Mappings\{DateTime.Now: yyyy.MM.dd HH-mm-ss} Mappings__OneS_Creatio.xlsx");
                 excellWriter.SaveMappingsInfo();
+
+                SyncContractors(settings, new List<string> { "38500619" });
+
+                //SyncNomenclature(settings);
+
+                //SyncEmployeesAndCareers(settings);
             }
             catch(Exception ex)
             {
